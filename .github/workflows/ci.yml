@@ -21,8 +21,5 @@ jobs:
       - name: Lint
         run: deno lint
 
-      - name: Typecheck
-        run: deno check main.js
-
       - name: Tests
         run: deno task test
