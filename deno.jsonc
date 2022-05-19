@@ -1,0 +1,5 @@
+{
+  "tasks": {
+    "test": "deno test --no-check=remote --allow-read"
+  }
+}
