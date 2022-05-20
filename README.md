@@ -5,7 +5,7 @@ that has 2 lines of code:
 
 ```js
 import blog from "https://deno.land/x/blog/blog.tsx";
-blog(import.meta.url);
+blog();
 ```
 
 ## Getting started
@@ -35,7 +35,7 @@ You can customize your blog as follows:
 
 ```js
 import blog from "https://deno.land/x/blog/blog.tsx";
-blog(import.meta.url, {
+blog({
   author: "Denobot",
   title: "My blog title",
   subtitle: "Subtitle",
