@@ -23,6 +23,7 @@ import type { Reporter as GaReporter } from "https://deno.land/x/g_a@0.1.2/mod.t
 import { Feed } from "https://esm.sh/feed@4.2.2?pin=v57";
 import type { Item as FeedItem } from "https://esm.sh/feed@4.2.2?pin=v57";
 import removeMarkdown from "https://esm.sh/remove-markdown?pin=v57";
+import callsites from "https://raw.githubusercontent.com/kt3k/callsites/v1.0.0/mod.ts";
 export interface BlogSettings {
   title?: string;
   author?: string;
@@ -56,14 +57,14 @@ const POSTS = new Map<string, Post>();
  *
  * ```js
  * import blog from "https://deno.land/x/blog/blog.tsx";
- * blog(import.meta.url);
+ * blog();
  * ```
  *
  * Configure it:
  *
  * ```js
  * import blog from "https://deno.land/x/blog/blog.tsx";
- * blog(import.meta.url, {
+ * blog({
  *   title: "My blog title",
  *   subtitle: "Subtitle",
  *   header:
@@ -72,7 +73,8 @@ const POSTS = new Map<string, Post>();
  * });
  * ```
  */
-export default async function blog(url: string, settings?: BlogSettings) {
+export default async function blog(settings?: BlogSettings) {
+  const url = callsites()[1].getFileName()!;
   const blogSettings = await configureBlog(IS_DEV, url, settings);
 
   let gaReporter: undefined | GaReporter;
