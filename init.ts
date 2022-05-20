@@ -32,7 +32,7 @@ This is my first blog post!
 
 const MAIN_CONTENTS = `import blog from "${MAIN_FILE_URL}";
 
-blog(import.meta.url, {
+blog({
   title: "My blog",
   author: "An author",
   header: "This is my new blog",
