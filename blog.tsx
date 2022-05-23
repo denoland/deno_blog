@@ -12,7 +12,7 @@ import {
   join,
   relative,
 } from "https://deno.land/std@0.137.0/path/mod.ts";
-import { serve } from "https://deno.land/std@0.137.0/http/mod.ts";
+import { serve, Handler, ConnInfo } from "https://deno.land/std@0.137.0/http/server.ts";
 
 import { h, Helmet, ssr } from "https://crux.land/nanossr@0.0.4";
 import * as gfm from "https://deno.land/x/gfm@0.1.20/mod.ts";
@@ -112,11 +112,6 @@ export default async function blog(settings?: BlogSettings) {
   const url = callsites()[1].getFileName()!;
   const blogSettings = await configureBlog(IS_DEV, url, settings);
 
-  let gaReporter: undefined | GaReporter;
-  if (blogSettings.gaKey) {
-    gaReporter = createReporter({ id: blogSettings.gaKey });
-  }
-
   serve(async (req: Request, connInfo) => {
     let err: undefined | Error;
     let res: undefined | Response;
@@ -136,6 +131,58 @@ export default async function blog(settings?: BlogSettings) {
     }
     return res;
   });
+}
+
+export function ga(gaKey: string): (req: Request, connInfo: ConnInfo, settings: BlogSettings & { blogDirectory: string }) => Promise<Response> {
+  let gaReporter = createReporter({ id: gaKey });
+  
+  return async function(request: Request, connInfo: ConnInfo, settings: BlogSettings & { blogDirectory: string }): Promise<Response> {
+    let err: undefined | Error;
+    let res: undefined | Response;
+
+    const start = performance.now();
+    try {
+      res = await handler(request, settings) as Response;
+    } catch (e) {
+      err = e;
+      res = new Response("Internal server error", {
+        status: 500,
+      });
+    } finally {
+      if (gaReporter) {
+        gaReporter(request, connInfo, res!, start, err);
+      }
+    }
+    return res;
+  }
+}
+
+export function redirect(redirectMap: Record<string, string>): (req: Request) => null | Response {
+  return function(req: Request): null | Response {
+    const { pathname } = new URL(req.url);
+
+    let maybeRedirect = redirectMap[pathname];
+
+    if (!maybeRedirect) {
+      // trim leading slash
+      maybeRedirect = redirectMap[pathname.slice(1)];
+    }
+
+    if (maybeRedirect) {
+      if (!maybeRedirect.startsWith("/")) {
+        maybeRedirect = "/" + maybeRedirect;
+      }
+
+      return new Response(null, {
+        status: 301,
+        headers: {
+          "location": maybeRedirect,
+        },
+      });
+    }
+
+    return null;
+  }
 }
 
 export async function configureBlog(
