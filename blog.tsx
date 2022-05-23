@@ -52,6 +52,41 @@ export interface Post {
 const IS_DEV = Deno.args.includes("--dev") && "watchFs" in Deno;
 const HMR_SOCKETS: Set<WebSocket> = new Set();
 const POSTS = new Map<string, Post>();
+const HMR_CLIENT = `let socket;
+let reconnectTimer;
+
+const wsOrigin = window.location.origin
+  .replace("http", "ws")
+  .replace("https", "wss");
+const hmrUrl = wsOrigin + "/hmr";
+
+hmrSocket();
+
+function hmrSocket(callback) {
+  if (socket) {
+    socket.close();
+  }
+
+  socket = new WebSocket(hmrUrl);
+  socket.addEventListener("open", callback);
+  socket.addEventListener("message", (event) => {
+    if (event.data === "refresh") {
+      console.log("refreshings");
+      window.location.reload();
+    }
+  });
+
+  socket.addEventListener("close", () => {
+    console.log("reconnecting...");
+    clearTimeout(reconnectTimer);
+    reconnectTimer = setTimeout(() => {
+      hmrSocket(() => {
+        window.location.reload();
+      });
+    }, 1000);
+  });
+}
+`;
 
 /** The main function of the library.
  *
@@ -252,12 +287,7 @@ export async function handler(
     });
   }
   if (pathname == "/hmr.js") {
-    const HMR_CLIENT_PATH = join(
-      fromFileUrl(dirname(import.meta.url)),
-      "./hmr.js",
-    );
-    const hmrClient = await Deno.readTextFile(HMR_CLIENT_PATH);
-    return new Response(hmrClient, {
+    return new Response(HMR_CLIENT, {
       headers: {
         "content-type": "application/javascript",
       },
