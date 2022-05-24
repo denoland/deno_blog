@@ -24,8 +24,20 @@ import { Feed } from "https://esm.sh/feed@4.2.2?pin=v57";
 import type { Item as FeedItem } from "https://esm.sh/feed@4.2.2?pin=v57";
 import removeMarkdown from "https://esm.sh/remove-markdown?pin=v57";
 import callsites from "https://raw.githubusercontent.com/kt3k/callsites/v1.0.0/mod.ts";
+
 export interface BlogSettings {
   title?: string;
+  author?: string;
+  subtitle?: string;
+  header?: string;
+  style?: string;
+  gaKey?: string;
+  redirectMap?: Record<string, string>;
+}
+
+interface BlogState {
+  title: string;
+  directory: string;
   author?: string;
   subtitle?: string;
   header?: string;
@@ -142,25 +154,25 @@ export async function configureBlog(
   isDev: boolean,
   url: string,
   maybeSetting?: BlogSettings,
-): Promise<BlogSettings & { blogDirectory: string }> {
-  let blogDirectory;
+): Promise<BlogState> {
+  let directory;
 
   try {
     const blogPath = fromFileUrl(url);
-    blogDirectory = dirname(blogPath);
+    directory = dirname(blogPath);
   } catch (e) {
     console.log(e);
     throw new Error("Cannot run blog from a remote URL.");
   }
 
-  let blogSettings: BlogSettings & { blogDirectory: string } = {
+  let blogState: BlogState = {
     title: "Blog",
-    blogDirectory,
+    directory,
   };
 
   if (maybeSetting) {
-    blogSettings = {
-      ...blogSettings,
+    blogState = {
+      ...blogState,
       ...maybeSetting,
     };
 
@@ -169,13 +181,13 @@ export async function configureBlog(
         content: string;
       };
 
-      blogSettings.header = content;
+      blogState.header = content;
     }
   }
 
-  await loadContent(blogDirectory, isDev);
+  await loadContent(directory, isDev);
 
-  return blogSettings;
+  return blogState;
 }
 
 async function loadContent(blogDirectory: string, isDev: boolean) {
@@ -253,16 +265,16 @@ async function loadPost(postsDirectory: string, path: string) {
 
 export async function handler(
   req: Request,
-  blogSettings: BlogSettings & { blogDirectory: string },
+  blogState: BlogState,
 ) {
   const { pathname } = new URL(req.url);
 
-  if (blogSettings.redirectMap) {
-    let maybeRedirect = blogSettings.redirectMap[pathname];
+  if (blogState.redirectMap) {
+    let maybeRedirect = blogState.redirectMap[pathname];
 
     if (!maybeRedirect) {
       // trim leading slash
-      maybeRedirect = blogSettings.redirectMap[pathname.slice(1)];
+      maybeRedirect = blogState.redirectMap[pathname.slice(1)];
     }
 
     if (maybeRedirect) {
@@ -286,6 +298,7 @@ export async function handler(
       },
     });
   }
+
   if (pathname == "/hmr.js") {
     return new Response(HMR_CLIENT, {
       headers: {
@@ -294,7 +307,7 @@ export async function handler(
     });
   }
 
-  if (pathname.endsWith("/hmr")) {
+  if (pathname == "/hmr") {
     const { response, socket } = Deno.upgradeWebSocket(req);
     HMR_SOCKETS.add(socket);
     socket.onclose = () => {
@@ -308,18 +321,19 @@ export async function handler(
     return ssr(() => (
       <Index
         posts={POSTS}
-        settings={blogSettings}
+        state={blogState}
         hmr={IS_DEV}
       />
     ));
   }
+
   if (pathname == "/feed") {
-    return serveRSS(req, blogSettings, POSTS);
+    return serveRSS(req, blogState, POSTS);
   }
 
   const post = POSTS.get(pathname);
   if (post) {
-    return ssr(() => <Post post={post} hmr={IS_DEV} settings={blogSettings} />);
+    return ssr(() => <Post post={post} hmr={IS_DEV} state={blogState} />);
   }
 
   if (pathname.endsWith("/")) {
@@ -337,22 +351,21 @@ export async function handler(
 
   // Try to serve static files from the posts/ directory first.
   const response = await serveDir(req, {
-    fsRoot: join(blogSettings.blogDirectory, "./posts"),
+    fsRoot: join(blogState.directory, "./posts"),
   });
+  if (response.status != 404) {
+    return response;
+  }
 
   // Fallback to serving static files from the root, this will handle 404s
   // as well.
-  if (response.status == 404) {
-    return serveDir(req, { fsRoot: blogSettings.blogDirectory });
-  }
-
-  return response;
+  return serveDir(req, { fsRoot: blogState.directory });
 }
 
 export function Index(
-  { posts, settings, hmr }: {
+  { posts, state, hmr }: {
     posts: Map<string, Post>;
-    settings: BlogSettings;
+    state: BlogState;
     hmr: boolean;
   },
 ) {
@@ -362,17 +375,17 @@ export function Index(
   }
   postIndex.sort((a, b) => b.publishDate.getTime() - a.publishDate.getTime());
 
-  const headerHtml = settings.header && gfm.render(settings.header);
+  const headerHtml = state.header && gfm.render(state.header);
 
   return (
     <div class="max-w-screen-sm px-4 pt-16 mx-auto">
       <Helmet>
-        <title>{settings.title}</title>
+        <title>{state.title}</title>
         <link rel="stylesheet" href="/static/gfm.css" />
         <style type="text/css">
           {` .markdown-body { --color-canvas-default: transparent; } `}
         </style>
-        {settings.style && <style>{settings.style}</style>}
+        {state.style && <style>{state.style}</style>}
         {hmr && <script src="/hmr.js"></script>}
       </Helmet>
       {headerHtml && (
@@ -407,7 +420,7 @@ function PostCard({ post }: { post: Post }) {
 }
 
 function Post(
-  { post, hmr, settings }: { post: Post; hmr: boolean; settings: BlogSettings },
+  { post, hmr, state }: { post: Post; hmr: boolean; state: BlogState },
 ) {
   const html = gfm.render(post.markdown);
 
@@ -419,7 +432,7 @@ function Post(
         </style>
         <title>{post.title}</title>
         <link rel="stylesheet" href="/static/gfm.css" />
-        {settings.style && <style>{settings.style}</style>}
+        {state.style && <style>{state.style}</style>}
         <meta property="og:title" content={post.title} />
         {post.snippet && <meta name="description" content={post.snippet} />}
         {post.snippet && (
@@ -447,7 +460,7 @@ function Post(
             <PrettyDate date={post.publishDate} />
             <RssFeedIcon />
           </p>
-          {settings.author && <p>{settings.author}</p>}
+          {state.author && <p>{state.author}</p>}
         </div>
         <hr class="my-8" />
         <div class="markdown-body">
@@ -484,15 +497,15 @@ function RssFeedIcon() {
 /** Serves the rss/atom feed of the blog. */
 function serveRSS(
   req: Request,
-  settings: BlogSettings,
+  state: BlogState,
   posts: Map<string, Post>,
-) {
+): Response {
   const url = new URL(req.url);
   const origin = url.origin;
   const copyright = `Copyright ${new Date().getFullYear()} ${origin}`;
   const feed = new Feed({
-    title: settings.title ?? "Blog",
-    description: settings.subtitle,
+    title: state.title ?? "Blog",
+    description: state.subtitle,
     id: `${origin}/blog`,
     link: `${origin}/blog`,
     language: "en",
