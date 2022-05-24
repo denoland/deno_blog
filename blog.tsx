@@ -22,8 +22,14 @@ import {
   walk,
 } from "./deps.ts";
 import { Index, PostPage } from "./components.tsx";
-import type { FeedItem, GaReporter } from "./deps.ts";
-import type { BlogSettings, BlogState, Post } from "./types.d.ts";
+import type { ConnInfo, FeedItem } from "./deps.ts";
+import type {
+  BlogContext,
+  BlogMiddleware,
+  BlogSettings,
+  BlogState,
+  Post,
+} from "./types.d.ts";
 
 const IS_DEV = Deno.args.includes("--dev") && "watchFs" in Deno;
 const HMR_SOCKETS: Set<WebSocket> = new Set();
@@ -88,30 +94,62 @@ export default async function blog(settings?: BlogSettings) {
   const url = callsites()[1].getFileName()!;
   const blogSettings = await configureBlog(IS_DEV, url, settings);
 
-  let gaReporter: undefined | GaReporter;
-  if (blogSettings.gaKey) {
-    gaReporter = createReporter({ id: blogSettings.gaKey });
-  }
+  const middlewares = blogSettings.middlewares || [];
 
-  serve(async (req: Request, connInfo) => {
-    let err: undefined | Error;
-    let res: undefined | Response;
+  const blogHandler = createBlogHandler(blogSettings, middlewares);
+  serve(blogHandler);
+}
 
-    const start = performance.now();
-    try {
-      res = await handler(req, blogSettings) as Response;
-    } catch (e) {
-      err = e;
-      res = new Response("Internal server error", {
-        status: 500,
-      });
-    } finally {
-      if (gaReporter) {
-        gaReporter(req, connInfo, res!, start, err);
-      }
+export function createBlogHandler(
+  state: BlogState,
+  middlewares: Array<(req: Request, ctx: BlogContext) => Promise<Response>>,
+) {
+  const inner = handler;
+  const withMiddlewares = composeMiddlewares(state, middlewares);
+  return function handler(req: Request, connInfo: ConnInfo) {
+    // Redirect requests that end with a trailing slash
+    // to their non-trailing slash counterpart.
+    // Ex: /about/ -> /about
+    const url = new URL(req.url);
+    if (url.pathname.length > 1 && url.pathname.endsWith("/")) {
+      url.pathname = url.pathname.slice(0, -1);
+      return Response.redirect(url.href, 307);
     }
-    return res;
-  });
+    return withMiddlewares(req, connInfo, inner);
+  };
+}
+
+function composeMiddlewares(
+  state: BlogState,
+  middlewares: Array<(req: Request, ctx: BlogContext) => Promise<Response>>,
+) {
+  return (
+    req: Request,
+    connInfo: ConnInfo,
+    inner: (req: Request, ctx: BlogContext) => Promise<Response>,
+  ) => {
+    const mws = middlewares.reverse();
+
+    const handlers: (() => Response | Promise<Response>)[] = [];
+
+    const ctx = {
+      next() {
+        const handler = handlers.shift()!;
+        return Promise.resolve(handler());
+      },
+      connInfo,
+      state,
+    };
+
+    for (const mw of mws) {
+      handlers.push(() => mw(req, ctx));
+    }
+
+    handlers.push(() => inner(req, ctx));
+
+    const handler = handlers.shift()!;
+    return handler();
+  };
 }
 
 export async function configureBlog(
@@ -152,6 +190,61 @@ export async function configureBlog(
   await loadContent(directory, isDev);
 
   return blogState;
+}
+
+export function ga(gaKey: string): BlogMiddleware {
+  const gaReporter = createReporter({ id: gaKey });
+
+  return async function (
+    request: Request,
+    ctx: BlogContext,
+  ): Promise<Response> {
+    let err: undefined | Error;
+    let res: undefined | Response;
+
+    const start = performance.now();
+    try {
+      res = await ctx.next() as Response;
+    } catch (e) {
+      err = e;
+      res = new Response("Internal server error", {
+        status: 500,
+      });
+    } finally {
+      if (gaReporter) {
+        gaReporter(request, ctx.connInfo, res!, start, err);
+      }
+    }
+    return res;
+  };
+}
+
+export function redirects(redirectMap: Record<string, string>): BlogMiddleware {
+  return async function (req: Request, ctx: BlogContext): Promise<Response> {
+    const { pathname } = new URL(req.url);
+
+    let maybeRedirect = redirectMap[pathname];
+
+    if (!maybeRedirect) {
+      // trim leading slash
+      maybeRedirect = redirectMap[pathname.slice(1)];
+    }
+
+    if (maybeRedirect) {
+      if (!maybeRedirect.startsWith("/")) {
+        maybeRedirect = "/" + maybeRedirect;
+      }
+
+      return new Response(null, {
+        status: 307,
+        headers: {
+          "location": maybeRedirect,
+        },
+      });
+    }
+
+    return await ctx.next();
+  };
 }
 
 async function loadContent(blogDirectory: string, isDev: boolean) {
@@ -229,31 +322,10 @@ async function loadPost(postsDirectory: string, path: string) {
 
 export async function handler(
   req: Request,
-  blogState: BlogState,
+  ctx: BlogContext,
 ) {
+  const { state: blogState } = ctx;
   const { pathname } = new URL(req.url);
-
-  if (blogState.redirectMap) {
-    let maybeRedirect = blogState.redirectMap[pathname];
-
-    if (!maybeRedirect) {
-      // trim leading slash
-      maybeRedirect = blogState.redirectMap[pathname.slice(1)];
-    }
-
-    if (maybeRedirect) {
-      if (!maybeRedirect.startsWith("/")) {
-        maybeRedirect = "/" + maybeRedirect;
-      }
-
-      return new Response(null, {
-        status: 301,
-        headers: {
-          "location": maybeRedirect,
-        },
-      });
-    }
-  }
 
   if (pathname == "/static/gfm.css") {
     return new Response(gfm.CSS, {
@@ -298,19 +370,6 @@ export async function handler(
   const post = POSTS.get(pathname);
   if (post) {
     return ssr(() => <PostPage post={post} hmr={IS_DEV} state={blogState} />);
-  }
-
-  if (pathname.endsWith("/")) {
-    const newPathname = pathname.slice(0, pathname.length - 1);
-    const post = POSTS.get(newPathname);
-    if (post) {
-      return new Response(null, {
-        status: 301,
-        headers: {
-          "location": newPathname,
-        },
-      });
-    }
   }
 
   // Try to serve static files from the posts/ directory first.

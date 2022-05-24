@@ -7,6 +7,7 @@ export {
   relative,
 } from "https://deno.land/std@0.137.0/path/mod.ts";
 export { serve } from "https://deno.land/std@0.137.0/http/mod.ts";
+export type { ConnInfo } from "https://deno.land/std@0.137.0/http/mod.ts";
 
 export { h, Helmet, ssr } from "https://crux.land/nanossr@0.0.4";
 export * as gfm from "https://deno.land/x/gfm@0.1.20/mod.ts";

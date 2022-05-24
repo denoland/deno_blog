@@ -1,11 +1,23 @@
+import type { ConnInfo } from "./deps.ts";
+
+export interface BlogContext {
+  state: BlogState;
+  connInfo: ConnInfo;
+  next: () => Promise<Response>;
+}
+
+export type BlogMiddleware = (
+  req: Request,
+  ctx: BlogContext,
+) => Promise<Response>;
+
 export interface BlogSettings {
   title?: string;
   author?: string;
   subtitle?: string;
   header?: string;
   style?: string;
-  gaKey?: string;
-  redirectMap?: Record<string, string>;
+  middlewares?: BlogMiddleware[];
 }
 
 export interface BlogState {
@@ -15,8 +27,7 @@ export interface BlogState {
   subtitle?: string;
   header?: string;
   style?: string;
-  gaKey?: string;
-  redirectMap?: Record<string, string>;
+  middlewares?: BlogMiddleware[];
 }
 
 /** Represents a Post in the Blog. */

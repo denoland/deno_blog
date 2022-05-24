@@ -1,4 +1,4 @@
-import { configureBlog, handler } from "./blog.tsx";
+import { configureBlog, createBlogHandler, redirects } from "./blog.tsx";
 import {
   assert,
   assertEquals,
@@ -14,18 +14,34 @@ const SETTINGS = {
   subtitle: "This is some subtitle",
   header: "This is some header",
   style: `body { background-color: #f0f0f0; }`,
-  redirectMap: {
-    "/to_second": "second",
-    "/to_second_with_slash": "/second",
-    "second.html": "second",
-  },
 };
 const BLOG_SETTINGS = await configureBlog(false, BLOG_URL, SETTINGS);
 
+const blogHandler = createBlogHandler(BLOG_SETTINGS, [
+  redirects({
+    "/to_second": "second",
+    "/to_second_with_slash": "/second",
+    "second.html": "second",
+  }),
+]);
+
+const CONN_INFO = {
+  localAddr: {
+    transport: "tcp" as const,
+    hostname: "0.0.0.0",
+    port: 8000,
+  },
+  remoteAddr: {
+    transport: "tcp" as const,
+    hostname: "0.0.0.0",
+    port: 8001,
+  },
+};
+
 Deno.test("index page", async () => {
-  const resp = await handler(
+  const resp = await blogHandler(
     new Request("https://blog.deno.dev"),
-    BLOG_SETTINGS,
+    CONN_INFO,
   );
   assert(resp);
   assertEquals(resp.status, 200);
@@ -41,9 +57,9 @@ Deno.test("index page", async () => {
 });
 
 Deno.test("posts/ first", async () => {
-  const resp = await handler(
+  const resp = await blogHandler(
     new Request("https://blog.deno.dev/first"),
-    BLOG_SETTINGS,
+    CONN_INFO,
   );
   assert(resp);
   assertEquals(resp.status, 200);
@@ -58,9 +74,9 @@ Deno.test("posts/ first", async () => {
 });
 
 Deno.test("posts/ second", async () => {
-  const resp = await handler(
+  const resp = await blogHandler(
     new Request("https://blog.deno.dev/second"),
-    BLOG_SETTINGS,
+    CONN_INFO,
   );
   assert(resp);
   assertEquals(resp.status, 200);
@@ -75,44 +91,44 @@ Deno.test("posts/ second", async () => {
 });
 
 Deno.test("posts/ trailing slash redirects", async () => {
-  const resp = await handler(
+  const resp = await blogHandler(
     new Request("https://blog.deno.dev/second/"),
-    BLOG_SETTINGS,
+    CONN_INFO,
   );
   assert(resp);
-  assertEquals(resp.status, 301);
-  assertEquals(resp.headers.get("location"), "/second");
+  assertEquals(resp.status, 307);
+  assertEquals(resp.headers.get("location"), "https://blog.deno.dev/second");
   await resp.text();
 });
 
 Deno.test("redirect map", async () => {
   {
-    const resp = await handler(
+    const resp = await blogHandler(
       new Request("https://blog.deno.dev/second.html"),
-      BLOG_SETTINGS,
+      CONN_INFO,
     );
     assert(resp);
-    assertEquals(resp.status, 301);
+    assertEquals(resp.status, 307);
     assertEquals(resp.headers.get("location"), "/second");
     await resp.text();
   }
   {
-    const resp = await handler(
+    const resp = await blogHandler(
       new Request("https://blog.deno.dev/to_second"),
-      BLOG_SETTINGS,
+      CONN_INFO,
     );
     assert(resp);
-    assertEquals(resp.status, 301);
+    assertEquals(resp.status, 307);
     assertEquals(resp.headers.get("location"), "/second");
     await resp.text();
   }
   {
-    const resp = await handler(
+    const resp = await blogHandler(
       new Request("https://blog.deno.dev/to_second_with_slash"),
-      BLOG_SETTINGS,
+      CONN_INFO,
     );
     assert(resp);
-    assertEquals(resp.status, 301);
+    assertEquals(resp.status, 307);
     assertEquals(resp.headers.get("location"), "/second");
     await resp.text();
   }
@@ -120,9 +136,9 @@ Deno.test("redirect map", async () => {
 
 Deno.test("static files in posts/ directory", async () => {
   {
-    const resp = await handler(
+    const resp = await blogHandler(
       new Request("https://blog.deno.dev/first/hello.png"),
-      BLOG_SETTINGS,
+      CONN_INFO,
     );
     assert(resp);
     assertEquals(resp.status, 200);
@@ -136,9 +152,9 @@ Deno.test("static files in posts/ directory", async () => {
     );
   }
   {
-    const resp = await handler(
+    const resp = await blogHandler(
       new Request("https://blog.deno.dev/second/hello2.png"),
-      BLOG_SETTINGS,
+      CONN_INFO,
     );
     assert(resp);
     assertEquals(resp.status, 200);
@@ -157,9 +173,9 @@ Deno.test("static files in posts/ directory", async () => {
 });
 
 Deno.test("static files in root directory", async () => {
-  const resp = await handler(
+  const resp = await blogHandler(
     new Request("https://blog.deno.dev/cat.png"),
-    BLOG_SETTINGS,
+    CONN_INFO,
   );
   assert(resp);
   assertEquals(resp.status, 200);
@@ -174,9 +190,9 @@ Deno.test("static files in root directory", async () => {
 });
 
 Deno.test("RSS feed", async () => {
-  const resp = await handler(
+  const resp = await blogHandler(
     new Request("https://blog.deno.dev/feed"),
-    BLOG_SETTINGS,
+    CONN_INFO,
   );
   assert(resp);
   assertEquals(resp.status, 200);
