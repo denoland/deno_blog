@@ -27,7 +27,7 @@ export interface BlogState {
   subtitle?: string;
   header?: string;
   style?: string;
-  middlewares?: BlogMiddleware[];
+  middlewares: BlogMiddleware[];
 }
 
 /** Represents a Post in the Blog. */

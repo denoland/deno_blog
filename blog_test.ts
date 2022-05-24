@@ -14,17 +14,15 @@ const SETTINGS = {
   subtitle: "This is some subtitle",
   header: "This is some header",
   style: `body { background-color: #f0f0f0; }`,
+  middlewares: [
+    redirects({
+      "/to_second": "second",
+      "/to_second_with_slash": "/second",
+      "second.html": "second",
+    }),
+  ],
 };
 const BLOG_SETTINGS = await configureBlog(false, BLOG_URL, SETTINGS);
-
-const blogHandler = createBlogHandler(BLOG_SETTINGS, [
-  redirects({
-    "/to_second": "second",
-    "/to_second_with_slash": "/second",
-    "second.html": "second",
-  }),
-]);
-
 const CONN_INFO = {
   localAddr: {
     transport: "tcp" as const,
@@ -37,6 +35,8 @@ const CONN_INFO = {
     port: 8001,
   },
 };
+
+const blogHandler = createBlogHandler(BLOG_SETTINGS);
 
 Deno.test("index page", async () => {
   const resp = await blogHandler(

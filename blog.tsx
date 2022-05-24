@@ -92,20 +92,17 @@ function hmrSocket(callback) {
  */
 export default async function blog(settings?: BlogSettings) {
   const url = callsites()[1].getFileName()!;
-  const blogSettings = await configureBlog(IS_DEV, url, settings);
+  const blogState = await configureBlog(IS_DEV, url, settings);
 
-  const middlewares = blogSettings.middlewares || [];
-
-  const blogHandler = createBlogHandler(blogSettings, middlewares);
+  const blogHandler = createBlogHandler(blogState);
   serve(blogHandler);
 }
 
 export function createBlogHandler(
   state: BlogState,
-  middlewares: Array<(req: Request, ctx: BlogContext) => Promise<Response>>,
 ) {
   const inner = handler;
-  const withMiddlewares = composeMiddlewares(state, middlewares);
+  const withMiddlewares = composeMiddlewares(state);
   return function handler(req: Request, connInfo: ConnInfo) {
     // Redirect requests that end with a trailing slash
     // to their non-trailing slash counterpart.
@@ -121,14 +118,13 @@ export function createBlogHandler(
 
 function composeMiddlewares(
   state: BlogState,
-  middlewares: Array<(req: Request, ctx: BlogContext) => Promise<Response>>,
 ) {
   return (
     req: Request,
     connInfo: ConnInfo,
     inner: (req: Request, ctx: BlogContext) => Promise<Response>,
   ) => {
-    const mws = middlewares.reverse();
+    const mws = state.middlewares.reverse();
 
     const handlers: (() => Response | Promise<Response>)[] = [];
 
@@ -170,6 +166,7 @@ export async function configureBlog(
   let blogState: BlogState = {
     title: "Blog",
     directory,
+    middlewares: [],
   };
 
   if (maybeSetting) {
