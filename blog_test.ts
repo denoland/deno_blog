@@ -37,12 +37,12 @@ const CONN_INFO = {
 };
 
 const blogHandler = createBlogHandler(BLOG_SETTINGS);
+const testHandler = (req: Request): Response | Promise<Response> => {
+  return blogHandler(req, CONN_INFO);
+};
 
 Deno.test("index page", async () => {
-  const resp = await blogHandler(
-    new Request("https://blog.deno.dev"),
-    CONN_INFO,
-  );
+  const resp = await testHandler(new Request("https://blog.deno.dev"));
   assert(resp);
   assertEquals(resp.status, 200);
   assertEquals(resp.headers.get("content-type"), "text/html");
@@ -57,10 +57,7 @@ Deno.test("index page", async () => {
 });
 
 Deno.test("posts/ first", async () => {
-  const resp = await blogHandler(
-    new Request("https://blog.deno.dev/first"),
-    CONN_INFO,
-  );
+  const resp = await testHandler(new Request("https://blog.deno.dev/first"));
   assert(resp);
   assertEquals(resp.status, 200);
   assertEquals(resp.headers.get("content-type"), "text/html");
@@ -74,10 +71,7 @@ Deno.test("posts/ first", async () => {
 });
 
 Deno.test("posts/ second", async () => {
-  const resp = await blogHandler(
-    new Request("https://blog.deno.dev/second"),
-    CONN_INFO,
-  );
+  const resp = await testHandler(new Request("https://blog.deno.dev/second"));
   assert(resp);
   assertEquals(resp.status, 200);
   assertEquals(resp.headers.get("content-type"), "text/html");
@@ -91,10 +85,7 @@ Deno.test("posts/ second", async () => {
 });
 
 Deno.test("posts/ trailing slash redirects", async () => {
-  const resp = await blogHandler(
-    new Request("https://blog.deno.dev/second/"),
-    CONN_INFO,
-  );
+  const resp = await testHandler(new Request("https://blog.deno.dev/second/"));
   assert(resp);
   assertEquals(resp.status, 307);
   assertEquals(resp.headers.get("location"), "https://blog.deno.dev/second");
@@ -103,9 +94,8 @@ Deno.test("posts/ trailing slash redirects", async () => {
 
 Deno.test("redirect map", async () => {
   {
-    const resp = await blogHandler(
+    const resp = await testHandler(
       new Request("https://blog.deno.dev/second.html"),
-      CONN_INFO,
     );
     assert(resp);
     assertEquals(resp.status, 307);
@@ -113,9 +103,8 @@ Deno.test("redirect map", async () => {
     await resp.text();
   }
   {
-    const resp = await blogHandler(
+    const resp = await testHandler(
       new Request("https://blog.deno.dev/to_second"),
-      CONN_INFO,
     );
     assert(resp);
     assertEquals(resp.status, 307);
@@ -123,9 +112,8 @@ Deno.test("redirect map", async () => {
     await resp.text();
   }
   {
-    const resp = await blogHandler(
+    const resp = await testHandler(
       new Request("https://blog.deno.dev/to_second_with_slash"),
-      CONN_INFO,
     );
     assert(resp);
     assertEquals(resp.status, 307);
@@ -136,9 +124,8 @@ Deno.test("redirect map", async () => {
 
 Deno.test("static files in posts/ directory", async () => {
   {
-    const resp = await blogHandler(
+    const resp = await testHandler(
       new Request("https://blog.deno.dev/first/hello.png"),
-      CONN_INFO,
     );
     assert(resp);
     assertEquals(resp.status, 200);
@@ -152,9 +139,8 @@ Deno.test("static files in posts/ directory", async () => {
     );
   }
   {
-    const resp = await blogHandler(
+    const resp = await testHandler(
       new Request("https://blog.deno.dev/second/hello2.png"),
-      CONN_INFO,
     );
     assert(resp);
     assertEquals(resp.status, 200);
@@ -173,10 +159,7 @@ Deno.test("static files in posts/ directory", async () => {
 });
 
 Deno.test("static files in root directory", async () => {
-  const resp = await blogHandler(
-    new Request("https://blog.deno.dev/cat.png"),
-    CONN_INFO,
-  );
+  const resp = await testHandler(new Request("https://blog.deno.dev/cat.png"));
   assert(resp);
   assertEquals(resp.status, 200);
   assertEquals(resp.headers.get("content-type"), "image/png");
@@ -190,10 +173,7 @@ Deno.test("static files in root directory", async () => {
 });
 
 Deno.test("RSS feed", async () => {
-  const resp = await blogHandler(
-    new Request("https://blog.deno.dev/feed"),
-    CONN_INFO,
-  );
+  const resp = await testHandler(new Request("https://blog.deno.dev/feed"));
   assert(resp);
   assertEquals(resp.status, 200);
   assertEquals(
