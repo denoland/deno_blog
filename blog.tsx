@@ -80,13 +80,15 @@ function hmrSocket(callback) {
  * Configure it:
  *
  * ```js
- * import blog from "https://deno.land/x/blog/blog.tsx";
+ * import blog, { ga } from "https://deno.land/x/blog/blog.tsx";
  * blog({
  *   title: "My blog title",
  *   subtitle: "Subtitle",
  *   header:
  *     `A header that will be visible on the index page. You can use *Markdown* here.`,
- *   gaKey: "GA-ANALYTICS-KEY",
+ *   middlewares: [
+ *     ga("GA-ANALYTICS-KEY"),
+ *   ],
  * });
  * ```
  */
@@ -190,6 +192,10 @@ export async function configureBlog(
 }
 
 export function ga(gaKey: string): BlogMiddleware {
+  if (gaKey.length == 0) {
+    throw new Error("GA key cannot be empty.");
+  }
+
   const gaReporter = createReporter({ id: gaKey });
 
   return async function (

@@ -42,12 +42,14 @@ blog({
   header:
     `A header that will be visible on the index page. You can use *Markdown* here.`,
   style: `body { background-color: #f0f0f0; }`,
-  gaKey: "GA-ANALYTICS-KEY",
-  redirectMap: {
-    "/foo": "/my_post",
-    // you can skip leading slashes too
-    "bar": "my_post2",
-  },
+  middlewares: [
+    ga("UA-XXXXXXXX-X"),
+    redirects({
+      "/foo": "/my_post",
+      // you can skip leading slashes too
+      "bar": "my_post2",
+    }),
+  ],
 });
 ```
 

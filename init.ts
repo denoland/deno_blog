@@ -30,7 +30,7 @@ publish_date: ${CURRENT_DATE_STRING}
 This is my first blog post!
 `;
 
-const MAIN_CONTENTS = `import blog from "${MAIN_FILE_URL}";
+const MAIN_CONTENTS = `import blog, { ga, redirects } from "${MAIN_FILE_URL}";
 
 blog({
   title: "My blog",
@@ -38,14 +38,18 @@ blog({
   header: "This is my new blog",
   style: "body { padding: 32px 0; background-color: #f0f0f0; }",
 
-  // If you want to set up Google Analytics, paste your GA key here.
-  // gaKey: "UA-XXXXXXXX-X",
+  // middlewares: [
+    
+    // If you want to set up Google Analytics, paste your GA key here.
+    // ga("UA-XXXXXXXX-X"),
 
-  // If you want to provide some redirections, you can specify them here,
-  // pathname specified in a key will redirect to pathname in the value.
-  // redirectMap: {
-  //  "/hello_world.html": "/hello_world",
-  // },
+    // If you want to provide some redirections, you can specify them here,
+    // pathname specified in a key will redirect to pathname in the value.
+    // redirects({
+    //  "/hello_world.html": "/hello_world",
+    // }),
+
+  // ]
 });
 `;
 
