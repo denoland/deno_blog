@@ -21,10 +21,9 @@ import {
   ssr,
   walk,
 } from "./deps.ts";
-import type { FeedItem, GaReporter } from "./deps.ts";
-
-import type { BlogSettings, BlogState, Post } from "./types.d.ts";
 import { Index, PostPage } from "./components.tsx";
+import type { FeedItem, GaReporter } from "./deps.ts";
+import type { BlogSettings, BlogState, Post } from "./types.d.ts";
 
 const IS_DEV = Deno.args.includes("--dev") && "watchFs" in Deno;
 const HMR_SOCKETS: Set<WebSocket> = new Set();
