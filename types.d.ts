@@ -1,3 +1,5 @@
+// Copyright 2022 the Deno authors. All rights reserved. MIT license.
+
 import type { ConnInfo } from "./deps.ts";
 
 export interface BlogContext {

@@ -1,3 +1,5 @@
+// Copyright 2022 the Deno authors. All rights reserved. MIT license.
+
 export { serveDir } from "https://deno.land/std@0.137.0/http/file_server.ts";
 export { walk } from "https://deno.land/std@0.137.0/fs/walk.ts";
 export {
