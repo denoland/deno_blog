@@ -34,7 +34,7 @@ from the Deno Manual.
 You can customize your blog as follows:
 
 ```js
-import blog from "https://deno.land/x/blog/blog.tsx";
+import blog, { ga, redirects } from "https://deno.land/x/blog/blog.tsx";
 blog({
   author: "Denobot",
   title: "My blog title",
