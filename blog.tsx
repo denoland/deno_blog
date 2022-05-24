@@ -12,20 +12,33 @@ import {
   join,
   relative,
 } from "https://deno.land/std@0.137.0/path/mod.ts";
-import { serve } from "https://deno.land/std@0.137.0/http/mod.ts";
 
 import { h, Helmet, ssr } from "https://crux.land/nanossr@0.0.4";
 import * as gfm from "https://deno.land/x/gfm@0.1.20/mod.ts";
 import "https://esm.sh/prismjs@1.27.0/components/prism-c?no-check";
 import { parse as frontMatter } from "https://deno.land/x/frontmatter@v0.1.4/mod.ts";
-import { createReporter } from "https://deno.land/x/g_a@0.1.2/mod.ts";
-import type { Reporter as GaReporter } from "https://deno.land/x/g_a@0.1.2/mod.ts";
+import { createReportMiddleware } from "https://deno.land/x/g_a@0.1.2/mod.ts";
 import { Feed } from "https://esm.sh/feed@4.2.2?pin=v57";
 import type { Item as FeedItem } from "https://esm.sh/feed@4.2.2?pin=v57";
 import removeMarkdown from "https://esm.sh/remove-markdown?pin=v57";
 import callsites from "https://raw.githubusercontent.com/kt3k/callsites/v1.0.0/mod.ts";
+import { Application, Context, Request } from "https://deno.land/x/oak@v10.1.0/mod.ts";
+
+
 export interface BlogSettings {
   title?: string;
+  author?: string;
+  subtitle?: string;
+  header?: string;
+  style?: string;
+  gaKey?: string;
+  redirectMap?: Record<string, string>;
+}
+
+// TODO(bartlomieju): refactor
+interface BlogState {
+  blogDirectory: string;
+  title: string;
   author?: string;
   subtitle?: string;
   header?: string;
@@ -110,39 +123,23 @@ function hmrSocket(callback) {
  */
 export default async function blog(settings?: BlogSettings) {
   const url = callsites()[1].getFileName()!;
-  const blogSettings = await configureBlog(IS_DEV, url, settings);
+  const blogState = await configureBlog(IS_DEV, url, settings);
 
-  let gaReporter: undefined | GaReporter;
-  if (blogSettings.gaKey) {
-    gaReporter = createReporter({ id: blogSettings.gaKey });
+  const app = new Application<BlogState>({ state: blogState });
+
+  if (blogState.gaKey) {
+    const ga = createReportMiddleware({ id: blogState.gaKey });
+    app.use(ga);
   }
 
-  serve(async (req: Request, connInfo) => {
-    let err: undefined | Error;
-    let res: undefined | Response;
-
-    const start = performance.now();
-    try {
-      res = await handler(req, blogSettings) as Response;
-    } catch (e) {
-      err = e;
-      res = new Response("Internal server error", {
-        status: 500,
-      });
-    } finally {
-      if (gaReporter) {
-        gaReporter(req, connInfo, res!, start, err);
-      }
-    }
-    return res;
-  });
+  await app.listen({ port: 8000 });
 }
 
 export async function configureBlog(
   isDev: boolean,
   url: string,
   maybeSetting?: BlogSettings,
-): Promise<BlogSettings & { blogDirectory: string }> {
+): Promise<BlogState> {
   let blogDirectory;
 
   try {
@@ -153,7 +150,7 @@ export async function configureBlog(
     throw new Error("Cannot run blog from a remote URL.");
   }
 
-  let blogSettings: BlogSettings & { blogDirectory: string } = {
+  let blogSettings: BlogState = {
     title: "Blog",
     blogDirectory,
   };
@@ -252,17 +249,18 @@ async function loadPost(postsDirectory: string, path: string) {
 }
 
 export async function handler(
-  req: Request,
-  blogSettings: BlogSettings & { blogDirectory: string },
+  ctx: Context,
+  next,
 ) {
-  const { pathname } = new URL(req.url);
+  const blogState = ctx.state;
+  const { pathname } = new URL(ctx.request.url);
 
-  if (blogSettings.redirectMap) {
-    let maybeRedirect = blogSettings.redirectMap[pathname];
+  if (blogState.redirectMap) {
+    let maybeRedirect = blogState.redirectMap[pathname];
 
     if (!maybeRedirect) {
       // trim leading slash
-      maybeRedirect = blogSettings.redirectMap[pathname.slice(1)];
+      maybeRedirect = blogState.redirectMap[pathname.slice(1)];
     }
 
     if (maybeRedirect) {
@@ -295,7 +293,7 @@ export async function handler(
   }
 
   if (pathname.endsWith("/hmr")) {
-    const { response, socket } = Deno.upgradeWebSocket(req);
+    const { response, socket } = Deno.upgradeWebSocket(ctx.request);
     HMR_SOCKETS.add(socket);
     socket.onclose = () => {
       HMR_SOCKETS.delete(socket);
@@ -308,18 +306,18 @@ export async function handler(
     return ssr(() => (
       <Index
         posts={POSTS}
-        settings={blogSettings}
+        settings={blogState}
         hmr={IS_DEV}
       />
     ));
   }
   if (pathname == "/feed") {
-    return serveRSS(req, blogSettings, POSTS);
+    return serveRSS(ctx.request, blogState, POSTS);
   }
 
   const post = POSTS.get(pathname);
   if (post) {
-    return ssr(() => <Post post={post} hmr={IS_DEV} settings={blogSettings} />);
+    return ssr(() => <Post post={post} hmr={IS_DEV} settings={blogState} />);
   }
 
   if (pathname.endsWith("/")) {
@@ -336,14 +334,14 @@ export async function handler(
   }
 
   // Try to serve static files from the posts/ directory first.
-  const response = await serveDir(req, {
-    fsRoot: join(blogSettings.blogDirectory, "./posts"),
+  const response = await serveDir(ctx.request, {
+    fsRoot: join(blogState.blogDirectory, "./posts"),
   });
 
   // Fallback to serving static files from the root, this will handle 404s
   // as well.
   if (response.status == 404) {
-    return serveDir(req, { fsRoot: blogSettings.blogDirectory });
+    return serveDir(ctx.request, { fsRoot: blogState.blogDirectory });
   }
 
   return response;
