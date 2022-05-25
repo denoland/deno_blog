@@ -1,53 +1,37 @@
+// Copyright 2022 the Deno authors. All rights reserved. MIT license.
+
 /** @jsx h */
 /// <reference no-default-lib="true"/>
 /// <reference lib="dom" />
 /// <reference lib="dom.asynciterable" />
 /// <reference lib="deno.ns" />
 
-import { serveDir } from "https://deno.land/std@0.137.0/http/file_server.ts";
-import { walk } from "https://deno.land/std@0.137.0/fs/walk.ts";
 import {
+  callsites,
+  createReporter,
   dirname,
+  Feed,
   fromFileUrl,
+  frontMatter,
+  gfm,
+  h,
   join,
   relative,
-} from "https://deno.land/std@0.137.0/path/mod.ts";
-import { serve } from "https://deno.land/std@0.137.0/http/mod.ts";
-
-import { h, Helmet, ssr } from "https://crux.land/nanossr@0.0.4";
-import * as gfm from "https://deno.land/x/gfm@0.1.20/mod.ts";
-import "https://esm.sh/prismjs@1.27.0/components/prism-c?no-check";
-import { parse as frontMatter } from "https://deno.land/x/frontmatter@v0.1.4/mod.ts";
-import { createReporter } from "https://deno.land/x/g_a@0.1.2/mod.ts";
-import type { Reporter as GaReporter } from "https://deno.land/x/g_a@0.1.2/mod.ts";
-import { Feed } from "https://esm.sh/feed@4.2.2?pin=v57";
-import type { Item as FeedItem } from "https://esm.sh/feed@4.2.2?pin=v57";
-import removeMarkdown from "https://esm.sh/remove-markdown?pin=v57";
-import callsites from "https://raw.githubusercontent.com/kt3k/callsites/v1.0.0/mod.ts";
-export interface BlogSettings {
-  title?: string;
-  author?: string;
-  subtitle?: string;
-  header?: string;
-  style?: string;
-  gaKey?: string;
-  redirectMap?: Record<string, string>;
-}
-
-/** Represents a Post in the Blog. */
-export interface Post {
-  title: string;
-  pathname: string;
-  author: string;
-  publishDate: Date;
-  snippet: string;
-  /** Raw markdown content. */
-  markdown: string;
-  coverHtml: string;
-  background: string;
-  /** An image URL which is used in the OpenGraph og:image tag. */
-  ogImage: string;
-}
+  removeMarkdown,
+  serve,
+  serveDir,
+  ssr,
+  walk,
+} from "./deps.ts";
+import { Index, PostPage } from "./components.tsx";
+import type { ConnInfo, FeedItem } from "./deps.ts";
+import type {
+  BlogContext,
+  BlogMiddleware,
+  BlogSettings,
+  BlogState,
+  Post,
+} from "./types.d.ts";
 
 const IS_DEV = Deno.args.includes("--dev") && "watchFs" in Deno;
 const HMR_SOCKETS: Set<WebSocket> = new Set();
@@ -98,69 +82,100 @@ function hmrSocket(callback) {
  * Configure it:
  *
  * ```js
- * import blog from "https://deno.land/x/blog/blog.tsx";
+ * import blog, { ga } from "https://deno.land/x/blog/blog.tsx";
  * blog({
  *   title: "My blog title",
  *   subtitle: "Subtitle",
  *   header:
  *     `A header that will be visible on the index page. You can use *Markdown* here.`,
- *   gaKey: "GA-ANALYTICS-KEY",
+ *   middlewares: [
+ *     ga("GA-ANALYTICS-KEY"),
+ *   ],
  * });
  * ```
  */
 export default async function blog(settings?: BlogSettings) {
   const url = callsites()[1].getFileName()!;
-  const blogSettings = await configureBlog(IS_DEV, url, settings);
+  const blogState = await configureBlog(IS_DEV, url, settings);
 
-  let gaReporter: undefined | GaReporter;
-  if (blogSettings.gaKey) {
-    gaReporter = createReporter({ id: blogSettings.gaKey });
-  }
+  const blogHandler = createBlogHandler(blogState);
+  serve(blogHandler);
+}
 
-  serve(async (req: Request, connInfo) => {
-    let err: undefined | Error;
-    let res: undefined | Response;
-
-    const start = performance.now();
-    try {
-      res = await handler(req, blogSettings) as Response;
-    } catch (e) {
-      err = e;
-      res = new Response("Internal server error", {
-        status: 500,
-      });
-    } finally {
-      if (gaReporter) {
-        gaReporter(req, connInfo, res!, start, err);
-      }
+export function createBlogHandler(
+  state: BlogState,
+) {
+  const inner = handler;
+  const withMiddlewares = composeMiddlewares(state);
+  return function handler(req: Request, connInfo: ConnInfo) {
+    // Redirect requests that end with a trailing slash
+    // to their non-trailing slash counterpart.
+    // Ex: /about/ -> /about
+    const url = new URL(req.url);
+    if (url.pathname.length > 1 && url.pathname.endsWith("/")) {
+      url.pathname = url.pathname.slice(0, -1);
+      return Response.redirect(url.href, 307);
     }
-    return res;
-  });
+    return withMiddlewares(req, connInfo, inner);
+  };
+}
+
+function composeMiddlewares(
+  state: BlogState,
+) {
+  return (
+    req: Request,
+    connInfo: ConnInfo,
+    inner: (req: Request, ctx: BlogContext) => Promise<Response>,
+  ) => {
+    const mws = state.middlewares.reverse();
+
+    const handlers: (() => Response | Promise<Response>)[] = [];
+
+    const ctx = {
+      next() {
+        const handler = handlers.shift()!;
+        return Promise.resolve(handler());
+      },
+      connInfo,
+      state,
+    };
+
+    for (const mw of mws) {
+      handlers.push(() => mw(req, ctx));
+    }
+
+    handlers.push(() => inner(req, ctx));
+
+    const handler = handlers.shift()!;
+    return handler();
+  };
 }
 
 export async function configureBlog(
   isDev: boolean,
   url: string,
   maybeSetting?: BlogSettings,
-): Promise<BlogSettings & { blogDirectory: string }> {
-  let blogDirectory;
+): Promise<BlogState> {
+  let directory;
 
   try {
     const blogPath = fromFileUrl(url);
-    blogDirectory = dirname(blogPath);
+    directory = dirname(blogPath);
   } catch (e) {
     console.log(e);
     throw new Error("Cannot run blog from a remote URL.");
   }
 
-  let blogSettings: BlogSettings & { blogDirectory: string } = {
+  let blogState: BlogState = {
     title: "Blog",
-    blogDirectory,
+    directory,
+    middlewares: [],
   };
 
   if (maybeSetting) {
-    blogSettings = {
-      ...blogSettings,
+    blogState = {
+      ...blogState,
       ...maybeSetting,
     };
 
@@ -169,13 +184,72 @@ export async function configureBlog(
         content: string;
       };
 
-      blogSettings.header = content;
+      blogState.header = content;
     }
   }
 
-  await loadContent(blogDirectory, isDev);
+  await loadContent(directory, isDev);
 
-  return blogSettings;
+  return blogState;
+}
+
+export function ga(gaKey: string): BlogMiddleware {
+  if (gaKey.length == 0) {
+    throw new Error("GA key cannot be empty.");
+  }
+
+  const gaReporter = createReporter({ id: gaKey });
+
+  return async function (
+    request: Request,
+    ctx: BlogContext,
+  ): Promise<Response> {
+    let err: undefined | Error;
+    let res: undefined | Response;
+
+    const start = performance.now();
+    try {
+      res = await ctx.next() as Response;
+    } catch (e) {
+      err = e;
+      res = new Response("Internal server error", {
+        status: 500,
+      });
+    } finally {
+      if (gaReporter) {
+        gaReporter(request, ctx.connInfo, res!, start, err);
+      }
+    }
+    return res;
+  };
+}
+
+export function redirects(redirectMap: Record<string, string>): BlogMiddleware {
+  return async function (req: Request, ctx: BlogContext): Promise<Response> {
+    const { pathname } = new URL(req.url);
+
+    let maybeRedirect = redirectMap[pathname];
+
+    if (!maybeRedirect) {
+      // trim leading slash
+      maybeRedirect = redirectMap[pathname.slice(1)];
+    }
+
+    if (maybeRedirect) {
+      if (!maybeRedirect.startsWith("/")) {
+        maybeRedirect = "/" + maybeRedirect;
+      }
+
+      return new Response(null, {
+        status: 307,
+        headers: {
+          "location": maybeRedirect,
+        },
+      });
+    }
+
+    return await ctx.next();
+  };
 }
 
 async function loadContent(blogDirectory: string, isDev: boolean) {
@@ -253,31 +327,10 @@ async function loadPost(postsDirectory: string, path: string) {
 
 export async function handler(
   req: Request,
-  blogSettings: BlogSettings & { blogDirectory: string },
+  ctx: BlogContext,
 ) {
+  const { state: blogState } = ctx;
   const { pathname } = new URL(req.url);
-
-  if (blogSettings.redirectMap) {
-    let maybeRedirect = blogSettings.redirectMap[pathname];
-
-    if (!maybeRedirect) {
-      // trim leading slash
-      maybeRedirect = blogSettings.redirectMap[pathname.slice(1)];
-    }
-
-    if (maybeRedirect) {
-      if (!maybeRedirect.startsWith("/")) {
-        maybeRedirect = "/" + maybeRedirect;
-      }
-
-      return new Response(null, {
-        status: 301,
-        headers: {
-          "location": maybeRedirect,
-        },
-      });
-    }
-  }
 
   if (pathname == "/static/gfm.css") {
     return new Response(gfm.CSS, {
@@ -286,6 +339,7 @@ export async function handler(
       },
     });
   }
+
   if (pathname == "/hmr.js") {
     return new Response(HMR_CLIENT, {
       headers: {
@@ -294,7 +348,7 @@ export async function handler(
     });
   }
 
-  if (pathname.endsWith("/hmr")) {
+  if (pathname == "/hmr") {
     const { response, socket } = Deno.upgradeWebSocket(req);
     HMR_SOCKETS.add(socket);
     socket.onclose = () => {
@@ -308,191 +362,46 @@ export async function handler(
     return ssr(() => (
       <Index
         posts={POSTS}
-        settings={blogSettings}
+        state={blogState}
         hmr={IS_DEV}
       />
     ));
   }
+
   if (pathname == "/feed") {
-    return serveRSS(req, blogSettings, POSTS);
+    return serveRSS(req, blogState, POSTS);
   }
 
   const post = POSTS.get(pathname);
   if (post) {
-    return ssr(() => <Post post={post} hmr={IS_DEV} settings={blogSettings} />);
-  }
-
-  if (pathname.endsWith("/")) {
-    const newPathname = pathname.slice(0, pathname.length - 1);
-    const post = POSTS.get(newPathname);
-    if (post) {
-      return new Response(null, {
-        status: 301,
-        headers: {
-          "location": newPathname,
-        },
-      });
-    }
+    return ssr(() => <PostPage post={post} hmr={IS_DEV} state={blogState} />);
   }
 
   // Try to serve static files from the posts/ directory first.
   const response = await serveDir(req, {
-    fsRoot: join(blogSettings.blogDirectory, "./posts"),
+    fsRoot: join(blogState.directory, "./posts"),
   });
+  if (response.status != 404) {
+    return response;
+  }
 
   // Fallback to serving static files from the root, this will handle 404s
   // as well.
-  if (response.status == 404) {
-    return serveDir(req, { fsRoot: blogSettings.blogDirectory });
-  }
-
-  return response;
-}
-
-export function Index(
-  { posts, settings, hmr }: {
-    posts: Map<string, Post>;
-    settings: BlogSettings;
-    hmr: boolean;
-  },
-) {
-  const postIndex = [];
-  for (const [_key, post] of posts.entries()) {
-    postIndex.push(post);
-  }
-  postIndex.sort((a, b) => b.publishDate.getTime() - a.publishDate.getTime());
-
-  const headerHtml = settings.header && gfm.render(settings.header);
-
-  return (
-    <div class="max-w-screen-sm px-4 pt-16 mx-auto">
-      <Helmet>
-        <title>{settings.title}</title>
-        <link rel="stylesheet" href="/static/gfm.css" />
-        <style type="text/css">
-          {` .markdown-body { --color-canvas-default: transparent; } `}
-        </style>
-        {settings.style && <style>{settings.style}</style>}
-        {hmr && <script src="/hmr.js"></script>}
-      </Helmet>
-      {headerHtml && (
-        <div>
-          <div class="markdown-body">
-            <div innerHTML={{ __dangerousHtml: headerHtml }} />
-          </div>
-        </div>
-      )}
-
-      <div class="mt-8">
-        {postIndex.map((post) => <PostCard post={post} />)}
-      </div>
-    </div>
-  );
-}
-
-function PostCard({ post }: { post: Post }) {
-  return (
-    <div class="py-8">
-      <PrettyDate date={post.publishDate} />
-      <a class="" href={post.pathname}>
-        <h3 class="text-2xl font-bold text-blue-500 hover:text-blue-600 hover:underline">
-          {post.title}
-        </h3>
-        <div class="mt-4 text-gray-900">
-          {post.snippet}
-        </div>
-      </a>
-    </div>
-  );
-}
-
-function Post(
-  { post, hmr, settings }: { post: Post; hmr: boolean; settings: BlogSettings },
-) {
-  const html = gfm.render(post.markdown);
-
-  return (
-    <div class="min-h-screen">
-      <Helmet>
-        <style type="text/css">
-          {` .markdown-body { --color-canvas-default: transparent; } `}
-        </style>
-        <title>{post.title}</title>
-        <link rel="stylesheet" href="/static/gfm.css" />
-        {settings.style && <style>{settings.style}</style>}
-        <meta property="og:title" content={post.title} />
-        {post.snippet && <meta name="description" content={post.snippet} />}
-        {post.snippet && (
-          <meta property="og:description" content={post.snippet} />
-        )}
-        {hmr && <script src="/hmr.js"></script>}
-        {post.background && (
-          <style type="text/css">
-            {` body { background: ${post.background}; } `}
-          </style>
-        )}
-      </Helmet>
-      <article class="max-w-screen-sm px-4 mx-auto">
-        <a href="/" class="hover:text-gray-700" title="Index">← Index</a>
-      </article>
-      {post.coverHtml && (
-        <div dangerouslySetInnerHTML={{ __html: post.coverHtml }} />
-      )}
-      <article class="max-w-screen-sm px-4 pt-8 md:pt-16 mx-auto">
-        <h1 class="text-5xl text-gray-900 font-bold">
-          {post.title}
-        </h1>
-        <div class="mt-8 text-gray-500">
-          <p class="flex gap-2 items-center">
-            <PrettyDate date={post.publishDate} />
-            <RssFeedIcon />
-          </p>
-          {settings.author && <p>{settings.author}</p>}
-        </div>
-        <hr class="my-8" />
-        <div class="markdown-body">
-          <div innerHTML={{ __dangerousHtml: html }} />
-        </div>
-      </article>
-    </div>
-  );
-}
-
-function PrettyDate({ date }: { date: Date }) {
-  const formatted = date.toISOString().split("T")[0];
-  return <time datetime={date.toISOString()}>{formatted}</time>;
-}
-
-function RssFeedIcon() {
-  return (
-    <a href="/feed" class="hover:text-gray-700" title="Atom Feed">
-      <svg
-        class="w-4 h-4"
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 20 20"
-        fill="currentColor"
-      >
-        <path d="M5 3a1 1 0 000 2c5.523 0 10 4.477 10 10a1 1 0 102 0C17 8.373 11.627 3 5 3z">
-        </path>
-        <path d="M4 9a1 1 0 011-1 7 7 0 017 7 1 1 0 11-2 0 5 5 0 00-5-5 1 1 0 01-1-1zM3 15a2 2 0 114 0 2 2 0 01-4 0z">
-        </path>
-      </svg>
-    </a>
-  );
+  return serveDir(req, { fsRoot: blogState.directory });
 }
 
 /** Serves the rss/atom feed of the blog. */
 function serveRSS(
   req: Request,
-  settings: BlogSettings,
+  state: BlogState,
   posts: Map<string, Post>,
-) {
+): Response {
   const url = new URL(req.url);
   const origin = url.origin;
   const copyright = `Copyright ${new Date().getFullYear()} ${origin}`;
   const feed = new Feed({
-    title: settings.title ?? "Blog",
-    description: settings.subtitle,
+    title: state.title ?? "Blog",
+    description: state.subtitle,
     id: `${origin}/blog`,
     link: `${origin}/blog`,
     language: "en",
