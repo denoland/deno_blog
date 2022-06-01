@@ -11,7 +11,7 @@ export {
 export { serve } from "https://deno.land/std@0.137.0/http/mod.ts";
 export type { ConnInfo } from "https://deno.land/std@0.137.0/http/mod.ts";
 
-export { h, Helmet, ssr } from "https://crux.land/nanossr@0.0.4";
+export { h, Helmet, ssr } from "https://crux.land/nanossr@0.0.5";
 export * as gfm from "https://deno.land/x/gfm@0.1.20/mod.ts";
 import "https://esm.sh/prismjs@1.27.0/components/prism-c?no-check";
 export { parse as frontMatter } from "https://deno.land/x/frontmatter@v0.1.4/mod.ts";
