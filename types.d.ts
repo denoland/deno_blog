@@ -22,6 +22,7 @@ export interface BlogSettings {
   footer?: VNode;
   style?: string;
   background?: string;
+  ogImage?: string;
   middlewares?: BlogMiddleware[];
 }
 

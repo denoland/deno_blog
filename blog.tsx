@@ -34,6 +34,8 @@ import type {
   Post,
 } from "./types.d.ts";
 
+export { Fragment, h };
+
 const IS_DEV = Deno.args.includes("--dev") && "watchFs" in Deno;
 const POSTS = new Map<string, Post>();
 const HMR_SOCKETS: Set<WebSocket> = new Set();
@@ -81,7 +83,7 @@ function hmrSocket(callback) {
  *
  * blog({
  *   title: "My Blog",
- *   description: "Description.",
+ *   description: "The blog description.",
  *   picture: "profile.png",
  *   middlewares: [
  *     ga("GA-ANALYTICS-KEY"),
@@ -279,9 +281,14 @@ export async function handler(
     return html({
       title: blogState.title ?? "My Blog",
       meta: {
-        "og:title": blogState.title,
         "description": blogState.description,
+        "og:title": blogState.title,
         "og:description": blogState.description,
+        "og:image": blogState.ogImage ?? blogState.picture,
+        "twitter:title": blogState.title,
+        "twitter:description": blogState.description,
+        "twitter:image": blogState.ogImage ?? blogState.picture,
+        "twitter:card": blogState.ogImage ? "summary_large_image" : undefined,
       },
       styles: [
         ...(blogState.style ? [blogState.style] : []),
@@ -304,9 +311,14 @@ export async function handler(
     return html({
       title: post.title,
       meta: {
-        "og:title": post.title,
         "description": post.snippet,
+        "og:title": post.title,
         "og:description": post.snippet,
+        "og:image": post.ogImage,
+        "twitter:title": post.title,
+        "twitter:description": post.snippet,
+        "twitter:image": post.ogImage,
+        "twitter:card": post.ogImage ? "summary_large_image" : undefined,
       },
       styles: [
         gfm.CSS,
@@ -443,5 +455,3 @@ export function redirects(redirectMap: Record<string, string>): BlogMiddleware {
     return await ctx.next();
   };
 }
-
-export { Fragment, h };
