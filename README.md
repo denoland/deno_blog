@@ -38,10 +38,10 @@ You can customize your blog as follows:
 import blog, { ga, redirects } from "https://deno.land/x/blog/blog.tsx";
 
 blog({
-  author: "Denobot",
+  author: "Dino",
   title: "My Blog",
-  subtitle: "Subtitle.",
-  picture: "denobot.png",
+  description: "The blog description.",
+  picture: "avatar.png",
   links: [
     { title: "Email", url: "mailto:bot@deno.com" },
     { title: "GitHub", url: "https://github.com/denobot" },
@@ -55,6 +55,28 @@ blog({
       "bar": "my_post2",
     }),
   ],
+});
+```
+
+![Preview](./.github/preview.png)
+
+## Customize the header and footer
+
+By default, we render the header and footer with builtin template using the blog settings. You can customize them as follows:
+
+```jsx
+/** @jsx h */
+
+import blog, { h } from "https://deno.land/x/blog/blog.tsx";
+
+blog({ 
+  title: "My Blog",
+  header: (
+    <header>Your custom header</header>
+  ),
+  footer: (
+    <footer>Your custom footer</footer>
+  )
 });
 ```
 
