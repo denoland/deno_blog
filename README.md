@@ -46,7 +46,7 @@ blog({
     { title: "Email", url: "mailto:bot@deno.com" },
     { title: "GitHub", url: "https://github.com/denobot" },
     { title: "Twitter", url: "https://twitter.com/denobot" },
-  ], 
+  ],
   middlewares: [
     ga("UA-XXXXXXXX-X"),
     redirects({
