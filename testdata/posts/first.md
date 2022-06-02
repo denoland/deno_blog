@@ -23,3 +23,5 @@ versions of Lorem Ipsum.
 ```js
 const blog = await import("https://deno.land/x/blog/blog.tsx");
 ```
+
+$100, $200, $300, $400, $500
