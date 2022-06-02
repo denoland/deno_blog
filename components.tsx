@@ -9,10 +9,10 @@
 import { gfm, h } from "./deps.ts";
 import type { BlogState, Post } from "./types.d.ts";
 
-type IndexProps = {
+interface IndexProps {
   state: BlogState;
   posts: Map<string, Post>;
-};
+}
 
 export function Index({ state, posts }: IndexProps) {
   const postIndex = [];
@@ -128,10 +128,10 @@ function PostCard({ post }: { post: Post }) {
   );
 }
 
-type PostPageProps = {
+interface PostPageProps {
   state: BlogState;
   post: Post;
-};
+}
 
 export function PostPage({ post, state }: PostPageProps) {
   const html = gfm.render(post.markdown);
