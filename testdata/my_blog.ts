@@ -1,9 +1,9 @@
 import blog from "../blog.tsx";
 
 blog({
-  author: "Denobot",
+  author: "Dino",
   title: "My Blog",
-  description: "Description.",
+  description: "The blog description.",
   picture: "https://deno-avatar.deno.dev/avatar/blog.svg",
   background: "#f9f9f9",
   links: [
