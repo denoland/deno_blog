@@ -9,13 +9,11 @@
 import { gfm, h, Helmet } from "./deps.ts";
 import type { BlogState, Post } from "./types.d.ts";
 
-export function Index(
-  { posts, state, hmr }: {
-    posts: Map<string, Post>;
-    state: BlogState;
-    hmr: boolean;
-  },
-) {
+export function Index({ posts, state, hmr }: {
+  posts: Map<string, Post>;
+  state: BlogState;
+  hmr: boolean;
+}) {
   const postIndex = [];
   for (const [_key, post] of posts.entries()) {
     postIndex.push(post);
