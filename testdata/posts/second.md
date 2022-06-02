@@ -1,6 +1,7 @@
 ---
 title: Second post
 publish_date: 2022-05-02
+abstract: This is the second post.
 ---
 
 <img src="second/hello2.png"/>

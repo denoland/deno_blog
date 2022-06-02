@@ -8,86 +8,37 @@
 
 import {
   callsites,
-  createReporter,
   dirname,
   Feed,
   fromFileUrl,
   frontMatter,
   gfm,
   h,
+  html,
   join,
   relative,
   removeMarkdown,
   serve,
   serveDir,
-  ssr,
   walk,
 } from "./deps.ts";
 import { Index, PostPage } from "./components.tsx";
+import { HMR_SOCKETS, hmrHandler } from "./hmr.ts";
 import type { ConnInfo, FeedItem } from "./deps.ts";
-import type {
-  BlogContext,
-  BlogMiddleware,
-  BlogSettings,
-  BlogState,
-  Post,
-} from "./types.d.ts";
+import type { BlogContext, BlogSettings, BlogState, Post } from "./types.d.ts";
 
 const IS_DEV = Deno.args.includes("--dev") && "watchFs" in Deno;
-const HMR_SOCKETS: Set<WebSocket> = new Set();
 const POSTS = new Map<string, Post>();
-const HMR_CLIENT = `let socket;
-let reconnectTimer;
-
-const wsOrigin = window.location.origin
-  .replace("http", "ws")
-  .replace("https", "wss");
-const hmrUrl = wsOrigin + "/hmr";
-
-hmrSocket();
-
-function hmrSocket(callback) {
-  if (socket) {
-    socket.close();
-  }
-
-  socket = new WebSocket(hmrUrl);
-  socket.addEventListener("open", callback);
-  socket.addEventListener("message", (event) => {
-    if (event.data === "refresh") {
-      console.log("refreshings");
-      window.location.reload();
-    }
-  });
-
-  socket.addEventListener("close", () => {
-    console.log("reconnecting...");
-    clearTimeout(reconnectTimer);
-    reconnectTimer = setTimeout(() => {
-      hmrSocket(() => {
-        window.location.reload();
-      });
-    }, 1000);
-  });
-}
-`;
 
 /** The main function of the library.
  *
- * ```js
- * import blog from "https://deno.land/x/blog/blog.tsx";
- * blog();
- * ```
- *
- * Configure it:
- *
- * ```js
+ * ```jsx
  * import blog, { ga } from "https://deno.land/x/blog/blog.tsx";
+ *
  * blog({
- *   title: "My blog title",
- *   subtitle: "Subtitle",
- *   header:
- *     `A header that will be visible on the index page. You can use *Markdown* here.`,
+ *   title: "My Blog",
+ *   description: "Description.",
+ *   picture: "profile.png",
  *   middlewares: [
  *     ga("GA-ANALYTICS-KEY"),
  *   ],
@@ -96,15 +47,13 @@ function hmrSocket(callback) {
  */
 export default async function blog(settings?: BlogSettings) {
   const url = callsites()[1].getFileName()!;
-  const blogState = await configureBlog(IS_DEV, url, settings);
+  const blogState = await configureBlog(url, IS_DEV, settings);
 
   const blogHandler = createBlogHandler(blogState);
   serve(blogHandler);
 }
 
-export function createBlogHandler(
-  state: BlogState,
-) {
+export function createBlogHandler(state: BlogState) {
   const inner = handler;
   const withMiddlewares = composeMiddlewares(state);
   return function handler(req: Request, connInfo: ConnInfo) {
@@ -120,15 +69,13 @@ export function createBlogHandler(
   };
 }
 
-function composeMiddlewares(
-  state: BlogState,
-) {
+function composeMiddlewares(state: BlogState) {
   return (
     req: Request,
     connInfo: ConnInfo,
     inner: (req: Request, ctx: BlogContext) => Promise<Response>,
   ) => {
-    const mws = state.middlewares.reverse();
+    const mws = state.middlewares?.reverse();
 
     const handlers: (() => Response | Promise<Response>)[] = [];
 
@@ -141,8 +88,10 @@ function composeMiddlewares(
       state,
     };
 
-    for (const mw of mws) {
-      handlers.push(() => mw(req, ctx));
+    if (mws) {
+      for (const mw of mws) {
+        handlers.push(() => mw(req, ctx));
+      }
     }
 
     handlers.push(() => inner(req, ctx));
@@ -153,9 +102,9 @@ function composeMiddlewares(
 }
 
 export async function configureBlog(
-  isDev: boolean,
   url: string,
-  maybeSetting?: BlogSettings,
+  isDev: boolean,
+  settings?: BlogSettings,
 ): Promise<BlogState> {
   let directory;
 
@@ -167,89 +116,14 @@ export async function configureBlog(
     throw new Error("Cannot run blog from a remote URL.");
   }
 
-  let blogState: BlogState = {
-    title: "Blog",
+  const state: BlogState = {
     directory,
-    middlewares: [],
+    ...settings,
   };
-
-  if (maybeSetting) {
-    blogState = {
-      ...blogState,
-      ...maybeSetting,
-    };
-
-    if (maybeSetting.header) {
-      const { content } = frontMatter(maybeSetting.header) as {
-        content: string;
-      };
-
-      blogState.header = content;
-    }
-  }
 
   await loadContent(directory, isDev);
 
-  return blogState;
-}
-
-export function ga(gaKey: string): BlogMiddleware {
-  if (gaKey.length == 0) {
-    throw new Error("GA key cannot be empty.");
-  }
-
-  const gaReporter = createReporter({ id: gaKey });
-
-  return async function (
-    request: Request,
-    ctx: BlogContext,
-  ): Promise<Response> {
-    let err: undefined | Error;
-    let res: undefined | Response;
-
-    const start = performance.now();
-    try {
-      res = await ctx.next() as Response;
-    } catch (e) {
-      err = e;
-      res = new Response("Internal server error", {
-        status: 500,
-      });
-    } finally {
-      if (gaReporter) {
-        gaReporter(request, ctx.connInfo, res!, start, err);
-      }
-    }
-    return res;
-  };
-}
-
-export function redirects(redirectMap: Record<string, string>): BlogMiddleware {
-  return async function (req: Request, ctx: BlogContext): Promise<Response> {
-    const { pathname } = new URL(req.url);
-
-    let maybeRedirect = redirectMap[pathname];
-
-    if (!maybeRedirect) {
-      // trim leading slash
-      maybeRedirect = redirectMap[pathname.slice(1)];
-    }
-
-    if (maybeRedirect) {
-      if (!maybeRedirect.startsWith("/")) {
-        maybeRedirect = "/" + maybeRedirect;
-      }
-
-      return new Response(null, {
-        status: 307,
-        headers: {
-          "location": maybeRedirect,
-        },
-      });
-    }
-
-    return await ctx.next();
-  };
+  return state;
 }
 
 async function loadContent(blogDirectory: string, isDev: boolean) {
@@ -298,7 +172,8 @@ async function loadPost(postsDirectory: string, path: string) {
     content: string;
   };
 
-  let snippet = data.snippet;
+  let snippet = data.snippet ?? data.abstract ?? data.summary ??
+    data.description;
   if (!snippet) {
     const maybeSnippet = content.split("\n\n")[0];
     if (maybeSnippet) {
@@ -309,7 +184,7 @@ async function loadPost(postsDirectory: string, path: string) {
   }
 
   const post: Post = {
-    title: data.title,
+    title: data.title ?? "Untitled",
     author: data.author,
     // Note: users can override path of a blog post using
     // pathname in front matter.
@@ -332,62 +207,75 @@ export async function handler(
   const { state: blogState } = ctx;
   const { pathname } = new URL(req.url);
 
-  if (pathname == "/static/gfm.css") {
-    return new Response(gfm.CSS, {
-      headers: {
-        "content-type": "text/css",
-      },
-    });
-  }
-
-  if (pathname == "/hmr.js") {
-    return new Response(HMR_CLIENT, {
-      headers: {
-        "content-type": "application/javascript",
-      },
-    });
-  }
-
-  if (pathname == "/hmr") {
-    const { response, socket } = Deno.upgradeWebSocket(req);
-    HMR_SOCKETS.add(socket);
-    socket.onclose = () => {
-      HMR_SOCKETS.delete(socket);
-    };
-
-    return response;
-  }
-
-  if (pathname == "/") {
-    return ssr(() => (
-      <Index
-        posts={POSTS}
-        state={blogState}
-        hmr={IS_DEV}
-      />
-    ));
-  }
-
-  if (pathname == "/feed") {
+  if (pathname === "/feed") {
     return serveRSS(req, blogState, POSTS);
+  }
+
+  if (IS_DEV) {
+    const res = hmrHandler(req);
+    if (res) return res;
+  }
+
+  if (pathname === "/") {
+    return html({
+      title: blogState.title ?? "My Blog",
+      meta: {
+        "og:title": blogState.title,
+        "description": blogState.description,
+        "og:description": blogState.description,
+      },
+      styles: [
+        ...(blogState.style ? [blogState.style] : []),
+        ...(blogState.background
+          ? [`body{background:${blogState.background};}`]
+          : []),
+      ],
+      scripts: IS_DEV ? [{ src: "/hmr.js" }] : undefined,
+      body: (
+        <Index
+          state={blogState}
+          posts={POSTS}
+        />
+      ),
+    });
   }
 
   const post = POSTS.get(pathname);
   if (post) {
-    return ssr(() => <PostPage post={post} hmr={IS_DEV} state={blogState} />);
+    return html({
+      title: post.title,
+      meta: {
+        "og:title": post.title,
+        "description": post.snippet,
+        "og:description": post.snippet,
+      },
+      styles: [
+        gfm.CSS,
+        `.markdown-body { --color-canvas-default: transparent; --color-border-muted: rgba(128,128,128,0.2); } .markdown-body img + p { margin-top: 16px; }`,
+        ...(blogState.style ? [blogState.style] : []),
+        ...(post.background ? [`body{background:${post.background};}`] : (
+          blogState.background
+            ? [`body{background:${blogState.background};}`]
+            : []
+        )),
+      ],
+      scripts: IS_DEV ? [{ src: "/hmr.js" }] : undefined,
+      body: <PostPage post={post} state={blogState} />,
+    });
   }
 
-  // Try to serve static files from the posts/ directory first.
-  const response = await serveDir(req, {
-    fsRoot: join(blogState.directory, "./posts"),
-  });
-  if (response.status != 404) {
-    return response;
+  let fsRoot = blogState.directory;
+  try {
+    await Deno.lstat(join(blogState.directory, "./posts", pathname));
+    fsRoot = join(blogState.directory, "./posts");
+  } catch (e) {
+    if (!(e instanceof Deno.errors.NotFound)) {
+      console.error(e);
+      return new Response(e.message, { status: 500 });
+    }
   }
 
-  // Fallback to serving static files from the root, this will handle 404s
-  // as well.
-  return serveDir(req, { fsRoot: blogState.directory });
+  return serveDir(req, { fsRoot });
 }
 
 /** Serves the rss/atom feed of the blog. */
@@ -401,7 +289,7 @@ function serveRSS(
   const copyright = `Copyright ${new Date().getFullYear()} ${origin}`;
   const feed = new Feed({
     title: state.title ?? "Blog",
-    description: state.subtitle,
+    description: state.description,
     id: `${origin}/blog`,
     link: `${origin}/blog`,
     language: "en",
@@ -437,3 +325,6 @@ function serveRSS(
     },
   });
 }
+
+export * from "https://deno.land/x/htm@0.0.6/mod.tsx";
+export * from "./middlewares.ts";

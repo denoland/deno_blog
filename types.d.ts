@@ -1,6 +1,6 @@
 // Copyright 2022 the Deno authors. All rights reserved. MIT license.
 
-import type { ConnInfo } from "./deps.ts";
+import type { ConnInfo, VNode } from "./deps.ts";
 
 export interface BlogContext {
   state: BlogState;
@@ -8,41 +8,37 @@ export interface BlogContext {
   next: () => Promise<Response>;
 }
 
-export type BlogMiddleware = (
-  req: Request,
-  ctx: BlogContext,
-) => Promise<Response>;
+export interface BlogMiddleware {
+  (req: Request, ctx: BlogContext): Promise<Response>;
+}
 
 export interface BlogSettings {
   title?: string;
+  description?: string;
+  picture?: string;
   author?: string;
-  subtitle?: string;
-  header?: string;
+  links?: { title: string; url: string; icon?: VNode }[];
+  header?: VNode;
+  footer?: VNode;
   style?: string;
+  background?: string;
   middlewares?: BlogMiddleware[];
 }
 
-export interface BlogState {
-  title: string;
+export interface BlogState extends BlogSettings {
   directory: string;
-  author?: string;
-  subtitle?: string;
-  header?: string;
-  style?: string;
-  middlewares: BlogMiddleware[];
 }
 
 /** Represents a Post in the Blog. */
 export interface Post {
-  title: string;
   pathname: string;
-  author: string;
-  publishDate: Date;
-  snippet: string;
-  /** Raw markdown content. */
   markdown: string;
-  coverHtml: string;
-  background: string;
+  title: string;
+  publishDate: Date;
+  author?: string;
+  snippet?: string;
+  coverHtml?: string;
+  background?: string;
   /** An image URL which is used in the OpenGraph og:image tag. */
-  ogImage: string;
+  ogImage?: string;
 }

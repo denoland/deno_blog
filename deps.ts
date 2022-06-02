@@ -8,17 +8,20 @@ export {
   join,
   relative,
 } from "https://deno.land/std@0.140.0/path/mod.ts";
-export { serve } from "https://deno.land/std@0.140.0/http/mod.ts";
-export type { ConnInfo } from "https://deno.land/std@0.140.0/http/mod.ts";
+export {
+  type ConnInfo,
+  serve,
+} from "https://deno.land/std@0.140.0/http/mod.ts";
 
 export * as gfm from "https://deno.land/x/gfm@0.1.20/mod.ts";
-export { h, Helmet, ssr } from "https://crux.land/nanossr@0.0.4";
+export { h, html, type VNode } from "https://deno.land/x/htm@0.0.6/mod.tsx";
 export { parse as frontMatter } from "https://deno.land/x/frontmatter@v0.1.4/mod.ts";
-export { createReporter } from "https://deno.land/x/g_a@0.1.2/mod.ts";
-export type { Reporter as GaReporter } from "https://deno.land/x/g_a@0.1.2/mod.ts";
-export { Feed } from "https://esm.sh/feed@4.2.2";
-export type { Item as FeedItem } from "https://esm.sh/feed@4.2.2";
+export {
+  createReporter,
+  type Reporter as GaReporter,
+} from "https://deno.land/x/g_a@0.1.2/mod.ts";
 export { default as callsites } from "https://raw.githubusercontent.com/kt3k/callsites/v1.0.0/mod.ts";
+export { Feed, type Item as FeedItem } from "https://esm.sh/feed@4.2.2";
 export { default as removeMarkdown } from "https://esm.sh/remove-markdown@0.5.0";
 
 // Add syntax highlighting support for C by default

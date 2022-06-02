@@ -5,6 +5,7 @@ that has 2 lines of code:
 
 ```js
 import blog from "https://deno.land/x/blog/blog.tsx";
+
 blog();
 ```
 
@@ -33,15 +34,19 @@ from the Deno Manual.
 
 You can customize your blog as follows:
 
-```js
+```jsx
 import blog, { ga, redirects } from "https://deno.land/x/blog/blog.tsx";
+
 blog({
   author: "Denobot",
-  title: "My blog title",
-  subtitle: "Subtitle",
-  header:
-    `A header that will be visible on the index page. You can use *Markdown* here.`,
-  style: `body { background-color: #f0f0f0; }`,
+  title: "My Blog",
+  subtitle: "Subtitle.",
+  picture: "denobot.png",
+  links: [
+    { title: "Email", url: "mailto:bot@deno.com" },
+    { title: "GitHub", url: "https://github.com/denobot" },
+    { title: "Twitter", url: "https://twitter.com/denobot" },
+  ], 
   middlewares: [
     ga("UA-XXXXXXXX-X"),
     redirects({
