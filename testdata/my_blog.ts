@@ -1,5 +1,3 @@
-/** @jsx h */
-
 import blog from "../blog.tsx";
 
 blog({

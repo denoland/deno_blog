@@ -1,7 +1,5 @@
 // Copyright 2022 the Deno authors. All rights reserved. MIT license.
 
-/** @jsx h */
-
 import { configureBlog, createBlogHandler, h, redirects } from "./blog.tsx";
 import {
   assert,

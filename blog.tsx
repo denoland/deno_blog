@@ -8,8 +8,10 @@
 
 import {
   callsites,
+  createReporter,
   dirname,
   Feed,
+  Fragment,
   fromFileUrl,
   frontMatter,
   gfm,
@@ -23,12 +25,54 @@ import {
   walk,
 } from "./deps.ts";
 import { Index, PostPage } from "./components.tsx";
-import { HMR_SOCKETS, hmrHandler } from "./hmr.ts";
 import type { ConnInfo, FeedItem } from "./deps.ts";
-import type { BlogContext, BlogSettings, BlogState, Post } from "./types.d.ts";
+import type {
+  BlogContext,
+  BlogMiddleware,
+  BlogSettings,
+  BlogState,
+  Post,
+} from "./types.d.ts";
 
 const IS_DEV = Deno.args.includes("--dev") && "watchFs" in Deno;
 const POSTS = new Map<string, Post>();
+const HMR_SOCKETS: Set<WebSocket> = new Set();
+
+const HMR_CLIENT = `let socket;
+let reconnectTimer;
+
+const wsOrigin = window.location.origin
+  .replace("http", "ws")
+  .replace("https", "wss");
+const hmrUrl = wsOrigin + "/hmr";
+
+hmrSocket();
+
+function hmrSocket(callback) {
+  if (socket) {
+    socket.close();
+  }
+
+  socket = new WebSocket(hmrUrl);
+  socket.addEventListener("open", callback);
+  socket.addEventListener("message", (event) => {
+    if (event.data === "refresh") {
+      console.log("refreshings");
+      window.location.reload();
+    }
+  });
+
+  socket.addEventListener("close", () => {
+    console.log("reconnecting...");
+    clearTimeout(reconnectTimer);
+    reconnectTimer = setTimeout(() => {
+      hmrSocket(() => {
+        window.location.reload();
+      });
+    }, 1000);
+  });
+}
+`;
 
 /** The main function of the library.
  *
@@ -212,8 +256,23 @@ export async function handler(
   }
 
   if (IS_DEV) {
-    const res = hmrHandler(req);
-    if (res) return res;
+    if (pathname == "/hmr.js") {
+      return new Response(HMR_CLIENT, {
+        headers: {
+          "content-type": "application/javascript",
+        },
+      });
+    }
+
+    if (pathname == "/hmr") {
+      const { response, socket } = Deno.upgradeWebSocket(req);
+      HMR_SOCKETS.add(socket);
+      socket.onclose = () => {
+        HMR_SOCKETS.delete(socket);
+      };
+
+      return response;
+    }
   }
 
   if (pathname === "/") {
@@ -326,5 +385,63 @@ function serveRSS(
   });
 }
 
-export * from "https://deno.land/x/htm@0.0.6/mod.tsx";
-export * from "./middlewares.ts";
+export function ga(gaKey: string): BlogMiddleware {
+  if (gaKey.length === 0) {
+    throw new Error("GA key cannot be empty.");
+  }
+
+  const gaReporter = createReporter({ id: gaKey });
+
+  return async function (
+    request: Request,
+    ctx: BlogContext,
+  ): Promise<Response> {
+    let err: undefined | Error;
+    let res: undefined | Response;
+
+    const start = performance.now();
+    try {
+      res = await ctx.next() as Response;
+    } catch (e) {
+      err = e;
+      res = new Response("Internal server error", {
+        status: 500,
+      });
+    } finally {
+      if (gaReporter) {
+        gaReporter(request, ctx.connInfo, res!, start, err);
+      }
+    }
+    return res;
+  };
+}
+
+export function redirects(redirectMap: Record<string, string>): BlogMiddleware {
+  return async function (req: Request, ctx: BlogContext): Promise<Response> {
+    const { pathname } = new URL(req.url);
+
+    let maybeRedirect = redirectMap[pathname];
+
+    if (!maybeRedirect) {
+      // trim leading slash
+      maybeRedirect = redirectMap[pathname.slice(1)];
+    }
+
+    if (maybeRedirect) {
+      if (!maybeRedirect.startsWith("/")) {
+        maybeRedirect = "/" + maybeRedirect;
+      }
+
+      return new Response(null, {
+        status: 307,
+        headers: {
+          "location": maybeRedirect,
+        },
+      });
+    }
+
+    return await ctx.next();
+  };
+}
+
+export { Fragment, h };

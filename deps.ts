@@ -14,7 +14,12 @@ export {
 } from "https://deno.land/std@0.140.0/http/mod.ts";
 
 export * as gfm from "https://deno.land/x/gfm@0.1.20/mod.ts";
-export { h, html, type VNode } from "https://deno.land/x/htm@0.0.6/mod.tsx";
+export {
+  Fragment,
+  h,
+  html,
+  type VNode,
+} from "https://deno.land/x/htm@0.0.6/mod.tsx";
 export { parse as frontMatter } from "https://deno.land/x/frontmatter@v0.1.4/mod.ts";
 export {
   createReporter,
