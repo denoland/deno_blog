@@ -62,21 +62,18 @@ blog({
 
 ## Customize the header and footer
 
-By default, we render the header and footer with builtin template using the blog settings. You can customize them as follows:
+By default, we render the header and footer with builtin template using the blog
+settings. You can customize them as follows:
 
 ```jsx
 /** @jsx h */
 
 import blog, { h } from "https://deno.land/x/blog/blog.tsx";
 
-blog({ 
+blog({
   title: "My Blog",
-  header: (
-    <header>Your custom header</header>
-  ),
-  footer: (
-    <footer>Your custom footer</footer>
-  )
+  header: <header>Your custom header</header>,
+  footer: <footer>Your custom footer</footer>,
 });
 ```
 
