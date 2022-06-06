@@ -84,7 +84,7 @@ function hmrSocket(callback) {
  * blog({
  *   title: "My Blog",
  *   description: "The blog description.",
- *   picture: "profile.png",
+ *   cover: "profile.png",
  *   middlewares: [
  *     ga("GA-ANALYTICS-KEY"),
  *   ],
@@ -284,10 +284,10 @@ export async function handler(
         "description": blogState.description,
         "og:title": blogState.title,
         "og:description": blogState.description,
-        "og:image": blogState.ogImage ?? blogState.picture,
+        "og:image": blogState.ogImage ?? blogState.cover,
         "twitter:title": blogState.title,
         "twitter:description": blogState.description,
-        "twitter:image": blogState.ogImage ?? blogState.picture,
+        "twitter:image": blogState.ogImage ?? blogState.cover,
         "twitter:card": blogState.ogImage ? "summary_large_image" : undefined,
       },
       styles: [

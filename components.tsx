@@ -1,12 +1,13 @@
 // Copyright 2022 the Deno authors. All rights reserved. MIT license.
 
 /** @jsx h */
+/** @jsxFrag Fragment */
 /// <reference no-default-lib="true"/>
 /// <reference lib="dom" />
 /// <reference lib="dom.asynciterable" />
 /// <reference lib="deno.ns" />
 
-import { gfm, h } from "./deps.ts";
+import { Fragment, gfm, h } from "./deps.ts";
 import type { BlogState, Post } from "./types.d.ts";
 
 interface IndexProps {
@@ -15,6 +16,7 @@ interface IndexProps {
 }
 
 export function Index({ state, posts }: IndexProps) {
+  const fullCover = state.cover && state.coverStyle === "full";
   const postIndex = [];
   for (const [_key, post] of posts.entries()) {
     postIndex.push(post);
@@ -24,58 +26,85 @@ export function Index({ state, posts }: IndexProps) {
   );
 
   return (
-    <div class="max-w-screen-sm px-4 pt-20 mx-auto">
+    <>
       {state.header || (
-        <header class="flex flex-col items-center border-b-1 border-gray-200 pb-16 mb-16">
-          {state.picture && (
-            <div
-              class="bg-cover bg-center bg-no-repeat rounded-full mb-4 w-30 h-30 border-3 border-white"
-              style={{ backgroundImage: `url(${state.picture})` }}
-            />
-          )}
-          <h1 class="text-3xl font-bold text-gray-900">
-            {state.title ?? "My Blog"}
-          </h1>
-          {state.description && (
-            <p class="text-md text-gray-600">{state.description}</p>
-          )}
-          {state.links && (
-            <nav class="mt-2 flex gap-2">
-              {state.links.map((link) => {
-                const url = new URL(link.url);
-                let Icon = IconExternalLink;
-                if (url.protocol === "mailto:") {
-                  Icon = IconEmail;
-                } else {
-                  const icon = socialAppIcons.get(
-                    url.hostname.replace(/^www\./, ""),
-                  );
-                  if (icon) {
-                    Icon = icon;
+        <header
+          class="w-full h-100 bg-cover bg-center bg-no-repeat"
+          style={{
+            backgroundImage: fullCover ? `url(${state.cover})` : undefined,
+          }}
+        >
+          <div class="max-w-screen-sm h-full px-4 mx-auto flex flex-col items-center justify-center">
+            {state.cover && state.coverStyle !== "full" && (
+              <div
+                class={[
+                  "bg-cover bg-center bg-no-repeat mb-4 w-30 h-30 border-3 border-white",
+                  (state.coverStyle === undefined ||
+                    state.coverStyle === "avatar-rounded") &&
+                  "rounded-full",
+                ].filter(Boolean).join(" ")}
+                style={{ backgroundImage: `url(${state.cover})` }}
+              />
+            )}
+            <h1
+              class="text-4xl text-gray-900 font-bold"
+              style={{ color: state.coverTextColor }}
+            >
+              {state.title ?? "My Blog"}
+            </h1>
+            {state.description && (
+              <p
+                class="text-lg text-gray-600"
+                style={{ color: state.coverTextColor }}
+              >
+                {state.description}
+              </p>
+            )}
+            {state.links && (
+              <nav class="mt-3 flex gap-2">
+                {state.links.map((link) => {
+                  const url = new URL(link.url);
+                  let Icon = IconExternalLink;
+                  if (url.protocol === "mailto:") {
+                    Icon = IconEmail;
+                  } else {
+                    const icon = socialAppIcons.get(
+                      url.hostname.replace(/^www\./, ""),
+                    );
+                    if (icon) {
+                      Icon = icon;
+                    }
                   }
-                }
 
-                return (
-                  <a
-                    class="flex items-center justify-center w-8 h-8 rounded-full bg-gray-200/60 text-gray-700 hover:bg-gray-200 hover:text-black transition-colors"
-                    href={link.url}
-                    title={link.title}
-                  >
-                    <Icon />
-                  </a>
-                );
-              })}
-            </nav>
-          )}
+                  return (
+                    <a
+                      class="flex items-center justify-center w-8 h-8 rounded-full bg-gray-600/10 text-gray-700 hover:bg-gray-600/15 hover:text-black transition-colors"
+                      href={link.url}
+                      title={link.title}
+                    >
+                      <Icon />
+                    </a>
+                  );
+                })}
+              </nav>
+            )}
+          </div>
         </header>
       )}
 
-      <div>
-        {postIndex.map((post) => <PostCard post={post} key={post.pathname} />)}
-      </div>
+      <div class="max-w-screen-sm px-4 mx-auto">
+        <div class="pt-16 border-t-1 border-gray-300/80">
+          {postIndex.map((post) => (
+            <PostCard
+              post={post}
+              key={post.pathname}
+            />
+          ))}
+        </div>
 
-      {state.footer || <Footer author={state.author} />}
-    </div>
+        {state.footer || <Footer author={state.author} />}
+      </div>
+    </>
   );
 }
 
@@ -115,11 +144,11 @@ export function PostPage({ post, state }: PostPageProps) {
   const html = gfm.render(post.markdown);
 
   return (
-    <div class="max-w-screen-sm px-4 pt-5 mx-auto">
+    <div class="max-w-screen-sm px-4 pt-8 mx-auto">
       <div class="pb-16">
         <a
           href="/"
-          class="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-900"
+          class="inline-flex items-center gap-1 text-sm text-gray-500/80 hover:text-gray-700 transition-colors"
           title="Back to Index Page"
         >
           <svg
@@ -168,23 +197,22 @@ function Footer(props: { author?: string }) {
   return (
     <footer class="mt-20 pb-16">
       <p class="flex items-center gap-2.5 text-gray-400/800 text-sm">
-        <span>&copy; {new Date().getFullYear()} {props.author}</span>
-        <a
-          href="/feed"
-          class="inline-flex items-center gap-1 hover:text-gray-700"
-          title="Atom Feed"
-        >
-          <IconRssFeed /> RSS
-        </a>
-        <span class="inline-flex items-center gap-1">
-          powered by
+        <span>
+          &copy; {new Date().getFullYear()} {props.author}, Powered by{" "}
           <a
-            class="inline-flex items-center gap-1 underline hover:text-gray-700"
+            class="inline-flex items-center gap-1 underline hover:text-gray-800 transition-colors"
             href="https://deno.land/x/blog"
           >
             Deno Blog
           </a>
         </span>
+        <a
+          href="/feed"
+          class="inline-flex items-center gap-1 hover:text-gray-800 transition-colors"
+          title="Atom Feed"
+        >
+          <IconRssFeed /> RSS
+        </a>
       </p>
     </footer>
   );

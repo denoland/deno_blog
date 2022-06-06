@@ -4,7 +4,7 @@ blog({
   author: "Dino",
   title: "My Blog",
   description: "The blog description.",
-  picture: "https://deno-avatar.deno.dev/avatar/blog.svg",
+  cover: "https://deno-avatar.deno.dev/avatar/blog.svg",
   background: "#f9f9f9",
   links: [
     { title: "Email", url: "mailto:bot@deno.com" },
