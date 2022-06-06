@@ -84,7 +84,7 @@ function hmrSocket(callback) {
  * blog({
  *   title: "My Blog",
  *   description: "The blog description.",
- *   picture: "profile.png",
+ *   cover: "profile.png",
  *   middlewares: [
  *     ga("GA-ANALYTICS-KEY"),
  *   ],

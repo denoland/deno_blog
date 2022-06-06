@@ -37,7 +37,8 @@ const MAIN_CONTENTS = `import blog, { ga, redirects } from "${MAIN_FILE_URL}";
 blog({
   title: "My Blog",
   description: "This is my new blog.",
-  picture: "https://deno-avatar.deno.dev/avatar/blog.svg",
+  cover: "https://deno-avatar.deno.dev/avatar/blog.svg",
+  coverStyle: "avatar-rounded",
   author: "An author",
   background: "#f9f9f9",
 

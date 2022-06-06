@@ -41,7 +41,8 @@ blog({
   author: "Dino",
   title: "My Blog",
   description: "The blog description.",
-  picture: "avatar.png",
+  cover: "cover.png",
+  coverStyle: "avatar-rounded",
   links: [
     { title: "Email", url: "mailto:bot@deno.com" },
     { title: "GitHub", url: "https://github.com/denobot" },
