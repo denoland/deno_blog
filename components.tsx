@@ -74,29 +74,7 @@ export function Index({ state, posts }: IndexProps) {
         {postIndex.map((post) => <PostCard post={post} key={post.pathname} />)}
       </div>
 
-      {state.footer || (
-        <footer class="mt-20 pb-16">
-          <p class="flex items-center gap-2.5 text-gray-400 text-sm">
-            <span>&copy; {new Date().getFullYear()} {state.author}</span>
-            <a
-              href="/feed"
-              class="inline-flex items-center gap-1 hover:text-gray-700"
-              title="Atom Feed"
-            >
-              <IconRssFeed /> RSS
-            </a>
-            <span class="inline-flex items-center gap-1">
-              powered by
-              <a
-                class="inline-flex items-center gap-1 underline hover:text-gray-700"
-                href="https://deno.land/x/blog"
-              >
-                Deno Blog
-              </a>
-            </span>
-          </p>
-        </footer>
-      )}
+      {state.footer || <Footer author={state.author} />}
     </div>
   );
 }
@@ -109,15 +87,15 @@ function PostCard({ post }: { post: Post }) {
           {post.title}
         </a>
       </h3>
-      <p class="text-sm text-gray-500">
+      <p class="text-gray-500/80">
         <PrettyDate date={post.publishDate} />
       </p>
       <p class="mt-3 text-gray-600">
         {post.snippet}
       </p>
-      <p class="mt-1.5">
+      <p class="mt-3">
         <a
-          class="text-sm leading-tight text-gray-900 inline-block border-b-1 border-gray-600 hover:text-gray-500 hover:border-gray-500 transition-colors"
+          class="leading-tight text-gray-900 inline-block border-b-1 border-gray-600 hover:text-gray-500 hover:border-gray-500 transition-colors"
           href={post.pathname}
           title={`Read "${post.title}"`}
         >
@@ -137,7 +115,7 @@ export function PostPage({ post, state }: PostPageProps) {
   const html = gfm.render(post.markdown);
 
   return (
-    <div class="max-w-screen-sm px-4 pt-6 mx-auto">
+    <div class="max-w-screen-sm px-4 pt-5 mx-auto">
       <div class="pb-16">
         <a
           href="/"
@@ -181,35 +159,39 @@ export function PostPage({ post, state }: PostPageProps) {
         />
       </article>
 
-      {state.footer || (
-        <footer class="mt-20 pb-16">
-          <p class="flex items-center gap-2.5 text-gray-400 text-sm">
-            <span>&copy; {new Date().getFullYear()} {state.author}</span>
-            <a
-              href="/feed"
-              class="inline-flex items-center gap-1 hover:text-gray-700"
-              title="Atom Feed"
-            >
-              <IconRssFeed /> RSS
-            </a>
-            <span class="inline-flex items-center gap-1">
-              powered by
-              <a
-                class="inline-flex items-center gap-1 underline hover:text-gray-700"
-                href="https://deno.land/x/blog"
-              >
-                Deno Blog
-              </a>
-            </span>
-          </p>
-        </footer>
-      )}
+      {state.footer || <Footer author={state.author} />}
     </div>
   );
 }
 
+function Footer(props: { author?: string }) {
+  return (
+    <footer class="mt-20 pb-16">
+      <p class="flex items-center gap-2.5 text-gray-400/800 text-sm">
+        <span>&copy; {new Date().getFullYear()} {props.author}</span>
+        <a
+          href="/feed"
+          class="inline-flex items-center gap-1 hover:text-gray-700"
+          title="Atom Feed"
+        >
+          <IconRssFeed /> RSS
+        </a>
+        <span class="inline-flex items-center gap-1">
+          powered by
+          <a
+            class="inline-flex items-center gap-1 underline hover:text-gray-700"
+            href="https://deno.land/x/blog"
+          >
+            Deno Blog
+          </a>
+        </span>
+      </p>
+    </footer>
+  );
+}
+
 function PrettyDate({ date }: { date: Date }) {
-  const formatted = date.toISOString().split("T")[0];
+  const formatted = date.toISOString().split("T")[0].replaceAll("-", "/");
   return <time dateTime={date.toISOString()}>{formatted}</time>;
 }
 
