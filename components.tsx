@@ -46,15 +46,15 @@ export function Index({ state, posts }: IndexProps) {
                 let Icon = IconExternalLink;
                 if (url.protocol === "mailto:") {
                   Icon = IconEmail;
-                } else if (url.hostname === "github.com") {
-                  Icon = IconGithub;
-                } else if (url.hostname === "twitter.com") {
-                  Icon = IconTwitter;
-                } else if (url.hostname === "instagram.com") {
-                  Icon = IconInstagram;
-                } else if (url.hostname === "linkedin.com") {
-                  Icon = IconLinkedin;
+                } else {
+                  const icon = socialAppIcons.get(
+                    url.hostname.replace(/^www\./, ""),
+                  );
+                  if (icon) {
+                    Icon = icon;
+                  }
                 }
+
                 return (
                   <a
                     class="flex items-center justify-center w-8 h-8 rounded-full bg-gray-200/60 text-gray-700 hover:bg-gray-200 hover:text-black transition-colors"
@@ -243,6 +243,22 @@ function IconEmail() {
   );
 }
 
+function IconExternalLink() {
+  return (
+    <svg
+      className="inline-block w-5 h-5"
+      viewBox="0 0 20 20"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M6.66715 5.83333C6.66715 5.3731 7.04025 5 7.50049 5L14.1672 5C14.6274 5 15.0005 5.3731 15.0005 5.83333V12.5C15.0005 12.9602 14.6274 13.3333 14.1672 13.3333C13.7069 13.3333 13.3338 12.9602 13.3338 12.5V7.84518L6.42308 14.7559C6.09764 15.0814 5.57 15.0814 5.24457 14.7559C4.91913 14.4305 4.91913 13.9028 5.24457 13.5774L12.1553 6.66667L7.50049 6.66667C7.04025 6.66667 6.66715 6.29357 6.66715 5.83333Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
+
 function IconGithub() {
   return (
     <svg
@@ -307,18 +323,9 @@ function IconLinkedin() {
   );
 }
 
-function IconExternalLink() {
-  return (
-    <svg
-      className="inline-block w-5 h-5"
-      viewBox="0 0 20 20"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        d="M6.66715 5.83333C6.66715 5.3731 7.04025 5 7.50049 5L14.1672 5C14.6274 5 15.0005 5.3731 15.0005 5.83333V12.5C15.0005 12.9602 14.6274 13.3333 14.1672 13.3333C13.7069 13.3333 13.3338 12.9602 13.3338 12.5V7.84518L6.42308 14.7559C6.09764 15.0814 5.57 15.0814 5.24457 14.7559C4.91913 14.4305 4.91913 13.9028 5.24457 13.5774L12.1553 6.66667L7.50049 6.66667C7.04025 6.66667 6.66715 6.29357 6.66715 5.83333Z"
-        fill="currentColor"
-      />
-    </svg>
-  );
-}
+const socialAppIcons = new Map([
+  ["github.com", IconGithub],
+  ["twitter.com", IconTwitter],
+  ["instagram.com", IconInstagram],
+  ["linkedin.com", IconLinkedin],
+]);
