@@ -5,6 +5,7 @@ that has 2 lines of code:
 
 ```js
 import blog from "https://deno.land/x/blog/blog.tsx";
+
 blog();
 ```
 
@@ -35,13 +36,17 @@ You can customize your blog as follows:
 
 ```js
 import blog, { ga, redirects } from "https://deno.land/x/blog/blog.tsx";
+
 blog({
-  author: "Denobot",
-  title: "My blog title",
-  subtitle: "Subtitle",
-  header:
-    `A header that will be visible on the index page. You can use *Markdown* here.`,
-  style: `body { background-color: #f0f0f0; }`,
+  author: "Dino",
+  title: "My Blog",
+  description: "The blog description.",
+  picture: "avatar.png",
+  links: [
+    { title: "Email", url: "mailto:bot@deno.com" },
+    { title: "GitHub", url: "https://github.com/denobot" },
+    { title: "Twitter", url: "https://twitter.com/denobot" },
+  ],
   middlewares: [
     ga("UA-XXXXXXXX-X"),
     redirects({
@@ -50,6 +55,25 @@ blog({
       "bar": "my_post2",
     }),
   ],
+});
+```
+
+![Preview](./.github/preview.png)
+
+## Customize the header and footer
+
+By default, we render the header and footer with builtin template using the blog
+settings. You can customize them as follows:
+
+```jsx
+/** @jsx h */
+
+import blog, { h } from "https://deno.land/x/blog/blog.tsx";
+
+blog({
+  title: "My Blog",
+  header: <header>Your custom header</header>,
+  footer: <footer>Your custom footer</footer>,
 });
 ```
 

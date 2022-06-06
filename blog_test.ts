@@ -5,17 +5,15 @@ import {
   assert,
   assertEquals,
   assertStringIncludes,
-} from "https://deno.land/std@0.137.0/testing/asserts.ts";
-import { fromFileUrl, join } from "https://deno.land/std@0.137.0/path/mod.ts";
+} from "https://deno.land/std@0.140.0/testing/asserts.ts";
+import { fromFileUrl, join } from "https://deno.land/std@0.140.0/path/mod.ts";
 
 const BLOG_URL = new URL("./testdata/main.js", import.meta.url).href;
 const TESTDATA_PATH = fromFileUrl(new URL("./testdata/", import.meta.url));
 const SETTINGS = {
   author: "The author",
   title: "Test blog",
-  subtitle: "This is some subtitle",
-  header: "This is some header",
-  style: `body { background-color: #f0f0f0; }`,
+  description: "This is some description.",
   middlewares: [
     redirects({
       "/to_second": "second",
@@ -24,7 +22,7 @@ const SETTINGS = {
     }),
   ],
 };
-const BLOG_SETTINGS = await configureBlog(false, BLOG_URL, SETTINGS);
+const BLOG_SETTINGS = await configureBlog(BLOG_URL, false, SETTINGS);
 const CONN_INFO = {
   localAddr: {
     transport: "tcp" as const,
@@ -47,13 +45,11 @@ Deno.test("index page", async () => {
   const resp = await testHandler(new Request("https://blog.deno.dev"));
   assert(resp);
   assertEquals(resp.status, 200);
-  assertEquals(resp.headers.get("content-type"), "text/html");
+  assertEquals(resp.headers.get("content-type"), "text/html; charset=utf-8");
   const body = await resp.text();
   assertStringIncludes(body, `<html lang="en">`);
   assertStringIncludes(body, `Test blog`);
-  // FIXME(bartlomieju)
-  // assertStringIncludes(body, `This is some subtitle`);
-  // assertStringIncludes(body, `This is some header`);
+  assertStringIncludes(body, `This is some description.`);
   assertStringIncludes(body, `href="/first"`);
   assertStringIncludes(body, `href="/second"`);
 });
@@ -62,7 +58,7 @@ Deno.test("posts/ first", async () => {
   const resp = await testHandler(new Request("https://blog.deno.dev/first"));
   assert(resp);
   assertEquals(resp.status, 200);
-  assertEquals(resp.headers.get("content-type"), "text/html");
+  assertEquals(resp.headers.get("content-type"), "text/html; charset=utf-8");
   const body = await resp.text();
   assertStringIncludes(body, `<html lang="en">`);
   assertStringIncludes(body, `First post`);
@@ -77,7 +73,7 @@ Deno.test("posts/ second", async () => {
   const resp = await testHandler(new Request("https://blog.deno.dev/second"));
   assert(resp);
   assertEquals(resp.status, 200);
-  assertEquals(resp.headers.get("content-type"), "text/html");
+  assertEquals(resp.headers.get("content-type"), "text/html; charset=utf-8");
   const body = await resp.text();
   assertStringIncludes(body, `<html lang="en">`);
   assertStringIncludes(body, `Second post`);

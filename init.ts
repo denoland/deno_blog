@@ -1,6 +1,6 @@
 // Copyright 2022 the Deno authors. All rights reserved. MIT license.
 
-import { join, resolve } from "https://deno.land/std@0.137.0/path/mod.ts";
+import { join, resolve } from "https://deno.land/std@0.140.0/path/mod.ts";
 
 const HELP = `deno_blog
 
@@ -35,10 +35,11 @@ This is my first blog post!
 const MAIN_CONTENTS = `import blog, { ga, redirects } from "${MAIN_FILE_URL}";
 
 blog({
-  title: "My blog",
+  title: "My Blog",
+  description: "This is my new blog.",
+  picture: "https://deno-avatar.deno.dev/avatar/blog.svg",
   author: "An author",
-  header: "This is my new blog",
-  style: "body { padding: 32px 0; background-color: #f0f0f0; }",
+  background: "#f9f9f9",
 
   // middlewares: [
     
@@ -57,7 +58,7 @@ blog({
 
 const DENO_JSONC_CONTENTS = `{
   "tasks": {
-    "dev": "deno run --allow-net --allow-read --no-check --watch main.ts --dev",
+    "dev": "deno run --allow-net --allow-read --watch main.ts --dev",
     "serve": "deno run --allow-net --allow-read --no-check main.ts",
   }
 }

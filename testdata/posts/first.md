@@ -1,7 +1,13 @@
 ---
 title: First post
 publish_date: 2022-03-20
+abstract: This is the first post.
+cover_html: <svg class="w-full" height="350" width="100%" background="black"><circle cx="50%" cy="170" r="150" stroke="white" stroke-width="10" fill="black" alpha="50%"/></svg>
 ---
+
+It was popularised in the 1960s with the release of Letraset sheets containing
+Lorem Ipsum passages, and more recently with desktop publishing software like
+Aldus PageMaker including versions of Lorem Ipsum.
 
 <img src="first/hello.png"/>
 
@@ -13,5 +19,9 @@ typesetting, remaining essentially unchanged. It was popularised in the 1960s
 with the release of Letraset sheets containing Lorem Ipsum passages, and more
 recently with desktop publishing software like Aldus PageMaker including
 versions of Lorem Ipsum.
+
+```js
+const blog = await import("https://deno.land/x/blog/blog.tsx");
+```
 
 $100, $200, $300, $400, $500
