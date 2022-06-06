@@ -46,15 +46,15 @@ export function Index({ state, posts }: IndexProps) {
                 let Icon = IconExternalLink;
                 if (url.protocol === "mailto:") {
                   Icon = IconEmail;
-                } else if (url.hostname === "github.com") {
-                  Icon = IconGithub;
-                } else if (url.hostname === "twitter.com") {
-                  Icon = IconTwitter;
-                } else if (url.hostname === "instagram.com") {
-                  Icon = IconInstagram;
-                } else if (url.hostname === "linkedin.com") {
-                  Icon = IconLinkedin;
+                } else {
+                  const icon = socialAppIcons.get(
+                    url.hostname.replace(/^www\./, ""),
+                  );
+                  if (icon) {
+                    Icon = icon;
+                  }
                 }
+
                 return (
                   <a
                     class="flex items-center justify-center w-8 h-8 rounded-full bg-gray-200/60 text-gray-700 hover:bg-gray-200 hover:text-black transition-colors"
@@ -74,29 +74,7 @@ export function Index({ state, posts }: IndexProps) {
         {postIndex.map((post) => <PostCard post={post} key={post.pathname} />)}
       </div>
 
-      {state.footer || (
-        <footer class="mt-20 pb-16">
-          <p class="flex items-center gap-2.5 text-gray-400 text-sm">
-            <span>&copy; {new Date().getFullYear()} {state.author}</span>
-            <a
-              href="/feed"
-              class="inline-flex items-center gap-1 hover:text-gray-700"
-              title="Atom Feed"
-            >
-              <IconRssFeed /> RSS
-            </a>
-            <span class="inline-flex items-center gap-1">
-              powered by
-              <a
-                class="inline-flex items-center gap-1 underline hover:text-gray-700"
-                href="https://deno.land/x/blog"
-              >
-                Deno Blog
-              </a>
-            </span>
-          </p>
-        </footer>
-      )}
+      {state.footer || <Footer author={state.author} />}
     </div>
   );
 }
@@ -109,15 +87,15 @@ function PostCard({ post }: { post: Post }) {
           {post.title}
         </a>
       </h3>
-      <p class="text-sm text-gray-500">
+      <p class="text-gray-500/80">
         <PrettyDate date={post.publishDate} />
       </p>
       <p class="mt-3 text-gray-600">
         {post.snippet}
       </p>
-      <p class="mt-1.5">
+      <p class="mt-3">
         <a
-          class="text-sm leading-tight text-gray-900 inline-block border-b-1 border-gray-600 hover:text-gray-500 hover:border-gray-500 transition-colors"
+          class="leading-tight text-gray-900 inline-block border-b-1 border-gray-600 hover:text-gray-500 hover:border-gray-500 transition-colors"
           href={post.pathname}
           title={`Read "${post.title}"`}
         >
@@ -137,7 +115,7 @@ export function PostPage({ post, state }: PostPageProps) {
   const html = gfm.render(post.markdown);
 
   return (
-    <div class="max-w-screen-sm px-4 pt-6 mx-auto">
+    <div class="max-w-screen-sm px-4 pt-5 mx-auto">
       <div class="pb-16">
         <a
           href="/"
@@ -181,35 +159,39 @@ export function PostPage({ post, state }: PostPageProps) {
         />
       </article>
 
-      {state.footer || (
-        <footer class="mt-20 pb-16">
-          <p class="flex items-center gap-2.5 text-gray-400 text-sm">
-            <span>&copy; {new Date().getFullYear()} {state.author}</span>
-            <a
-              href="/feed"
-              class="inline-flex items-center gap-1 hover:text-gray-700"
-              title="Atom Feed"
-            >
-              <IconRssFeed /> RSS
-            </a>
-            <span class="inline-flex items-center gap-1">
-              powered by
-              <a
-                class="inline-flex items-center gap-1 underline hover:text-gray-700"
-                href="https://deno.land/x/blog"
-              >
-                Deno Blog
-              </a>
-            </span>
-          </p>
-        </footer>
-      )}
+      {state.footer || <Footer author={state.author} />}
     </div>
   );
 }
 
+function Footer(props: { author?: string }) {
+  return (
+    <footer class="mt-20 pb-16">
+      <p class="flex items-center gap-2.5 text-gray-400/800 text-sm">
+        <span>&copy; {new Date().getFullYear()} {props.author}</span>
+        <a
+          href="/feed"
+          class="inline-flex items-center gap-1 hover:text-gray-700"
+          title="Atom Feed"
+        >
+          <IconRssFeed /> RSS
+        </a>
+        <span class="inline-flex items-center gap-1">
+          powered by
+          <a
+            class="inline-flex items-center gap-1 underline hover:text-gray-700"
+            href="https://deno.land/x/blog"
+          >
+            Deno Blog
+          </a>
+        </span>
+      </p>
+    </footer>
+  );
+}
+
 function PrettyDate({ date }: { date: Date }) {
-  const formatted = date.toISOString().split("T")[0];
+  const formatted = date.toISOString().split("T")[0].replaceAll("-", "/");
   return <time dateTime={date.toISOString()}>{formatted}</time>;
 }
 
@@ -237,6 +219,22 @@ function IconEmail() {
     >
       <path
         d="M9.99963 18C8.9063 18 7.87297 17.7899 6.89963 17.3696C5.9263 16.9499 5.07643 16.3765 4.35003 15.6496C3.6231 14.9232 3.04977 14.0733 2.63003 13.1C2.20977 12.1267 1.99963 11.0933 1.99963 10C1.99963 8.89333 2.20977 7.8568 2.63003 6.8904C3.04977 5.92347 3.6231 5.0768 4.35003 4.3504C5.07643 3.62347 5.9263 3.04987 6.89963 2.6296C7.87297 2.20987 8.9063 2 9.99963 2C11.1063 2 12.1428 2.20987 13.1092 2.6296C14.0762 3.04987 14.9228 3.62347 15.6492 4.3504C16.3762 5.0768 16.9495 5.92347 17.3692 6.8904C17.7895 7.8568 17.9996 8.89333 17.9996 10V11.16C17.9996 11.9467 17.7298 12.6165 17.19 13.1696C16.6498 13.7232 15.9863 14 15.1996 14C14.7196 14 14.273 13.8933 13.8596 13.68C13.4463 13.4667 13.1063 13.1867 12.8396 12.84C12.4796 13.2 12.0564 13.4835 11.57 13.6904C11.0831 13.8968 10.5596 14 9.99963 14C8.89297 14 7.94977 13.6099 7.17003 12.8296C6.38977 12.0499 5.99963 11.1067 5.99963 10C5.99963 8.89333 6.38977 7.94987 7.17003 7.1696C7.94977 6.38987 8.89297 6 9.99963 6C11.1063 6 12.0498 6.38987 12.83 7.1696C13.6098 7.94987 13.9996 8.89333 13.9996 10V11.16C13.9996 11.5467 14.1196 11.8499 14.3596 12.0696C14.5996 12.2899 14.8796 12.4 15.1996 12.4C15.5196 12.4 15.7996 12.2899 16.0396 12.0696C16.2796 11.8499 16.3996 11.5467 16.3996 11.16V10C16.3996 8.25333 15.7695 6.74987 14.5092 5.4896C13.2495 4.22987 11.7463 3.6 9.99963 3.6C8.25297 3.6 6.7495 4.22987 5.48923 5.4896C4.2295 6.74987 3.59963 8.25333 3.59963 10C3.59963 11.7467 4.2295 13.2499 5.48923 14.5096C6.7495 15.7699 8.25297 16.4 9.99963 16.4H13.9996V18H9.99963ZM9.99963 12.4C10.6663 12.4 11.233 12.1667 11.6996 11.7C12.1663 11.2333 12.3996 10.6667 12.3996 10C12.3996 9.33333 12.1663 8.76667 11.6996 8.3C11.233 7.83333 10.6663 7.6 9.99963 7.6C9.33297 7.6 8.7663 7.83333 8.29963 8.3C7.83297 8.76667 7.59963 9.33333 7.59963 10C7.59963 10.6667 7.83297 11.2333 8.29963 11.7C8.7663 12.1667 9.33297 12.4 9.99963 12.4Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
+
+function IconExternalLink() {
+  return (
+    <svg
+      className="inline-block w-5 h-5"
+      viewBox="0 0 20 20"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M6.66715 5.83333C6.66715 5.3731 7.04025 5 7.50049 5L14.1672 5C14.6274 5 15.0005 5.3731 15.0005 5.83333V12.5C15.0005 12.9602 14.6274 13.3333 14.1672 13.3333C13.7069 13.3333 13.3338 12.9602 13.3338 12.5V7.84518L6.42308 14.7559C6.09764 15.0814 5.57 15.0814 5.24457 14.7559C4.91913 14.4305 4.91913 13.9028 5.24457 13.5774L12.1553 6.66667L7.50049 6.66667C7.04025 6.66667 6.66715 6.29357 6.66715 5.83333Z"
         fill="currentColor"
       />
     </svg>
@@ -307,18 +305,9 @@ function IconLinkedin() {
   );
 }
 
-function IconExternalLink() {
-  return (
-    <svg
-      className="inline-block w-5 h-5"
-      viewBox="0 0 20 20"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        d="M6.66715 5.83333C6.66715 5.3731 7.04025 5 7.50049 5L14.1672 5C14.6274 5 15.0005 5.3731 15.0005 5.83333V12.5C15.0005 12.9602 14.6274 13.3333 14.1672 13.3333C13.7069 13.3333 13.3338 12.9602 13.3338 12.5V7.84518L6.42308 14.7559C6.09764 15.0814 5.57 15.0814 5.24457 14.7559C4.91913 14.4305 4.91913 13.9028 5.24457 13.5774L12.1553 6.66667L7.50049 6.66667C7.04025 6.66667 6.66715 6.29357 6.66715 5.83333Z"
-        fill="currentColor"
-      />
-    </svg>
-  );
-}
+const socialAppIcons = new Map([
+  ["github.com", IconGithub],
+  ["twitter.com", IconTwitter],
+  ["instagram.com", IconInstagram],
+  ["linkedin.com", IconLinkedin],
+]);
