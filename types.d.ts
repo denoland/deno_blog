@@ -15,8 +15,9 @@ export interface BlogMiddleware {
 export interface BlogSettings {
   title?: string;
   description?: string;
+  avatar?: string;
+  avatarClass?: string;
   cover?: string;
-  coverStyle?: "avatar" | "avatar-rounded" | "full";
   coverTextColor?: string;
   author?: string;
   links?: { title: string; url: string; icon?: VNode }[];

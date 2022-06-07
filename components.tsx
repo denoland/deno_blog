@@ -7,8 +7,15 @@
 /// <reference lib="dom.asynciterable" />
 /// <reference lib="deno.ns" />
 
-import { Fragment, gfm, h } from "./deps.ts";
+import { Fragment, gfm, h, type VNode } from "./deps.ts";
 import type { BlogState, Post } from "./types.d.ts";
+
+const socialAppIcons = new Map([
+  ["github.com", IconGithub],
+  ["twitter.com", IconTwitter],
+  ["instagram.com", IconInstagram],
+  ["linkedin.com", IconLinkedin],
+]);
 
 interface IndexProps {
   state: BlogState;
@@ -16,7 +23,6 @@ interface IndexProps {
 }
 
 export function Index({ state, posts }: IndexProps) {
-  const fullCover = state.cover && state.coverStyle === "full";
   const postIndex = [];
   for (const [_key, post] of posts.entries()) {
     postIndex.push(post);
@@ -29,25 +35,23 @@ export function Index({ state, posts }: IndexProps) {
     <>
       {state.header || (
         <header
-          class="w-full h-100 bg-cover bg-center bg-no-repeat"
+          class="w-full h-90 lt-sm:h-80 bg-cover bg-center bg-no-repeat"
           style={{
-            backgroundImage: fullCover ? `url(${state.cover})` : undefined,
+            backgroundImage: state.cover ? `url(${state.cover})` : undefined,
           }}
         >
-          <div class="max-w-screen-sm h-full px-4 mx-auto flex flex-col items-center justify-center">
-            {state.cover && state.coverStyle !== "full" && (
+          <div class="max-w-screen-sm h-full px-6 mx-auto flex flex-col items-center justify-center">
+            {state.avatar && (
               <div
                 class={[
-                  "bg-cover bg-center bg-no-repeat mb-4 w-30 h-30 border-3 border-white",
-                  (state.coverStyle === undefined ||
-                    state.coverStyle === "avatar-rounded") &&
-                  "rounded-full",
+                  "bg-cover bg-center bg-no-repeat w-25 h-25 border-4 border-white",
+                  state.avatarClass ?? "rounded-full",
                 ].filter(Boolean).join(" ")}
-                style={{ backgroundImage: `url(${state.cover})` }}
+                style={{ backgroundImage: `url(${state.avatar})` }}
               />
             )}
             <h1
-              class="text-4xl text-gray-900 font-bold"
+              class="mt-3 text-4xl text-gray-900 font-bold"
               style={{ color: state.coverTextColor }}
             >
               {state.title ?? "My Blog"}
@@ -78,11 +82,11 @@ export function Index({ state, posts }: IndexProps) {
 
                   return (
                     <a
-                      class="flex items-center justify-center w-8 h-8 rounded-full bg-gray-600/10 text-gray-700 hover:bg-gray-600/15 hover:text-black transition-colors"
+                      class="relative flex items-center justify-center w-8 h-8 rounded-full bg-gray-600/10 text-gray-700 hover:bg-gray-600/15 hover:text-black transition-colors group"
                       href={link.url}
-                      title={link.title}
                     >
                       <Icon />
+                      <Tooltip>{link.title}</Tooltip>
                     </a>
                   );
                 })}
@@ -92,8 +96,8 @@ export function Index({ state, posts }: IndexProps) {
         </header>
       )}
 
-      <div class="max-w-screen-sm px-4 mx-auto">
-        <div class="pt-16 border-t-1 border-gray-300/80">
+      <div class="max-w-screen-sm px-6 mx-auto">
+        <div class="pt-16 lt-sm:pt-12 border-t-1 border-gray-300/80">
           {postIndex.map((post) => (
             <PostCard
               post={post}
@@ -144,7 +148,7 @@ export function PostPage({ post, state }: PostPageProps) {
   const html = gfm.render(post.markdown);
 
   return (
-    <div class="max-w-screen-sm px-4 pt-8 mx-auto">
+    <div class="max-w-screen-sm px-6 pt-8 mx-auto">
       <div class="pb-16">
         <a
           href="/"
@@ -195,7 +199,7 @@ export function PostPage({ post, state }: PostPageProps) {
 
 function Footer(props: { author?: string }) {
   return (
-    <footer class="mt-20 pb-16">
+    <footer class="mt-20 pb-16 lt-sm:pb-8 lt-sm:mt-16">
       <p class="flex items-center gap-2.5 text-gray-400/800 text-sm">
         <span>
           &copy; {new Date().getFullYear()} {props.author}, Powered by{" "}
@@ -215,6 +219,36 @@ function Footer(props: { author?: string }) {
         </a>
       </p>
     </footer>
+  );
+}
+
+function Tooltip(
+  { children }: { children: string },
+) {
+  return (
+    <div
+      className={"absolute top-10 px-3 h-8 !leading-8 bg-black/80 text-white text-sm rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 group-focus:opacity-100 transition-opacity"}
+    >
+      <span
+        className="block absolute text-black/80"
+        style={{ top: -4, left: "50%", marginLeft: -4.5, width: 9, height: 4 }}
+      >
+        <svg
+          className="absolute"
+          width="9"
+          height="4"
+          viewBox="0 0 9 4"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M3.83564 0.590546C4.21452 0.253758 4.78548 0.253758 5.16436 0.590546L9 4H0L3.83564 0.590546Z"
+            fill="currentColor"
+          />
+        </svg>
+      </span>
+      {children}
+    </div>
   );
 }
 
@@ -332,10 +366,3 @@ function IconLinkedin() {
     </svg>
   );
 }
-
-const socialAppIcons = new Map([
-  ["github.com", IconGithub],
-  ["twitter.com", IconTwitter],
-  ["instagram.com", IconInstagram],
-  ["linkedin.com", IconLinkedin],
-]);
