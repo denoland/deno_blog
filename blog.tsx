@@ -279,7 +279,7 @@ export async function handler(
 
   if (pathname === "/") {
     return html({
-      lang:blogState.lang,
+      lang: blogState.lang,
       title: blogState.title ?? "My Blog",
       meta: {
         "description": blogState.description,
@@ -310,7 +310,7 @@ export async function handler(
   const post = POSTS.get(pathname);
   if (post) {
     return html({
-      lang:blogState.lang,
+      lang: blogState.lang,
       title: post.title,
       meta: {
         "description": post.snippet,

@@ -102,7 +102,7 @@ export function Index({ state, posts }: IndexProps) {
             <PostCard
               post={post}
               key={post.pathname}
-              timezone={state.timezone ?? 'en-US'}
+              timezone={state.timezone ?? "en-US"}
             />
           ))}
         </div>
@@ -113,7 +113,7 @@ export function Index({ state, posts }: IndexProps) {
   );
 }
 
-function PostCard({ post, timezone }: { post: Post, timezone: string }) {
+function PostCard({ post, timezone }: { post: Post; timezone: string }) {
   return (
     <div class="pt-12 first:pt-0">
       <h3 class="text-2xl font-bold">
@@ -147,7 +147,6 @@ interface PostPageProps {
 
 export function PostPage({ post, state }: PostPageProps) {
   const html = gfm.render(post.markdown);
-  
   return (
     <div class="max-w-screen-sm px-6 pt-8 mx-auto">
       <div class="pb-16">
@@ -185,7 +184,7 @@ export function PostPage({ post, state }: PostPageProps) {
               By {state.author || post.author} at {" "}
             </span>
           )}
-          <PrettyDate date={post.publishDate} timezone={state.timezone}/>
+          <PrettyDate date={post.publishDate} timezone={state.timezone} />
         </p>
         <div
           class="mt-8 markdown-body"
@@ -253,8 +252,8 @@ function Tooltip(
   );
 }
 
-function PrettyDate({ date, timezone }: { date: Date, timezone?: string }) {
-  const formatted = date.toLocaleDateString(timezone ?? 'en-US');
+function PrettyDate({ date, timezone }: { date: Date; timezone?: string }) {
+  const formatted = date.toLocaleDateString(timezone ?? "en-US");
   return <time dateTime={date.toISOString()}>{formatted}</time>;
 }
 
