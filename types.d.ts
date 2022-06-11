@@ -27,6 +27,8 @@ export interface BlogSettings {
   background?: string;
   ogImage?: string;
   middlewares?: BlogMiddleware[];
+  lang?: string;
+  timezone?: string;
 }
 
 export interface BlogState extends BlogSettings {

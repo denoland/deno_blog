@@ -279,6 +279,7 @@ export async function handler(
 
   if (pathname === "/") {
     return html({
+      lang:blogState.lang,
       title: blogState.title ?? "My Blog",
       meta: {
         "description": blogState.description,
@@ -309,6 +310,7 @@ export async function handler(
   const post = POSTS.get(pathname);
   if (post) {
     return html({
+      lang:blogState.lang,
       title: post.title,
       meta: {
         "description": post.snippet,
@@ -363,7 +365,7 @@ function serveRSS(
     description: state.description,
     id: `${origin}/blog`,
     link: `${origin}/blog`,
-    language: "en",
+    language: state.lang,
     favicon: `${origin}/favicon.ico`,
     copyright: copyright,
     generator: "Feed (https://github.com/jpmonette/feed) for Deno",
