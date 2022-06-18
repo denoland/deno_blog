@@ -192,6 +192,8 @@ export function PostPage({ post, state }: PostPageProps) {
         />
       </article>
 
+      {state.section}
+
       {state.footer || <Footer author={state.author} />}
     </div>
   );

@@ -76,6 +76,7 @@ import blog, { h } from "https://deno.land/x/blog/blog.tsx";
 blog({
   title: "My Blog",
   header: <header>Your custom header</header>,
+  section: <section>Feedback from readers</section>,
   footer: <footer>Your custom footer</footer>,
 });
 ```
