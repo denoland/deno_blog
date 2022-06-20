@@ -251,7 +251,7 @@ export async function handler(
   ctx: BlogContext,
 ) {
   const { state: blogState } = ctx;
-  const { pathname, href } = new URL(req.url);
+  const { pathname } = new URL(req.url);
 
   if (pathname === "/feed") {
     return serveRSS(req, blogState, POSTS);
@@ -333,7 +333,7 @@ export async function handler(
         )),
       ],
       scripts: IS_DEV ? [{ src: "/hmr.js" }] : undefined,
-      body: <PostPage post={post} state={blogState} href={href} />,
+      body: <PostPage post={post} state={blogState} />,
     });
   }
 

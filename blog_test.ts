@@ -186,14 +186,3 @@ Deno.test("RSS feed", async () => {
   assertStringIncludes(body, `Second post`);
   assertStringIncludes(body, `https://blog.deno.dev/second`);
 });
-
-Deno.test("default section (sharing links)",  async () => {
-  const resp = await testHandler(new Request("https://blog.deno.dev/first"));
-  assert(resp);
-  assertEquals(resp.status, 200);
-  assertEquals(resp.headers.get("content-type"), "text/html; charset=utf-8");
-  const body = await resp.text();
-  assertStringIncludes(body, `https://telegram.me/share/url?url=`);
-  assertStringIncludes(body, `https://twitter.com/intent/tweet?text=`);
-  assertStringIncludes(body, `https://api.whatsapp.com/send?text=`);
-});
