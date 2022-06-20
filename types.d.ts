@@ -30,6 +30,7 @@ export interface BlogSettings {
   middlewares?: BlogMiddleware[];
   lang?: string;
   timezone?: string;
+  rssDomain?: string;
 }
 
 export interface BlogState extends BlogSettings {

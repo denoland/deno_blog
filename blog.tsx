@@ -357,7 +357,7 @@ function serveRSS(
   state: BlogState,
   posts: Map<string, Post>,
 ): Response {
-  const url = new URL(req.url);
+  const url = state.rssDomain ? new URL(state.rssDomain) : new URL(req.url);
   const origin = url.origin;
   const copyright = `Copyright ${new Date().getFullYear()} ${origin}`;
   const feed = new Feed({
