@@ -51,14 +51,14 @@ export function Index({ state, posts }: IndexProps) {
               />
             )}
             <h1
-              class="mt-3 text-4xl text-gray-900 font-bold"
+              class="mt-3 text-4xl text-gray-900 dark:text-gray-100 font-bold"
               style={{ color: state.coverTextColor }}
             >
               {state.title ?? "My Blog"}
             </h1>
             {state.description && (
               <p
-                class="text-lg text-gray-600"
+                class="text-lg text-gray-600 dark:text-gray-400"
                 style={{ color: state.coverTextColor }}
               >
                 {state.description}
@@ -82,7 +82,7 @@ export function Index({ state, posts }: IndexProps) {
 
                   return (
                     <a
-                      class="relative flex items-center justify-center w-8 h-8 rounded-full bg-gray-600/10 text-gray-700 hover:bg-gray-600/15 hover:text-black transition-colors group"
+                      class="relative flex items-center justify-center w-8 h-8 rounded-full bg-gray-600/10 dark:bg-gray-400/10 text-gray-700 dark:text-gray-400 hover:bg-gray-600/15 dark:hover:bg-gray-400/15 hover:text-black dark:hover:text-white transition-colors group"
                       href={link.url}
                     >
                       <Icon />
@@ -124,12 +124,12 @@ function PostCard({ post, timezone }: { post: Post; timezone: string }) {
       <p class="text-gray-500/80">
         <PrettyDate date={post.publishDate} timezone={timezone} />
       </p>
-      <p class="mt-3 text-gray-600">
+      <p class="mt-3 text-gray-600 dark:text-gray-400">
         {post.snippet}
       </p>
       <p class="mt-3">
         <a
-          class="leading-tight text-gray-900 inline-block border-b-1 border-gray-600 hover:text-gray-500 hover:border-gray-500 transition-colors"
+          class="leading-tight text-gray-900 dark:text-gray-100 inline-block border-b-1 border-gray-600 hover:text-gray-500 hover:border-gray-500 transition-colors"
           href={post.pathname}
           title={`Read "${post.title}"`}
         >
@@ -175,7 +175,7 @@ export function PostPage({ post, state }: PostPageProps) {
         />
       )}
       <article>
-        <h1 class="text-4xl text-gray-900 font-bold">
+        <h1 class="text-4xl text-gray-900 dark:text-gray-100 font-bold">
           {post.title}
         </h1>
         <p class="mt-1 text-gray-500">
@@ -187,7 +187,7 @@ export function PostPage({ post, state }: PostPageProps) {
           <PrettyDate date={post.publishDate} timezone={state.timezone} />
         </p>
         <div
-          class="mt-8 markdown-body"
+          class="mt-8 markdown-body dark:text-gray-300"
           dangerouslySetInnerHTML={{ __html: html }}
         />
       </article>
@@ -206,7 +206,7 @@ function Footer(props: { author?: string }) {
         <span>
           &copy; {new Date().getFullYear()} {props.author}, Powered by{" "}
           <a
-            class="inline-flex items-center gap-1 underline hover:text-gray-800 transition-colors"
+            class="inline-flex items-center gap-1 underline hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
             href="https://deno.land/x/blog"
           >
             Deno Blog
@@ -214,7 +214,7 @@ function Footer(props: { author?: string }) {
         </span>
         <a
           href="/feed"
-          class="inline-flex items-center gap-1 hover:text-gray-800 transition-colors"
+          class="inline-flex items-center gap-1 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
           title="Atom Feed"
         >
           <IconRssFeed /> RSS
