@@ -59,7 +59,7 @@ blog({
 
 const DENO_JSONC_CONTENTS = `{
   "tasks": {
-    "dev": "deno run --allow-net --allow-read --watch main.ts --dev",
+    "dev": "deno run --allow-net --allow-read --allow-env --watch main.ts --dev",
     "serve": "deno run --allow-net --allow-read --no-check main.ts",
   }
 }
