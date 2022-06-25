@@ -294,7 +294,7 @@ export async function handler(
       links: blogState.canonicalUrl ? [
         {
           rel: "canonical",
-          href: blogState.canonicalUrl,
+          href: new URL(blogState.canonicalUrl).href,
         }
       ] : undefined,
       styles: [
