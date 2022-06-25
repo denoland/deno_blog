@@ -19,7 +19,7 @@ export {
   h,
   html,
   type VNode,
-} from "https://deno.land/x/htm@0.0.6/mod.tsx";
+} from "https://deno.land/x/htm@0.0.8/mod.tsx";
 export { parse as frontMatter } from "https://deno.land/x/frontmatter@v0.1.4/mod.ts";
 export {
   createReporter,
