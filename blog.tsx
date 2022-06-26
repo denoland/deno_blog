@@ -293,7 +293,7 @@ export async function handler(
         "twitter:card": blogState.ogImage ? "summary_large_image" : undefined,
       },
 	  links: [
-		{ href: canonicalUrl, rel: "canonical"}
+		{ href: canonicalUrl, rel: "canonical" }
 	  ],
       styles: [
         ...(blogState.style ? [blogState.style] : []),
@@ -336,6 +336,9 @@ export async function handler(
             : []
         )),
       ],
+	  links: [
+		{ href: `${canonicalUrl}${pathname}`, rel: 'canonical' }
+	  ],
       scripts: IS_DEV ? [{ src: "/hmr.js" }] : undefined,
       body: <PostPage post={post} state={blogState} />,
     });
