@@ -337,7 +337,7 @@ export async function handler(
         )),
       ],
 	  links: [
-		{ href: `${canonicalUrl}${pathname}`, rel: 'canonical' }
+		{ href: `${canonicalUrl}${pathname}`, rel: "canonical" }
 	  ],
       scripts: IS_DEV ? [{ src: "/hmr.js" }] : undefined,
       body: <PostPage post={post} state={blogState} />,
