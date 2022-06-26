@@ -187,7 +187,10 @@ export function PostPage({ post, state }: PostPageProps) {
           <PrettyDate date={post.publishDate} timezone={state.timezone} />
         </p>
         <div
-          class="mt-8 markdown-body dark:text-gray-300"
+          class="mt-8 markdown-body"
+          data-color-mode="auto"
+          data-light-theme="light"
+          data-dark-theme="dark"
           dangerouslySetInnerHTML={{ __html: html }}
         />
       </article>
