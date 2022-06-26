@@ -213,7 +213,7 @@ function Footer(props: { author?: string }) {
             href="https://deno.land/x/blog"
           >
             Deno Blog
-          </a> 
+          </a>
         </span>
         <a
           href="/feed"
