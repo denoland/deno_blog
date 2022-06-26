@@ -205,7 +205,7 @@ export function PostPage({ post, state }: PostPageProps) {
 function Footer(props: { author?: string }) {
   return (
     <footer class="mt-20 pb-16 lt-sm:pb-8 lt-sm:mt-16">
-      <p class="flex items-center gap-2.5 text-gray-400/800 text-sm">
+      <p class="flex items-center gap-2.5 text-gray-400/800 dark:text-gray-500/800 text-sm">
         <span>
           &copy; {new Date().getFullYear()} {props.author}, Powered by{" "}
           <a
@@ -213,7 +213,7 @@ function Footer(props: { author?: string }) {
             href="https://deno.land/x/blog"
           >
             Deno Blog
-          </a>
+          </a> 
         </span>
         <a
           href="/feed"
