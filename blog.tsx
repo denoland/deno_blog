@@ -252,6 +252,7 @@ export async function handler(
 ) {
   const { state: blogState } = ctx;
   const { pathname } = new URL(req.url);
+  const canonicalUrl = blogState.canonicalUrl || new URL(req.url).origin;
 
   if (pathname === "/feed") {
     return serveRSS(req, blogState, POSTS);
@@ -291,6 +292,9 @@ export async function handler(
         "twitter:image": blogState.ogImage ?? blogState.cover,
         "twitter:card": blogState.ogImage ? "summary_large_image" : undefined,
       },
+	  links: [
+		{ href: canonicalUrl, rel: "canonical"}
+	  ],
       styles: [
         ...(blogState.style ? [blogState.style] : []),
         ...(blogState.background
@@ -357,7 +361,7 @@ function serveRSS(
   state: BlogState,
   posts: Map<string, Post>,
 ): Response {
-  const url = state.rssDomain ? new URL(state.rssDomain) : new URL(req.url);
+  const url = state.canonicalUrl ? new URL(state.canonicalUrl) : new URL(req.url);
   const origin = url.origin;
   const copyright = `Copyright ${new Date().getFullYear()} ${origin}`;
   const feed = new Feed({
