@@ -292,9 +292,9 @@ export async function handler(
         "twitter:image": blogState.ogImage ?? blogState.cover,
         "twitter:card": blogState.ogImage ? "summary_large_image" : undefined,
       },
-	  links: [
-		{ href: canonicalUrl, rel: "canonical" }
-	  ],
+      links: [
+        { href: canonicalUrl, rel: "canonical" },
+      ],
       styles: [
         ...(blogState.style ? [blogState.style] : []),
         ...(blogState.background
@@ -336,9 +336,9 @@ export async function handler(
             : []
         )),
       ],
-	  links: [
-		{ href: `${canonicalUrl}${pathname}`, rel: "canonical" }
-	  ],
+      links: [
+        { href: `${canonicalUrl}${pathname}`, rel: "canonical" },
+      ],
       scripts: IS_DEV ? [{ src: "/hmr.js" }] : undefined,
       body: <PostPage post={post} state={blogState} />,
     });
@@ -364,7 +364,9 @@ function serveRSS(
   state: BlogState,
   posts: Map<string, Post>,
 ): Response {
-  const url = state.canonicalUrl ? new URL(state.canonicalUrl) : new URL(req.url);
+  const url = state.canonicalUrl
+    ? new URL(state.canonicalUrl)
+    : new URL(req.url);
   const origin = url.origin;
   const copyright = `Copyright ${new Date().getFullYear()} ${origin}`;
   const feed = new Feed({
