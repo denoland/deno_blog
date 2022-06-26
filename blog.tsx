@@ -22,6 +22,7 @@ import {
   removeMarkdown,
   serve,
   serveDir,
+  UnoCSS,
   walk,
 } from "./deps.ts";
 import { Index, PostPage } from "./components.tsx";
@@ -35,6 +36,8 @@ import type {
 } from "./types.d.ts";
 
 export { Fragment, h };
+
+html.use(UnoCSS());
 
 const IS_DEV = Deno.args.includes("--dev") && "watchFs" in Deno;
 const POSTS = new Map<string, Post>();
