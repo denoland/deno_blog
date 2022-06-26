@@ -85,7 +85,7 @@ export function Index({ state, posts }: IndexProps) {
                       class="relative flex items-center justify-center w-8 h-8 rounded-full bg-gray-600/10 dark:bg-gray-400/10 text-gray-700 dark:text-gray-400 hover:bg-gray-600/15 dark:hover:bg-gray-400/15 hover:text-black dark:hover:text-white transition-colors group"
                       href={link.url}
                     >
-                      <Icon />
+                      {link.icon ? link.icon : <Icon />}
                       <Tooltip>{link.title}</Tooltip>
                     </a>
                   );
