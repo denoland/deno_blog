@@ -20,6 +20,7 @@ export {
   html,
   type VNode,
 } from "https://deno.land/x/htm@0.0.10/mod.tsx";
+export { UnoCSS } from "https://deno.land/x/htm@0.0.10/plugins.ts";
 export { parse as frontMatter } from "https://deno.land/x/frontmatter@v0.1.4/mod.ts";
 export {
   createReporter,
