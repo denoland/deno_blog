@@ -35,7 +35,7 @@ import type {
   Post,
 } from "./types.d.ts";
 
-html.use(UnoCSS);
+html.use(UnoCSS());
 
 export { Fragment, h };
 
