@@ -14,6 +14,7 @@ import {
   Fragment,
   fromFileUrl,
   frontMatter,
+  GA4Report,
   gfm,
   h,
   html,
@@ -425,6 +426,35 @@ export function ga(gaKey: string): BlogMiddleware {
       if (gaReporter) {
         gaReporter(request, ctx.connInfo, res!, start, err);
       }
+    }
+    return res;
+  };
+}
+
+export function ga4(measurementId: string): BlogMiddleware {
+  if (measurementId.length === 0) {
+    throw new Error("Measurement ID cannot be empty.");
+  }
+
+  return async function (
+    request: Request,
+    ctx: BlogContext,
+  ): Promise<Response> {
+    let res: Response | undefined;
+
+    try {
+      res = await ctx.next();
+    } catch (e) {
+      res = new Response("Internal server error", {
+        status: 500,
+      });
+    } finally {
+      new GA4Report({
+        measurementId,
+        request,
+        response: res!,
+        conn: ctx.connInfo,
+      }).send();
     }
     return res;
   };
