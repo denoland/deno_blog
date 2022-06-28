@@ -25,7 +25,6 @@ export interface BlogSettings {
   section?: VNode;
   footer?: VNode;
   style?: string;
-  background?: string;
   ogImage?: string;
   middlewares?: BlogMiddleware[];
   lang?: string;
