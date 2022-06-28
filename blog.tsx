@@ -22,6 +22,7 @@ import {
   removeMarkdown,
   serve,
   serveDir,
+  UnoCSS,
   walk,
 } from "./deps.ts";
 import { Index, PostPage } from "./components.tsx";
@@ -33,6 +34,8 @@ import type {
   BlogState,
   Post,
 } from "./types.d.ts";
+
+html.use(UnoCSS());
 
 export { Fragment, h };
 
