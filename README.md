@@ -14,7 +14,7 @@ blog();
 To initialize your own blog you can run following script:
 
 ```shellsession
-$ deno run --allow-read --allow-write https://deno.land/x/blog/init.ts ./directory/for/blog/
+$ deno run -r --allow-read --allow-write https://deno.land/x/blog/init.ts ./directory/for/blog/
 ```
 
 _This command will setup a blog with a "Hello world" post so you can start
