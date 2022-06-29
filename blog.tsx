@@ -39,6 +39,8 @@ html.use(UnoCSS());
 
 export { Fragment, h };
 
+html.use(UnoCSS());
+
 const IS_DEV = Deno.args.includes("--dev") && "watchFs" in Deno;
 const POSTS = new Map<string, Post>();
 const HMR_SOCKETS: Set<WebSocket> = new Set();
@@ -242,7 +244,6 @@ async function loadPost(postsDirectory: string, path: string) {
     snippet,
     markdown: content,
     coverHtml: data.cover_html,
-    background: data.background,
     ogImage: data["og:image"],
   };
   POSTS.set(pathname, post);
@@ -282,6 +283,7 @@ export async function handler(
 
   if (pathname === "/") {
     return html({
+      colorScheme: "auto",
       lang: blogState.lang,
       title: blogState.title ?? "My Blog",
       meta: {
@@ -296,9 +298,6 @@ export async function handler(
       },
       styles: [
         ...(blogState.style ? [blogState.style] : []),
-        ...(blogState.background
-          ? [`body{background:${blogState.background};}`]
-          : []),
       ],
       scripts: IS_DEV ? [{ src: "/hmr.js" }] : undefined,
       body: (
@@ -313,6 +312,7 @@ export async function handler(
   const post = POSTS.get(pathname);
   if (post) {
     return html({
+      colorScheme: "auto",
       lang: blogState.lang,
       title: post.title,
       meta: {
@@ -327,13 +327,8 @@ export async function handler(
       },
       styles: [
         gfm.CSS,
-        `.markdown-body { --color-canvas-default: transparent; --color-canvas-subtle: #edf0f2; --color-border-muted: rgba(128,128,128,0.2); } .markdown-body img + p { margin-top: 16px; }`,
+        `.markdown-body { --color-canvas-default: transparent !important; --color-canvas-subtle: #edf0f2; --color-border-muted: rgba(128,128,128,0.2); } .markdown-body img + p { margin-top: 16px; }`,
         ...(blogState.style ? [blogState.style] : []),
-        ...(post.background ? [`body{background:${post.background};}`] : (
-          blogState.background
-            ? [`body{background:${blogState.background};}`]
-            : []
-        )),
       ],
       scripts: IS_DEV ? [{ src: "/hmr.js" }] : undefined,
       body: <PostPage post={post} state={blogState} />,
