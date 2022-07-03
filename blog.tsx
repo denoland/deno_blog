@@ -226,14 +226,15 @@ async function loadPost(postsDirectory: string, path: string) {
   };
 
   Object.defineProperty(data, "get", {
-    value: function(key: string) {
+    value: function (key: string) {
       return this[key];
     },
   });
 
-  let snippet = data.get<string>("snippet") ?? data.get<string>("abstract") ??
-    data.get<string>("summary") ??
-    data.get<string>("description");
+  let snippet: string | undefined = data.get("snippet") ??
+    data.get("abstract") ??
+    data.get("summary") ??
+    data.get("description");
   if (!snippet) {
     const maybeSnippet = content.split("\n\n")[0];
     if (maybeSnippet) {
@@ -244,17 +245,17 @@ async function loadPost(postsDirectory: string, path: string) {
   }
 
   const post: Post = {
-    title: data.get<string>("title") ?? "Untitled",
-    author: data.get<string>("author"),
+    title: data.get("title") ?? "Untitled",
+    author: data.get("author"),
     // Note: users can override path of a blog post using
     // pathname in front matter.
-    pathname: data.get<string>("pathname") ?? pathname,
-    publishDate: data.get<Date>("publish_date")!,
+    pathname: data.get("pathname") ?? pathname,
+    publishDate: data.get("publish_date")!,
     snippet,
     markdown: content,
     coverHtml: data.get("cover_html"),
-    ogImage: data.get<string>("og:image"),
-    tags: data.get<string[]>("tags"),
+    ogImage: data.get("og:image"),
+    tags: data.get("tags"),
   };
   POSTS.set(pathname, post);
   console.log("Load: ", post.pathname);
