@@ -84,7 +84,6 @@ export function assertArray<T = unknown>(
       ? val.map<T>((item) => assertChild(item, `child of ${name}`))
       : val;
   }
-  Object.defineProperty;
   throw new Error(assertTemplate(name, "array"));
 }
 
