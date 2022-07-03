@@ -100,7 +100,7 @@ export function assertArrayOf<T = unknown>(
       assertChild.type.includes("|")
         ? `(${assertChild.type})`
         : assertChild.type
-    }`,
+    }[]`,
   });
   return fn as Assert<T[]>;
 }
