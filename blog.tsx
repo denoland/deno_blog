@@ -218,18 +218,12 @@ async function loadPost(postsDirectory: string, path: string) {
   // Remove .md extension.
   pathname = pathname.slice(0, -3);
 
-  const { content, data } = frontMatter(contents) as {
-    data: Record<string, string | string[] | Date> & {
-      get<T>(key: string): T | undefined;
-    };
+  const { content, data: _data } = frontMatter(contents) as {
+    data: Record<string, string | string[] | Date>;
     content: string;
   };
 
-  Object.defineProperty(data, "get", {
-    value: function (key: string) {
-      return this[key];
-    },
-  });
+  const data = recordGetter(_data);
 
   let snippet: string | undefined = data.get("snippet") ??
     data.get("abstract") ??
@@ -487,4 +481,12 @@ function filterPosts(
   return new Map(
     Array.from(posts.entries()).filter(([, p]) => p.tags?.includes(tag)),
   );
+}
+
+function recordGetter(data: Record<string, unknown>) {
+  return {
+    get<T>(key: string): T | undefined {
+      return data[key] as T;
+    },
+  };
 }
