@@ -266,17 +266,19 @@ function PrettyDate({ date, timezone }: { date: Date; timezone?: string }) {
   return <time dateTime={date.toISOString()}>{formatted}</time>;
 }
 
-function Tags({tags}: {tags?: string[]}) {
-  return <section class="flex gap-x-2 flex-wrap">
-  {tags?.map((tag) => (
-    <a
-      class="text-bluegray-500 font-bold"
-      href={`/?tag=${tag}`}
-    >
-      #{tag}
-    </a>
-  ))}
-</section>
+function Tags({ tags }: { tags?: string[] }) {
+  return (
+    <section class="flex gap-x-2 flex-wrap">
+      {tags?.map((tag) => (
+        <a
+          class="text-bluegray-500 font-bold"
+          href={`/?tag=${tag}`}
+        >
+          #{tag}
+        </a>
+      ))}
+    </section>
+  );
 }
 
 function IconRssFeed() {
