@@ -34,6 +34,14 @@ import type {
   BlogState,
   Post,
 } from "./types.d.ts";
+import {
+  assertArrayOf,
+  assertDate,
+  assertString,
+  composeAssert,
+  optional,
+} from "./assert.ts";
+import { filterPosts } from "./post.ts";
 
 html.use(UnoCSS());
 
@@ -219,7 +227,7 @@ async function loadPost(postsDirectory: string, path: string) {
   pathname = pathname.slice(0, -3);
 
   const { content, data } = frontMatter(contents) as {
-    data: Record<string, string>;
+    data: Record<string, string | string[] | Date>;
     content: string;
   };
 
@@ -235,16 +243,23 @@ async function loadPost(postsDirectory: string, path: string) {
   }
 
   const post: Post = {
-    title: data.title ?? "Untitled",
-    author: data.author,
+    title: optional(assertString, data.title, "data.title") ?? "Untitled",
+    author: optional(assertString, data.author, "data.author"),
     // Note: users can override path of a blog post using
     // pathname in front matter.
-    pathname: data.pathname ?? pathname,
-    publishDate: new Date(data.publish_date),
-    snippet,
+    pathname: optional(assertString, data.pathname, "data.pathname") ??
+      pathname,
+    publishDate: new Date(
+      composeAssert(assertString, assertDate)(
+        data.publish_date,
+        "data.publish_date",
+      ),
+    ),
+    snippet: optional(assertString, snippet, "snippet"),
     markdown: content,
-    coverHtml: data.cover_html,
-    ogImage: data["og:image"],
+    coverHtml: optional(assertString, data.cover_html, "data.cover_html"),
+    ogImage: optional(assertString, data["og:image"], 'data["og:image"]'),
+    tags: optional(assertArrayOf(assertString), data.tags, "data.tags"),
   };
   POSTS.set(pathname, post);
   console.log("Load: ", post.pathname);
@@ -255,7 +270,7 @@ export async function handler(
   ctx: BlogContext,
 ) {
   const { state: blogState } = ctx;
-  const { pathname } = new URL(req.url);
+  const { pathname, searchParams } = new URL(req.url);
   const canonicalUrl = blogState.canonicalUrl || new URL(req.url).origin;
 
   if (pathname === "/feed") {
@@ -307,7 +322,7 @@ export async function handler(
       body: (
         <Index
           state={blogState}
-          posts={POSTS}
+          posts={filterPosts(POSTS, searchParams)}
         />
       ),
     });
