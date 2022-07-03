@@ -268,7 +268,7 @@ function PrettyDate({ date, timezone }: { date: Date; timezone?: string }) {
 
 function Tags({ tags }: { tags?: string[] }) {
   return (
-    <section class="flex gap-x-2 flex-wrap">
+    tags && tags.length > 0 ? <section class="flex gap-x-2 flex-wrap">
       {tags?.map((tag) => (
         <a
           class="text-bluegray-500 font-bold"
@@ -277,7 +277,7 @@ function Tags({ tags }: { tags?: string[] }) {
           #{tag}
         </a>
       ))}
-    </section>
+    </section> : null
   );
 }
 

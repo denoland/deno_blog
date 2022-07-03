@@ -34,14 +34,6 @@ import type {
   BlogState,
   Post,
 } from "./types.d.ts";
-import {
-  assertArrayOf,
-  assertDate,
-  assertString,
-  composeAssert,
-  optional,
-} from "./assert.ts";
-import { filterPosts } from "./post.ts";
 
 html.use(UnoCSS());
 
@@ -227,12 +219,21 @@ async function loadPost(postsDirectory: string, path: string) {
   pathname = pathname.slice(0, -3);
 
   const { content, data } = frontMatter(contents) as {
-    data: Record<string, string | string[] | Date>;
+    data: Record<string, string | string[] | Date> & {
+      get<T>(key: string): T | undefined;
+    };
     content: string;
   };
 
-  let snippet = data.snippet ?? data.abstract ?? data.summary ??
-    data.description;
+  Object.defineProperty(data, "get", {
+    value: function(key: string) {
+      return this[key];
+    },
+  });
+
+  let snippet = data.get<string>("snippet") ?? data.get<string>("abstract") ??
+    data.get<string>("summary") ??
+    data.get<string>("description");
   if (!snippet) {
     const maybeSnippet = content.split("\n\n")[0];
     if (maybeSnippet) {
@@ -243,23 +244,17 @@ async function loadPost(postsDirectory: string, path: string) {
   }
 
   const post: Post = {
-    title: optional(assertString, data.title, "data.title") ?? "Untitled",
-    author: optional(assertString, data.author, "data.author"),
+    title: data.get<string>("title") ?? "Untitled",
+    author: data.get<string>("author"),
     // Note: users can override path of a blog post using
     // pathname in front matter.
-    pathname: optional(assertString, data.pathname, "data.pathname") ??
-      pathname,
-    publishDate: new Date(
-      composeAssert(assertString, assertDate)(
-        data.publish_date,
-        "data.publish_date",
-      ),
-    ),
-    snippet: optional(assertString, snippet, "snippet"),
+    pathname: data.get<string>("pathname") ?? pathname,
+    publishDate: data.get<Date>("publish_date")!,
+    snippet,
     markdown: content,
-    coverHtml: optional(assertString, data.cover_html, "data.cover_html"),
-    ogImage: optional(assertString, data["og:image"], 'data["og:image"]'),
-    tags: optional(assertArrayOf(assertString), data.tags, "data.tags"),
+    coverHtml: data.get("cover_html"),
+    ogImage: data.get<string>("og:image"),
+    tags: data.get<string[]>("tags"),
   };
   POSTS.set(pathname, post);
   console.log("Load: ", post.pathname);
@@ -478,4 +473,17 @@ export function redirects(redirectMap: Record<string, string>): BlogMiddleware {
 
     return await ctx.next();
   };
+}
+
+function filterPosts(
+  posts: Map<string, Post>,
+  searchParams: URLSearchParams,
+) {
+  const tag = searchParams.get("tag");
+  if (!tag) {
+    return posts;
+  }
+  return new Map(
+    Array.from(posts.entries()).filter(([, p]) => p.tags?.includes(tag)),
+  );
 }
