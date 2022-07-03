@@ -284,7 +284,7 @@ export async function handler(
 
   if (pathname === "/") {
     return html({
-      colorScheme: "auto",
+      colorScheme: blogState.theme ?? "auto",
       lang: blogState.lang,
       title: blogState.title ?? "My Blog",
       meta: {
