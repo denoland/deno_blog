@@ -316,7 +316,7 @@ export async function handler(
   const post = POSTS.get(pathname);
   if (post) {
     return html({
-      colorScheme: "auto",
+      colorScheme: blogState.theme ?? "auto",
       lang: blogState.lang,
       title: post.title,
       meta: {
