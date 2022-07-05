@@ -13,17 +13,18 @@ export interface BlogMiddleware {
 }
 
 export interface BlogSettings {
-  title?: string;
-  description?: string;
+  title?: string | VNode;
+  description?: string | VNode;
   avatar?: string;
   avatarClass?: string;
   cover?: string;
   coverTextColor?: string;
   author?: string;
   links?: { title: string; url: string; icon?: VNode }[];
-  header?: VNode;
-  section?: VNode;
-  footer?: VNode;
+  header?: string | VNode;
+  showHeaderOnPostPage?: boolean;
+  section?: string | VNode;
+  footer?: string | VNode;
   style?: string;
   ogImage?: string;
   middlewares?: BlogMiddleware[];
