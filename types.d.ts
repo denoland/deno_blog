@@ -30,6 +30,7 @@ export interface BlogSettings {
   lang?: string;
   timezone?: string;
   canonicalUrl?: string;
+  theme?: "dark" | "light" | "auto";
 }
 
 export interface BlogState extends BlogSettings {
