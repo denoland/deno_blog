@@ -93,7 +93,6 @@ function hmrSocket(callback) {
  * ```
  */
 export default async function blog(settings?: BlogSettings) {
-
   html.use(UnoCSS(settings.unocss)); // Load custom unocss module if provided
 
   const url = callsites()[1].getFileName()!;

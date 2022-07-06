@@ -36,7 +36,7 @@ You can customize your blog as follows:
 
 ```js
 import blog, { ga, redirects } from "https://deno.land/x/blog/blog.tsx";
-import { unocss_opts } from './unocss.ts'
+import { unocss_opts } from "./unocss.ts";
 
 blog({
   author: "Dino",
@@ -59,7 +59,7 @@ blog({
       "bar": "my_post2",
     }),
   ],
-  unocss: unocss_opts // check https://github.com/unocss/unocss
+  unocss: unocss_opts, // check https://github.com/unocss/unocss
 });
 ```
 
