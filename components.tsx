@@ -43,6 +43,7 @@ export function Index({ state, posts }: IndexProps) {
           <div class="max-w-screen-sm h-full px-6 mx-auto flex flex-col items-center justify-center">
             {state.avatar && (
               <a
+                href="/"
                 class={[
                   "bg-cover bg-center bg-no-repeat w-25 h-25 border-4 border-white",
                   state.avatarClass ?? "rounded-full",
