@@ -36,6 +36,7 @@ You can customize your blog as follows:
 
 ```js
 import blog, { ga, redirects } from "https://deno.land/x/blog/blog.tsx";
+import { unocss_opts } from "./unocss.ts";
 
 blog({
   author: "Dino",
@@ -58,6 +59,7 @@ blog({
       "bar": "my_post2",
     }),
   ],
+  unocss: unocss_opts, // check https://github.com/unocss/unocss
 });
 ```
 
@@ -76,6 +78,7 @@ import blog, { h } from "https://deno.land/x/blog/blog.tsx";
 blog({
   title: "My Blog",
   header: <header>Your custom header</header>,
+  showHeaderOnPostPage: true // by default, the header will only show on home, set showHeaderOnPostPage to true to make it show on each post page
   section: <section>Your custom section</section>,
   footer: <footer>Your custom footer</footer>,
 });

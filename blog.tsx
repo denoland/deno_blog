@@ -35,11 +35,7 @@ import type {
   Post,
 } from "./types.d.ts";
 
-html.use(UnoCSS());
-
 export { Fragment, h };
-
-html.use(UnoCSS());
 
 const IS_DEV = Deno.args.includes("--dev") && "watchFs" in Deno;
 const POSTS = new Map<string, Post>();
@@ -97,6 +93,8 @@ function hmrSocket(callback) {
  * ```
  */
 export default async function blog(settings?: BlogSettings) {
+  html.use(UnoCSS(settings.unocss)); // Load custom unocss module if provided
+
   const url = callsites()[1].getFileName()!;
   const blogState = await configureBlog(url, IS_DEV, settings);
 
@@ -289,7 +287,7 @@ export async function handler(
 
   if (pathname === "/") {
     return html({
-      colorScheme: "auto",
+      colorScheme: blogState.theme ?? "auto",
       lang: blogState.lang,
       title: blogState.title ?? "My Blog",
       meta: {
@@ -321,7 +319,7 @@ export async function handler(
   const post = POSTS.get(pathname);
   if (post) {
     return html({
-      colorScheme: "auto",
+      colorScheme: blogState.theme ?? "auto",
       lang: blogState.lang,
       title: post.title,
       meta: {
