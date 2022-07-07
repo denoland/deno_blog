@@ -42,7 +42,8 @@ export function Index({ state, posts }: IndexProps) {
         >
           <div class="max-w-screen-sm h-full px-6 mx-auto flex flex-col items-center justify-center">
             {state.avatar && (
-              <div
+              <a
+                href="/"
                 class={[
                   "bg-cover bg-center bg-no-repeat w-25 h-25 border-4 border-white",
                   state.avatarClass ?? "rounded-full",
@@ -123,6 +124,7 @@ function PostCard({ post, timezone }: { post: Post; timezone: string }) {
           {post.title}
         </a>
       </h3>
+      <Tags tags={post.tags} />
       <p class="text-gray-500/80">
         <PrettyDate date={post.publishDate} timezone={timezone} />
       </p>
@@ -180,6 +182,7 @@ export function PostPage({ post, state }: PostPageProps) {
           <h1 class="text-4xl text-gray-900 dark:text-gray-100 font-bold">
             {post.title}
           </h1>
+          <Tags tags={post.tags} />
           <p class="mt-1 text-gray-500">
             {(state.author || post.author) && (
               <span>By {state.author || post.author} at</span>
@@ -260,6 +263,20 @@ function Tooltip({ children }: { children: string }) {
 function PrettyDate({ date, timezone }: { date: Date; timezone?: string }) {
   const formatted = date.toLocaleDateString(timezone ?? "en-US");
   return <time dateTime={date.toISOString()}>{formatted}</time>;
+}
+
+function Tags({ tags }: { tags?: string[] }) {
+  return tags && tags.length > 0
+    ? (
+      <section class="flex gap-x-2 flex-wrap">
+        {tags?.map((tag) => (
+          <a class="text-bluegray-500 font-bold" href={`/?tag=${tag}`}>
+            #{tag}
+          </a>
+        ))}
+      </section>
+    )
+    : null;
 }
 
 function IconRssFeed() {

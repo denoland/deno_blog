@@ -20,7 +20,7 @@ export {
   html,
   type VNode,
 } from "https://deno.land/x/htm@0.0.10/mod.tsx";
-export { UnoCSS } from "https://deno.land/x/htm@0.0.10/plugins.ts";
+import { UnoCSS } from "https://deno.land/x/htm@0.0.10/plugins.ts";
 export { parse as frontMatter } from "https://deno.land/x/frontmatter@v0.1.4/mod.ts";
 export {
   createReporter,
@@ -33,4 +33,8 @@ export { default as removeMarkdown } from "https://esm.sh/remove-markdown@0.5.0"
 // Add syntax highlighting support for C by default
 import "https://esm.sh/prismjs@1.28.0/components/prism-c?no-check";
 
-export type { UserConfig as UnoConfig } from "https://esm.sh/@unocss/core@0.43.2";
+export { UnoCSS };
+export type UnoConfig = typeof UnoCSS extends (
+  arg: infer P | undefined,
+) => unknown ? P
+  : never;
