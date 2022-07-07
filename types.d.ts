@@ -22,6 +22,7 @@ export interface BlogSettings {
   author?: string;
   links?: { title: string; url: string; icon?: VNode }[];
   header?: VNode;
+  showHeaderOnPostPage?: boolean;
   section?: VNode;
   footer?: VNode;
   style?: string;
