@@ -1,6 +1,6 @@
 // Copyright 2022 the Deno authors. All rights reserved. MIT license.
 
-import type { ConnInfo, VNode } from "./deps.ts";
+import type { ConnInfo, UnoConfig, VNode } from "./deps.ts";
 
 export interface BlogContext {
   state: BlogState;
@@ -30,6 +30,7 @@ export interface BlogSettings {
   lang?: string;
   timezone?: string;
   canonicalUrl?: string;
+  unocss?: UnoConfig;
   theme?: "dark" | "light" | "auto";
 }
 
