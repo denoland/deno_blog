@@ -35,7 +35,6 @@ import "https://esm.sh/prismjs@1.28.0/components/prism-c?no-check";
 
 import type { UnoCSS } from "https://deno.land/x/htm@0.0.10/plugins.ts";
 export type UnoConfig = typeof UnoCSS extends (
-  arg: infer P | undefined
-) => unknown
-  ? P
+  arg: infer P | undefined,
+) => unknown ? P
   : never;
