@@ -28,7 +28,7 @@ export function Index({ state, posts }: IndexProps) {
     postIndex.push(post);
   }
   postIndex.sort(
-    (a, b) => (b.publishDate?.getTime() ?? 0) - (a.publishDate?.getTime() ?? 0)
+    (a, b) => (b.publishDate?.getTime() ?? 0) - (a.publishDate?.getTime() ?? 0),
   );
 
   return (
@@ -75,7 +75,7 @@ export function Index({ state, posts }: IndexProps) {
                     Icon = IconEmail;
                   } else {
                     const icon = socialAppIcons.get(
-                      url.hostname.replace(/^www\./, "")
+                      url.hostname.replace(/^www\./, ""),
                     );
                     if (icon) {
                       Icon = icon;
@@ -210,7 +210,8 @@ function Footer(props: { author?: string }) {
     <footer class="mt-20 pb-16 lt-sm:pb-8 lt-sm:mt-16">
       <p class="flex items-center gap-2.5 text-gray-400/800 dark:text-gray-500/800 text-sm">
         <span>
-          &copy; {new Date().getFullYear()} {props.author} &middot; Powered by{" "}
+          &copy; {new Date().getFullYear()} {props.author} &middot; Powered by
+          {" "}
           <a
             class="inline-flex items-center gap-1 underline hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
             href="https://deno.land/x/blog"
@@ -233,9 +234,7 @@ function Footer(props: { author?: string }) {
 function Tooltip({ children }: { children: string }) {
   return (
     <div
-      className={
-        "absolute top-10 px-3 h-8 !leading-8 bg-black/80 text-white text-sm rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 group-focus:opacity-100 transition-opacity"
-      }
+      className={"absolute top-10 px-3 h-8 !leading-8 bg-black/80 text-white text-sm rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 group-focus:opacity-100 transition-opacity"}
     >
       <span
         className="block absolute text-black/80"
@@ -266,15 +265,17 @@ function PrettyDate({ date, timezone }: { date: Date; timezone?: string }) {
 }
 
 function Tags({ tags }: { tags?: string[] }) {
-  return tags && tags.length > 0 ? (
-    <section class="flex gap-x-2 flex-wrap">
-      {tags?.map((tag) => (
-        <a class="text-bluegray-500 font-bold" href={`/?tag=${tag}`}>
-          #{tag}
-        </a>
-      ))}
-    </section>
-  ) : null;
+  return tags && tags.length > 0
+    ? (
+      <section class="flex gap-x-2 flex-wrap">
+        {tags?.map((tag) => (
+          <a class="text-bluegray-500 font-bold" href={`/?tag=${tag}`}>
+            #{tag}
+          </a>
+        ))}
+      </section>
+    )
+    : null;
 }
 
 function IconRssFeed() {
