@@ -282,7 +282,7 @@ export async function handler(
 
   if (pathname === "/") {
     return html({
-      colorScheme: "auto",
+      colorScheme: blogState.theme ?? "auto",
       lang: blogState.lang,
       title: blogState.title ?? "My Blog",
       meta: {
@@ -314,7 +314,7 @@ export async function handler(
   const post = POSTS.get(pathname);
   if (post) {
     return html({
-      colorScheme: "auto",
+      colorScheme: blogState.theme ?? "auto",
       lang: blogState.lang,
       title: post.title,
       meta: {

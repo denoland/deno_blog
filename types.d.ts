@@ -31,6 +31,7 @@ export interface BlogSettings {
   timezone?: string;
   canonicalUrl?: string;
   unocss?: UnoConfig;
+  theme?: "dark" | "light" | "auto";
 }
 
 export interface BlogState extends BlogSettings {
