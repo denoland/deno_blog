@@ -127,6 +127,7 @@ function PostCard({ post, timezone }: { post: Post; timezone: string }) {
       <Tags tags={post.tags} />
       <p class="text-gray-500/80">
         <PrettyDate date={post.publishDate} timezone={timezone} />
+        {" " + post.author}
       </p>
       <p class="mt-3 text-gray-600 dark:text-gray-400">{post.snippet}</p>
       <p class="mt-3">
@@ -184,9 +185,8 @@ export function PostPage({ post, state }: PostPageProps) {
           </h1>
           <Tags tags={post.tags} />
           <p class="mt-1 text-gray-500">
-            {(state.author || post.author) && (
-              <span>By {state.author || post.author} at</span>
-            )}
+            {(state.author || post.author) &&
+              <span>By {post.author || state.author} at {" "}</span>}
             <PrettyDate date={post.publishDate} timezone={state.timezone} />
           </p>
           <div

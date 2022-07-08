@@ -1,5 +1,6 @@
 ---
 title: Second post
+author: author 2
 publish_date: 2022-05-02
 abstract: This is the second post.
 ---
