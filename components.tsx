@@ -169,7 +169,7 @@ export function PostPage({ post, state }: PostPageProps) {
                 fill="currentColor"
               />
             </svg>
-            INDEX
+            Back
           </a>
         </div>
         {post.coverHtml && (
