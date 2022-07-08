@@ -185,7 +185,7 @@ export function PostPage({ post, state }: PostPageProps) {
           <Tags tags={post.tags} />
           <p class="mt-1 text-gray-500">
             {(state.author || post.author) && (
-              <span>By {state.author || post.author} at</span>
+              <span>By {state.author || post.author} at{" "}</span>
             )}
             <PrettyDate date={post.publishDate} timezone={state.timezone} />
           </p>
