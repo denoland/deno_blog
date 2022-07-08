@@ -33,6 +33,7 @@ export interface BlogSettings {
   canonicalUrl?: string;
   unocss?: UnoConfig;
   theme?: "dark" | "light" | "auto";
+  favicon?: string;
 }
 
 export interface BlogState extends BlogSettings {

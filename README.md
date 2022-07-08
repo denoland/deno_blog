@@ -60,6 +60,7 @@ blog({
     }),
   ],
   unocss: unocss_opts, // check https://github.com/unocss/unocss
+  favicon: "favicon.ico",
 });
 ```
 
