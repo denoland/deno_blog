@@ -79,7 +79,7 @@ import blog, { h } from "https://deno.land/x/blog/blog.tsx";
 blog({
   title: "My Blog",
   header: <header>Your custom header</header>,
-  showHeaderOnPostPage: true // by default, the header will only show on home, set showHeaderOnPostPage to true to make it show on each post page
+  showHeaderOnPostPage: true, // by default, the header will only show on home, set showHeaderOnPostPage to true to make it show on each post page
   section: <section>Your custom section</section>,
   footer: <footer>Your custom footer</footer>,
 });
