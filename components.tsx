@@ -116,7 +116,9 @@ export function Index({ state, posts }: IndexProps) {
   );
 }
 
-function PostCard({ post, timezone }: { post: Post; timezone: string }) {
+function PostCard(
+  { post, timezone }: { post: Post; timezone: string },
+) {
   return (
     <div class="pt-12 first:pt-0">
       <h3 class="text-2xl font-bold">
@@ -126,6 +128,8 @@ function PostCard({ post, timezone }: { post: Post; timezone: string }) {
       </h3>
       <Tags tags={post.tags} />
       <p class="text-gray-500/80">
+        {(post.author) &&
+          <span>By {post.author || ""} at{" "}</span>}
         <PrettyDate date={post.publishDate} timezone={timezone} />
       </p>
       <p class="mt-3 text-gray-600 dark:text-gray-400">{post.snippet}</p>
@@ -184,9 +188,8 @@ export function PostPage({ post, state }: PostPageProps) {
           </h1>
           <Tags tags={post.tags} />
           <p class="mt-1 text-gray-500">
-            {(state.author || post.author) && (
-              <span>By {state.author || post.author} at</span>
-            )}
+            {(state.author || post.author) &&
+              <span>By {post.author || state.author} at</span>}
             <PrettyDate date={post.publishDate} timezone={state.timezone} />
           </p>
           <div
