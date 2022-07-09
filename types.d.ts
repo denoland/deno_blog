@@ -29,7 +29,7 @@ export interface BlogSettings {
   ogImage?: string;
   middlewares?: BlogMiddleware[];
   lang?: string;
-  timezone?: string;
+  dateFormat?: string;
   canonicalUrl?: string;
   unocss?: UnoConfig;
   theme?: "dark" | "light" | "auto";

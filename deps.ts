@@ -39,3 +39,8 @@ export type UnoConfig = typeof UnoCSS extends (
   arg: infer P | undefined,
 ) => unknown ? P
   : never;
+
+import dayjs from "https://esm.sh/dayjs@1.11.3";
+import localizedFormat from "https://esm.sh/dayjs@1.11.3/plugin/localizedFormat";
+dayjs.extend(localizedFormat);
+export { dayjs };

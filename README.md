@@ -50,7 +50,7 @@ blog({
     { title: "Twitter", url: "https://twitter.com/denobot" },
   ],
   lang: "en",
-  timezone: "en-US",
+  dateFormat: "ll", // localised format based on https://day.js.org/docs/en/display/format#list-of-localized-formats
   middlewares: [
     ga("UA-XXXXXXXX-X"),
     redirects({

@@ -7,7 +7,7 @@
 /// <reference lib="dom.asynciterable" />
 /// <reference lib="deno.ns" />
 
-import { Fragment, gfm, h, type VNode } from "./deps.ts";
+import { dayjs, Fragment, gfm, h } from "./deps.ts";
 import type { BlogState, Post } from "./types.d.ts";
 
 const socialAppIcons = new Map([
@@ -105,7 +105,7 @@ export function Index({ state, posts }: IndexProps) {
             <PostCard
               post={post}
               key={post.pathname}
-              timezone={state.timezone ?? "en-US"}
+              dateFormat={state.dateFormat}
             />
           ))}
         </div>
@@ -116,9 +116,7 @@ export function Index({ state, posts }: IndexProps) {
   );
 }
 
-function PostCard(
-  { post, timezone }: { post: Post; timezone: string },
-) {
+function PostCard({ post, dateFormat }: { post: Post; dateFormat?: string }) {
   return (
     <div class="pt-12 first:pt-0">
       <h3 class="text-2xl font-bold">
@@ -130,7 +128,10 @@ function PostCard(
       <p class="text-gray-500/80">
         {(post.author) &&
           <span>By {post.author || ""} at{" "}</span>}
-        <PrettyDate date={post.publishDate} timezone={timezone} />
+        <PrettyDate
+          date={post.publishDate}
+          dateFormat={dateFormat}
+        />
       </p>
       <p class="mt-3 text-gray-600 dark:text-gray-400">{post.snippet}</p>
       <p class="mt-3">
@@ -191,7 +192,10 @@ export function PostPage({ post, state }: PostPageProps) {
             {(post.author || state.author) && (
               <span>By {post.author || state.author} at{" "}</span>
             )}
-            <PrettyDate date={post.publishDate} timezone={state.timezone} />
+            <PrettyDate
+              date={post.publishDate}
+              dateFormat={state.dateFormat}
+            />
           </p>
           <div
             class="mt-8 markdown-body"
@@ -264,8 +268,8 @@ function Tooltip({ children }: { children: string }) {
   );
 }
 
-function PrettyDate({ date, timezone }: { date: Date; timezone?: string }) {
-  const formatted = date.toLocaleDateString(timezone ?? "en-US");
+function PrettyDate({ date, dateFormat }: { date: Date; dateFormat?: string }) {
+  const formatted = dayjs(date).format(dateFormat ?? "M/D/YYYY");
   return <time dateTime={date.toISOString()}>{formatted}</time>;
 }
 

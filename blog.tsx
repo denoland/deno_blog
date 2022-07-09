@@ -9,6 +9,7 @@
 import {
   callsites,
   createReporter,
+  dayjs,
   dirname,
   Feed,
   Fragment,
@@ -99,6 +100,8 @@ export default async function blog(settings?: BlogSettings) {
   const url = callsites()[1].getFileName()!;
   const blogState = await configureBlog(url, IS_DEV, settings);
 
+  await configureDateLocale(settings?.lang);
+
   const blogHandler = createBlogHandler(blogState);
   serve(blogHandler);
 }
@@ -174,6 +177,18 @@ export async function configureBlog(
   await loadContent(directory, isDev);
 
   return state;
+}
+
+export async function configureDateLocale(lang = "en") {
+  try {
+    await import(
+      `https://esm.sh/dayjs@1.11.3/locale/${lang}`
+    );
+    dayjs.locale(lang);
+  } catch {
+    await import("https://esm.sh/dayjs@1.11.3/locale/en");
+    dayjs.locale("en");
+  }
 }
 
 async function loadContent(blogDirectory: string, isDev: boolean) {
