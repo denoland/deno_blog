@@ -129,7 +129,7 @@ function PostCard(
       <Tags tags={post.tags} />
       <p class="text-gray-500/80">
         {(post.author) &&
-          <span>By {post.author || ""} at {" "}</span>}
+          <span>By {post.author || ""} at{" "}</span>}
         <PrettyDate date={post.publishDate} timezone={timezone} />
       </p>
       <p class="mt-3 text-gray-600 dark:text-gray-400">{post.snippet}</p>
