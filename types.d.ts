@@ -51,7 +51,6 @@ export interface Post {
   author?: string;
   snippet?: string;
   coverHtml?: string;
-  background?: string;
   /** An image URL which is used in the OpenGraph og:image tag. */
   ogImage?: string;
   tags?: string[];
