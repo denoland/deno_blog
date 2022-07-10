@@ -50,7 +50,7 @@ blog({
     { title: "Twitter", url: "https://twitter.com/denobot" },
   ],
   lang: "en",
-  timezone: "en-US",
+  dateStyle: "long", // localised format based on https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DateTimeFormat
   middlewares: [
     ga("UA-XXXXXXXX-X"),
     redirects({
@@ -60,6 +60,7 @@ blog({
     }),
   ],
   unocss: unocss_opts, // check https://github.com/unocss/unocss
+  favicon: "favicon.ico",
 });
 ```
 

@@ -7,8 +7,8 @@
 /// <reference lib="dom.asynciterable" />
 /// <reference lib="deno.ns" />
 
-import { Fragment, gfm, h, type VNode } from "./deps.ts";
-import type { BlogState, Post } from "./types.d.ts";
+import { Fragment, gfm, h } from "./deps.ts";
+import type { BlogState, DateStyle, Post } from "./types.d.ts";
 
 const socialAppIcons = new Map([
   ["github.com", IconGithub],
@@ -105,7 +105,8 @@ export function Index({ state, posts }: IndexProps) {
             <PostCard
               post={post}
               key={post.pathname}
-              timezone={state.timezone ?? "en-US"}
+              dateStyle={state.dateStyle}
+              lang={state.lang}
             />
           ))}
         </div>
@@ -117,7 +118,11 @@ export function Index({ state, posts }: IndexProps) {
 }
 
 function PostCard(
-  { post, timezone }: { post: Post; timezone: string },
+  { post, dateStyle, lang }: {
+    post: Post;
+    dateStyle?: DateStyle;
+    lang?: string;
+  },
 ) {
   return (
     <div class="pt-12 first:pt-0">
@@ -130,7 +135,11 @@ function PostCard(
       <p class="text-gray-500/80">
         {(post.author) &&
           <span>By {post.author || ""} at{" "}</span>}
-        <PrettyDate date={post.publishDate} timezone={timezone} />
+        <PrettyDate
+          date={post.publishDate}
+          dateStyle={dateStyle}
+          lang={lang}
+        />
       </p>
       <p class="mt-3 text-gray-600 dark:text-gray-400">{post.snippet}</p>
       <p class="mt-3">
@@ -188,9 +197,14 @@ export function PostPage({ post, state }: PostPageProps) {
           </h1>
           <Tags tags={post.tags} />
           <p class="mt-1 text-gray-500">
-            {(state.author || post.author) &&
-              <span>By {post.author || state.author} at</span>}
-            <PrettyDate date={post.publishDate} timezone={state.timezone} />
+            {(post.author || state.author) && (
+              <span>By {post.author || state.author} at{" "}</span>
+            )}
+            <PrettyDate
+              date={post.publishDate}
+              dateStyle={state.dateStyle}
+              lang={state.lang}
+            />
           </p>
           <div
             class="mt-8 markdown-body"
@@ -263,8 +277,14 @@ function Tooltip({ children }: { children: string }) {
   );
 }
 
-function PrettyDate({ date, timezone }: { date: Date; timezone?: string }) {
-  const formatted = date.toLocaleDateString(timezone ?? "en-US");
+function PrettyDate(
+  { date, dateStyle, lang }: {
+    date: Date;
+    dateStyle?: DateStyle;
+    lang?: string;
+  },
+) {
+  const formatted = date.toLocaleDateString(lang ?? "en-US", { dateStyle });
   return <time dateTime={date.toISOString()}>{formatted}</time>;
 }
 

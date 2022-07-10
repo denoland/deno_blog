@@ -18,6 +18,7 @@ export {
   Fragment,
   h,
   html,
+  type HtmlOptions,
   type VNode,
 } from "https://deno.land/x/htm@0.0.10/mod.tsx";
 import { UnoCSS } from "https://deno.land/x/htm@0.0.10/plugins.ts";
