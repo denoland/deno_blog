@@ -13,7 +13,7 @@ export {
   serve,
 } from "https://deno.land/std@0.145.0/http/mod.ts";
 
-export * as gfm from "https://deno.land/x/gfm@0.1.20/mod.ts";
+export * as gfm from "https://deno.land/x/gfm@0.1.22/mod.ts";
 export {
   Fragment,
   h,

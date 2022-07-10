@@ -1,6 +1,6 @@
 // Copyright 2022 the Deno authors. All rights reserved. MIT license.
 
-import { join, resolve } from "https://deno.land/std@0.140.0/path/mod.ts";
+import { join, resolve } from "https://deno.land/std@0.145.0/path/mod.ts";
 
 const HELP = `deno_blog
 
@@ -43,7 +43,7 @@ blog({
   background: "#f9f9f9",
 
   // middlewares: [
-    
+
     // If you want to set up Google Analytics, paste your GA key here.
     // ga("UA-XXXXXXXX-X"),
 
