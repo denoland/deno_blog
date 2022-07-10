@@ -1,11 +1,6 @@
 // Copyright 2022 the Deno authors. All rights reserved. MIT license.
 
-import {
-  configureBlog,
-  configureDateLocale,
-  createBlogHandler,
-  redirects,
-} from "./blog.tsx";
+import { configureBlog, createBlogHandler, redirects } from "./blog.tsx";
 import {
   assert,
   assertEquals,
@@ -15,12 +10,12 @@ import { fromFileUrl, join } from "https://deno.land/std@0.140.0/path/mod.ts";
 
 const BLOG_URL = new URL("./testdata/main.js", import.meta.url).href;
 const TESTDATA_PATH = fromFileUrl(new URL("./testdata/", import.meta.url));
-const SETTINGS = {
+const BLOG_SETTINGS = await configureBlog(BLOG_URL, false, {
   author: "The author",
   title: "Test blog",
   description: "This is some description.",
-  lang: "zh",
-  dateFormat: "ll",
+  lang: "en-GB",
+  dateStyle: "medium",
   middlewares: [
     redirects({
       "/to_second": "second",
@@ -28,9 +23,7 @@ const SETTINGS = {
       "second.html": "second",
     }),
   ],
-};
-const BLOG_SETTINGS = await configureBlog(BLOG_URL, false, SETTINGS);
-await configureDateLocale(BLOG_SETTINGS.lang);
+});
 const CONN_INFO = {
   localAddr: {
     transport: "tcp" as const,
@@ -55,7 +48,7 @@ Deno.test("index page", async () => {
   assertEquals(resp.status, 200);
   assertEquals(resp.headers.get("content-type"), "text/html; charset=utf-8");
   const body = await resp.text();
-  assertStringIncludes(body, `<html lang="zh">`);
+  assertStringIncludes(body, `<html lang="en-GB">`);
   assertStringIncludes(body, `Test blog`);
   assertStringIncludes(body, `This is some description.`);
   assertStringIncludes(body, `href="/first"`);
@@ -68,13 +61,13 @@ Deno.test("posts/ first", async () => {
   assertEquals(resp.status, 200);
   assertEquals(resp.headers.get("content-type"), "text/html; charset=utf-8");
   const body = await resp.text();
-  assertStringIncludes(body, `<html lang="zh">`);
+  assertStringIncludes(body, `<html lang="en-GB">`);
   assertStringIncludes(body, `First post`);
   assertStringIncludes(body, `By The author`);
   assertStringIncludes(body, `© ${new Date().getFullYear()} The author`);
   assertStringIncludes(
     body,
-    `<time dateTime="2022-03-20T00:00:00.000Z">2022年3月20日</time>`,
+    `<time dateTime="2022-03-20T00:00:00.000Z">20 Mar 2022</time>`,
   );
   assertStringIncludes(body, `<img src="first/hello.png" />`);
   assertStringIncludes(body, `<p>Lorem Ipsum is simply dummy text`);
@@ -87,13 +80,13 @@ Deno.test("posts/ second", async () => {
   assertEquals(resp.status, 200);
   assertEquals(resp.headers.get("content-type"), "text/html; charset=utf-8");
   const body = await resp.text();
-  assertStringIncludes(body, `<html lang="zh">`);
+  assertStringIncludes(body, `<html lang="en-GB">`);
   assertStringIncludes(body, `Second post`);
   assertStringIncludes(body, `By CUSTOM AUTHOR NAME`);
   assertStringIncludes(body, `© ${new Date().getFullYear()} The author`);
   assertStringIncludes(
     body,
-    `<time dateTime="2022-05-02T00:00:00.000Z">2022年5月2日</time>`,
+    `<time dateTime="2022-05-02T00:00:00.000Z">2 May 2022</time>`,
   );
   assertStringIncludes(body, `<img src="second/hello2.png" />`);
   assertStringIncludes(body, `<p>Lorem Ipsum is simply dummy text`);

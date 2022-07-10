@@ -12,6 +12,8 @@ export interface BlogMiddleware {
   (req: Request, ctx: BlogContext): Promise<Response>;
 }
 
+export type DateStyle = "full" | "long" | "medium" | "short";
+
 export interface BlogSettings {
   title?: string;
   description?: string;
@@ -29,7 +31,7 @@ export interface BlogSettings {
   ogImage?: string;
   middlewares?: BlogMiddleware[];
   lang?: string;
-  dateFormat?: string;
+  dateStyle?: DateStyle;
   canonicalUrl?: string;
   unocss?: UnoConfig;
   theme?: "dark" | "light" | "auto";

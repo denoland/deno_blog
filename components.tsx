@@ -7,8 +7,8 @@
 /// <reference lib="dom.asynciterable" />
 /// <reference lib="deno.ns" />
 
-import { dayjs, Fragment, gfm, h } from "./deps.ts";
-import type { BlogState, Post } from "./types.d.ts";
+import { Fragment, gfm, h } from "./deps.ts";
+import type { BlogState, DateStyle, Post } from "./types.d.ts";
 
 const socialAppIcons = new Map([
   ["github.com", IconGithub],
@@ -105,7 +105,8 @@ export function Index({ state, posts }: IndexProps) {
             <PostCard
               post={post}
               key={post.pathname}
-              dateFormat={state.dateFormat}
+              dateStyle={state.dateStyle}
+              lang={state.lang}
             />
           ))}
         </div>
@@ -116,7 +117,13 @@ export function Index({ state, posts }: IndexProps) {
   );
 }
 
-function PostCard({ post, dateFormat }: { post: Post; dateFormat?: string }) {
+function PostCard(
+  { post, dateStyle, lang }: {
+    post: Post;
+    dateStyle?: DateStyle;
+    lang?: string;
+  },
+) {
   return (
     <div class="pt-12 first:pt-0">
       <h3 class="text-2xl font-bold">
@@ -130,7 +137,8 @@ function PostCard({ post, dateFormat }: { post: Post; dateFormat?: string }) {
           <span>By {post.author || ""} at{" "}</span>}
         <PrettyDate
           date={post.publishDate}
-          dateFormat={dateFormat}
+          dateStyle={dateStyle}
+          lang={lang}
         />
       </p>
       <p class="mt-3 text-gray-600 dark:text-gray-400">{post.snippet}</p>
@@ -194,7 +202,8 @@ export function PostPage({ post, state }: PostPageProps) {
             )}
             <PrettyDate
               date={post.publishDate}
-              dateFormat={state.dateFormat}
+              dateStyle={state.dateStyle}
+              lang={state.lang}
             />
           </p>
           <div
@@ -268,8 +277,14 @@ function Tooltip({ children }: { children: string }) {
   );
 }
 
-function PrettyDate({ date, dateFormat }: { date: Date; dateFormat?: string }) {
-  const formatted = dayjs(date).format(dateFormat ?? "M/D/YYYY");
+function PrettyDate(
+  { date, dateStyle, lang }: {
+    date: Date;
+    dateStyle?: DateStyle;
+    lang?: string;
+  },
+) {
+  const formatted = date.toLocaleDateString(lang ?? "en-US", { dateStyle });
   return <time dateTime={date.toISOString()}>{formatted}</time>;
 }
 

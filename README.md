@@ -50,7 +50,7 @@ blog({
     { title: "Twitter", url: "https://twitter.com/denobot" },
   ],
   lang: "en",
-  dateFormat: "ll", // localised format based on https://day.js.org/docs/en/display/format#list-of-localized-formats
+  dateStyle: "long", // localised format based on https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DateTimeFormat
   middlewares: [
     ga("UA-XXXXXXXX-X"),
     redirects({
