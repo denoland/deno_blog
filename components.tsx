@@ -208,7 +208,7 @@ export function PostPage({ post, state }: PostPageProps) {
           </p>
           <div
             class="mt-8 markdown-body"
-            data-color-mode="auto"
+            data-color-mode={state.theme ?? "auto"}
             data-light-theme="light"
             data-dark-theme="dark"
             dangerouslySetInnerHTML={{ __html: html }}
