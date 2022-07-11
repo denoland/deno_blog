@@ -40,7 +40,6 @@ blog({
   avatar: "https://deno-avatar.deno.dev/avatar/blog.svg",
   avatarClass: "rounded-full",
   author: "An author",
-  background: "#f9f9f9",
 
   // middlewares: [
 
