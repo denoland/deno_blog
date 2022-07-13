@@ -86,6 +86,7 @@ export function Index({ state, posts }: IndexProps) {
                   return (
                     <a
                       class="relative flex items-center justify-center w-8 h-8 rounded-full bg-gray-600/10 dark:bg-gray-400/10 text-gray-700 dark:text-gray-400 hover:bg-gray-600/15 dark:hover:bg-gray-400/15 hover:text-black dark:hover:text-white transition-colors group"
+                      target="_blank"
                       href={link.url}
                     >
                       {link.icon ? link.icon : <Icon />}
@@ -134,7 +135,7 @@ function PostCard(
       <Tags tags={post.tags} />
       <p class="text-gray-500/80">
         {(post.author) &&
-          <span>By {post.author || ""} at{" "}</span>}
+          <span>Par {post.author || ""} le {" "}</span>}
         <PrettyDate
           date={post.publishDate}
           dateStyle={dateStyle}
@@ -148,7 +149,7 @@ function PostCard(
           href={post.pathname}
           title={`Read "${post.title}"`}
         >
-          Read More
+          Lire la suite
         </a>
       </p>
     </div>
@@ -182,7 +183,7 @@ export function PostPage({ post, state }: PostPageProps) {
                 fill="currentColor"
               />
             </svg>
-            INDEX
+            Retour
           </a>
         </div>
         {post.coverHtml && (
@@ -198,7 +199,7 @@ export function PostPage({ post, state }: PostPageProps) {
           <Tags tags={post.tags} />
           <p class="mt-1 text-gray-500">
             {(post.author || state.author) && (
-              <span>By {post.author || state.author} at{" "}</span>
+              <span>Par {post.author || state.author} le{" "}</span>
             )}
             <PrettyDate
               date={post.publishDate}
@@ -228,13 +229,13 @@ function Footer(props: { author?: string }) {
     <footer class="mt-20 pb-16 lt-sm:pb-8 lt-sm:mt-16">
       <p class="flex items-center gap-2.5 text-gray-400/800 dark:text-gray-500/800 text-sm">
         <span>
-          &copy; {new Date().getFullYear()} {props.author} &middot; Powered by
+          &copy; {new Date().getFullYear()} {props.author} &middot; Propulsé par
           {" "}
           <a
             class="inline-flex items-center gap-1 underline hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
             href="https://deno.land/x/blog"
           >
-            Deno Blog
+            Deno
           </a>
         </span>
         <a
@@ -284,7 +285,7 @@ function PrettyDate(
     lang?: string;
   },
 ) {
-  const formatted = date.toLocaleDateString(lang ?? "en-US", { dateStyle });
+  const formatted = date.toLocaleDateString(lang ?? "fr-FR", { dateStyle });
   return <time dateTime={date.toISOString()}>{formatted}</time>;
 }
 
