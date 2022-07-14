@@ -35,6 +35,7 @@ import type {
   BlogState,
   Post,
 } from "./types.d.ts";
+import { ServerInit } from "https://deno.land/std@0.145.0/http/mod.ts";
 
 export { Fragment, h };
 
@@ -100,7 +101,15 @@ export default async function blog(settings?: BlogSettings) {
   const blogState = await configureBlog(url, IS_DEV, settings);
 
   const blogHandler = createBlogHandler(blogState);
-  serve(blogHandler);
+
+  const port = Deno.env.get("BLOG_PORT");
+
+  if (port === undefined) {
+    serve(blogHandler);
+    return;
+  }
+
+  serve(blogHandler, { port: Number(port) });
 }
 
 export function createBlogHandler(state: BlogState) {
