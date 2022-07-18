@@ -22,7 +22,12 @@ export interface BlogSettings {
   cover?: string;
   coverTextColor?: string;
   author?: string;
-  links?: { title: string; url: string; icon?: VNode }[];
+  links?: {
+    title: string;
+    url: string;
+    icon?: VNode;
+    target?: "_self" | "_blank" | "_parent" | "_top";
+  }[];
   header?: VNode;
   showHeaderOnPostPage?: boolean;
   section?: VNode;
