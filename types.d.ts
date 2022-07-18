@@ -26,7 +26,7 @@ export interface BlogSettings {
     title: string;
     url: string;
     icon?: VNode;
-    target: "_self" | "_blank" | "_parent" | "_top";
+    target?: "_self" | "_blank" | "_parent" | "_top";
   }[];
   header?: VNode;
   showHeaderOnPostPage?: boolean;

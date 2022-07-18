@@ -90,7 +90,7 @@ export function Index({ state, posts }: IndexProps) {
                       rel={link.target === "_blank"
                         ? "noopener noreferrer"
                         : ""}
-                      target={link.target}
+                      target={link.target ?? "_self"}
                     >
                       {link.icon ? link.icon : <Icon />}
                       <Tooltip>{link.title}</Tooltip>
