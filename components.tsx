@@ -32,7 +32,7 @@ export function Index({ state, posts }: IndexProps) {
   );
 
   return (
-    <>
+    <div class="home">
       {state.header || (
         <header
           class="w-full h-90 lt-sm:h-80 bg-cover bg-center bg-no-repeat"
@@ -113,7 +113,7 @@ export function Index({ state, posts }: IndexProps) {
 
         {state.footer || <Footer author={state.author} />}
       </div>
-    </>
+    </div>
   );
 }
 
@@ -163,7 +163,7 @@ interface PostPageProps {
 export function PostPage({ post, state }: PostPageProps) {
   const html = gfm.render(post.markdown);
   return (
-    <Fragment>
+    <div className={`post ${post.pathname.substring(1)}`}>
       {state.showHeaderOnPostPage && state.header}
       <div class="max-w-screen-sm px-6 pt-8 mx-auto">
         <div class="pb-16">
@@ -219,7 +219,7 @@ export function PostPage({ post, state }: PostPageProps) {
 
         {state.footer || <Footer author={state.author} />}
       </div>
-    </Fragment>
+    </div>
   );
 }
 
