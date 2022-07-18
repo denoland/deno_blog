@@ -100,7 +100,10 @@ export default async function blog(settings?: BlogSettings) {
   const blogState = await configureBlog(url, IS_DEV, settings);
 
   const blogHandler = createBlogHandler(blogState);
-  serve(blogHandler);
+  serve(blogHandler, {
+    port: blogState.port,
+    hostname: blogState.hostname,
+  });
 }
 
 export function createBlogHandler(state: BlogState) {

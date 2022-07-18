@@ -96,5 +96,3 @@ You can also self-host the blog, in such case run:
 ```shellsession
 $ deno task serve
 ```
-
-TODO(bartlomieju): allow specyfing port and hostname?

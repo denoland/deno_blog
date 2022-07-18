@@ -41,6 +41,8 @@ export interface BlogSettings {
   unocss?: UnoConfig;
   theme?: "dark" | "light" | "auto";
   favicon?: string;
+  port?: number;
+  hostname?: string;
 }
 
 export interface BlogState extends BlogSettings {
