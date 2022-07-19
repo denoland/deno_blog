@@ -50,7 +50,7 @@ blog({
     { title: "Twitter", url: "https://twitter.com/denobot" },
   ],
   lang: "en",
-  timezone: "en-US",
+  dateStyle: "long", // localised format based on https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DateTimeFormat
   middlewares: [
     ga("UA-XXXXXXXX-X"),
     redirects({
@@ -60,6 +60,7 @@ blog({
     }),
   ],
   unocss: unocss_opts, // check https://github.com/unocss/unocss
+  favicon: "favicon.ico",
 });
 ```
 
@@ -78,7 +79,7 @@ import blog, { h } from "https://deno.land/x/blog/blog.tsx";
 blog({
   title: "My Blog",
   header: <header>Your custom header</header>,
-  showHeaderOnPostPage: true // by default, the header will only show on home, set showHeaderOnPostPage to true to make it show on each post page
+  showHeaderOnPostPage: true, // by default, the header will only show on home, set showHeaderOnPostPage to true to make it show on each post page
   section: <section>Your custom section</section>,
   footer: <footer>Your custom footer</footer>,
 });
@@ -95,5 +96,3 @@ You can also self-host the blog, in such case run:
 ```shellsession
 $ deno task serve
 ```
-
-TODO(bartlomieju): allow specyfing port and hostname?

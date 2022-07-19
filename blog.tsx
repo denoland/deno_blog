@@ -17,6 +17,7 @@ import {
   gfm,
   h,
   html,
+  HtmlOptions,
   join,
   relative,
   removeMarkdown,
@@ -99,7 +100,10 @@ export default async function blog(settings?: BlogSettings) {
   const blogState = await configureBlog(url, IS_DEV, settings);
 
   const blogHandler = createBlogHandler(blogState);
-  serve(blogHandler);
+  serve(blogHandler, {
+    port: blogState.port,
+    hostname: blogState.hostname,
+  });
 }
 
 export function createBlogHandler(state: BlogState) {
@@ -285,10 +289,26 @@ export async function handler(
     }
   }
 
+  const sharedHtmlOptions: HtmlOptions = {
+    colorScheme: blogState.theme ?? "auto",
+    lang: blogState.lang ?? "en",
+    scripts: IS_DEV ? [{ src: "/hmr.js" }] : undefined,
+    links: [
+      { href: canonicalUrl, rel: "canonical" },
+    ],
+  };
+
+  if (blogState.favicon) {
+    sharedHtmlOptions.links?.push({
+      href: blogState.favicon,
+      type: "image/x-icon",
+      rel: "icon",
+    });
+  }
+
   if (pathname === "/") {
     return html({
-      colorScheme: blogState.theme ?? "auto",
-      lang: blogState.lang,
+      ...sharedHtmlOptions,
       title: blogState.title ?? "My Blog",
       meta: {
         "description": blogState.description,
@@ -300,13 +320,9 @@ export async function handler(
         "twitter:image": blogState.ogImage ?? blogState.cover,
         "twitter:card": blogState.ogImage ? "summary_large_image" : undefined,
       },
-      links: [
-        { href: canonicalUrl, rel: "canonical" },
-      ],
       styles: [
         ...(blogState.style ? [blogState.style] : []),
       ],
-      scripts: IS_DEV ? [{ src: "/hmr.js" }] : undefined,
       body: (
         <Index
           state={blogState}
@@ -319,8 +335,7 @@ export async function handler(
   const post = POSTS.get(pathname);
   if (post) {
     return html({
-      colorScheme: blogState.theme ?? "auto",
-      lang: blogState.lang,
+      ...sharedHtmlOptions,
       title: post.title,
       meta: {
         "description": post.snippet,
@@ -337,10 +352,6 @@ export async function handler(
         `.markdown-body { --color-canvas-default: transparent !important; --color-canvas-subtle: #edf0f2; --color-border-muted: rgba(128,128,128,0.2); } .markdown-body img + p { margin-top: 16px; }`,
         ...(blogState.style ? [blogState.style] : []),
       ],
-      links: [
-        { href: `${canonicalUrl}${pathname}`, rel: "canonical" },
-      ],
-      scripts: IS_DEV ? [{ src: "/hmr.js" }] : undefined,
       body: <PostPage post={post} state={blogState} />,
     });
   }
@@ -375,7 +386,7 @@ function serveRSS(
     description: state.description,
     id: `${origin}/blog`,
     link: `${origin}/blog`,
-    language: state.lang,
+    language: state.lang ?? "en",
     favicon: `${origin}/favicon.ico`,
     copyright: copyright,
     generator: "Feed (https://github.com/jpmonette/feed) for Deno",

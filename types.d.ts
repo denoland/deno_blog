@@ -12,6 +12,8 @@ export interface BlogMiddleware {
   (req: Request, ctx: BlogContext): Promise<Response>;
 }
 
+export type DateStyle = "full" | "long" | "medium" | "short";
+
 export interface BlogSettings {
   title?: string;
   description?: string;
@@ -20,7 +22,12 @@ export interface BlogSettings {
   cover?: string;
   coverTextColor?: string;
   author?: string;
-  links?: { title: string; url: string; icon?: VNode }[];
+  links?: {
+    title: string;
+    url: string;
+    icon?: VNode;
+    target?: "_self" | "_blank" | "_parent" | "_top";
+  }[];
   header?: VNode;
   showHeaderOnPostPage?: boolean;
   section?: VNode;
@@ -29,10 +36,13 @@ export interface BlogSettings {
   ogImage?: string;
   middlewares?: BlogMiddleware[];
   lang?: string;
-  timezone?: string;
+  dateStyle?: DateStyle;
   canonicalUrl?: string;
   unocss?: UnoConfig;
   theme?: "dark" | "light" | "auto";
+  favicon?: string;
+  port?: number;
+  hostname?: string;
 }
 
 export interface BlogState extends BlogSettings {
@@ -48,7 +58,6 @@ export interface Post {
   author?: string;
   snippet?: string;
   coverHtml?: string;
-  background?: string;
   /** An image URL which is used in the OpenGraph og:image tag. */
   ogImage?: string;
   tags?: string[];
