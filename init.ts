@@ -1,6 +1,6 @@
 // Copyright 2022 the Deno authors. All rights reserved. MIT license.
 
-import { join, resolve } from "https://deno.land/std@0.145.0/path/mod.ts";
+import { join, resolve } from "https://deno.land/std@0.149.0/path/mod.ts";
 
 const HELP = `deno_blog
 
@@ -19,10 +19,6 @@ Print this message:
 
 const CURRENT_DATE = new Date();
 const CURRENT_DATE_STRING = CURRENT_DATE.toISOString().slice(0, 10);
-const MAIN_FILE_URL = new URL(
-  "./blog.tsx",
-  import.meta.url,
-);
 
 const FIRST_POST_CONTENTS = `---
 title: Hello world!
@@ -32,11 +28,17 @@ publish_date: ${CURRENT_DATE_STRING}
 This is my first blog post!
 `;
 
-const MAIN_CONTENTS = `import blog, { ga, redirects } from "${MAIN_FILE_URL}";
+const MAIN_NAME = "main.tsx";
+const MAIN_CONTENTS = `/** @jsx h */
+
+import blog, { ga, redirects, h } from "blog";
 
 blog({
   title: "My Blog",
   description: "This is my new blog.",
+  // header: <header>Your custom header</header>,
+  // section: <section>Your custom section</section>,
+  // footer: <footer>Your custom footer</footer>,
   avatar: "https://deno-avatar.deno.dev/avatar/blog.svg",
   avatarClass: "rounded-full",
   author: "An author",
@@ -56,10 +58,20 @@ blog({
 });
 `;
 
+const DENO_JSONC_NAME = "deno.jsonc";
 const DENO_JSONC_CONTENTS = `{
   "tasks": {
     "dev": "deno run --allow-net --allow-read --allow-env --watch main.ts --dev",
     "serve": "deno run --allow-net --allow-read --allow-env --no-check main.ts",
+  },
+  "importMap": "./import_map.json"
+}
+`;
+
+const IMPORT_MAP_JSON_NAME = "import_map.json";
+const IMPORT_MAP_JSON_CONTENTS = `{
+  "imports": {
+    "blog": "https://deno.land/x/blog@0.4.2/blog.tsx"
   }
 }
 `;
@@ -89,8 +101,9 @@ async function init(directory: string) {
     join(directory, "posts/hello_world.md"),
     FIRST_POST_CONTENTS,
   );
-  await Deno.writeTextFile(join(directory, "main.ts"), MAIN_CONTENTS);
-  await Deno.writeTextFile(join(directory, "deno.jsonc"), DENO_JSONC_CONTENTS);
+  await Deno.writeTextFile(join(directory, MAIN_NAME), MAIN_CONTENTS);
+  await Deno.writeTextFile(join(directory, DENO_JSONC_NAME), DENO_JSONC_CONTENTS);
+  await Deno.writeTextFile(join(directory, IMPORT_MAP_JSON_NAME), IMPORT_MAP_JSON_CONTENTS);
 
   console.log("Blog initialized, run `deno task dev` to get started.");
 }
