@@ -102,8 +102,14 @@ async function init(directory: string) {
     FIRST_POST_CONTENTS,
   );
   await Deno.writeTextFile(join(directory, MAIN_NAME), MAIN_CONTENTS);
-  await Deno.writeTextFile(join(directory, DENO_JSONC_NAME), DENO_JSONC_CONTENTS);
-  await Deno.writeTextFile(join(directory, IMPORT_MAP_JSON_NAME), IMPORT_MAP_JSON_CONTENTS);
+  await Deno.writeTextFile(
+    join(directory, DENO_JSONC_NAME),
+    DENO_JSONC_CONTENTS,
+  );
+  await Deno.writeTextFile(
+    join(directory, IMPORT_MAP_JSON_NAME),
+    IMPORT_MAP_JSON_CONTENTS,
+  );
 
   console.log("Blog initialized, run `deno task dev` to get started.");
 }
