@@ -85,9 +85,18 @@ blog({
 });
 ```
 
+Beware to use `.tsx` extension to this extent.
+
 ## Hosting with Deno Deploy
 
-<TODO>
+To deploy the project to the live internet, you can use
+[Deno Deploy](https://deno.com/deploy):
+
+1. Push your project to GitHub.
+2. [Create a Deno Deploy project](https://dash.deno.com/new).
+3. [Link](https://deno.com/deploy/docs/projects#enabling) the Deno Deploy
+   project to the `main.tsx` file in the root of the created repository.
+4. The project will be deployed to a public `$project.deno.dev` subdomain.
 
 ## Self hosting
 
