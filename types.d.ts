@@ -25,7 +25,7 @@ export interface BlogSettings {
   avatarClass?: string;
   /** URL to background cover. Can be relative. */
   cover?: string;
-  /** Color of the text that will be on the background cover. */
+  /** Color of the text that goes on the background cover. */
   coverTextColor?: string;
   /** The author of the blog. Can be overridden by respective post settings. */
   author?: string;
