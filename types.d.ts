@@ -15,59 +15,60 @@ export interface BlogMiddleware {
 export type DateStyle = "full" | "long" | "medium" | "short";
 
 export interface BlogSettings {
-  // The blog title
+  /** The blog title */
   title?: string;
-  // The blog description
+  /** The blog description */
   description?: string;
-  // URL to avatar. Can be relative.
+  /** URL to avatar. Can be relative. */
   avatar?: string;
-  // CSS classes to use with the avatar.
+  /** CSS classes to use with the avatar. */
   avatarClass?: string;
-  // URL to background cover. Can be relative.
+  /** URL to background cover. Can be relative. */
   cover?: string;
-  // Color of the text that will be on the background cover.
+  /** Color of the text that will be on the background cover. */
   coverTextColor?: string;
-  // The author of the blog. Can be overridden by respective post settings.
+  /** The author of the blog. Can be overridden by respective post settings. */
   author?: string;
-  // Social links
+  /** Social links */
   links?: {
-    // The link title
+    /** The link title */
     title: string;
-    // The link
+    /** The link */
     url: string;
-    // The element to use as the icon of the link
+    /** The element to use as the icon of the link */
     icon?: VNode;
-    // The link target
+    /** The link target */
     target?: "_self" | "_blank" | "_parent" | "_top";
   }[];
-  // The element ot use as header
+  /** The element ot use as header */
   header?: VNode;
-  // Whether to show the header on post pages
+  /** Whether to show the header on post pages */
   showHeaderOnPostPage?: boolean;
-  // The element to use as section
+  /** The element to use as section */
   section?: VNode;
-  // The element to use as footer
+  /** The element to use as footer */
   footer?: VNode;
-  // Custom CSS
+  /** Custom CSS */
   style?: string;
-  // URL to open graph image. Can be relative.
+  /** URL to open graph image. Can be relative. */
   ogImage?: string;
+  /** Functions that are called before rendering and can modify the content or make other changes. */
   middlewares?: BlogMiddleware[];
-  // The ISO code of the language the blog is in
+  /** The ISO code of the language the blog is in */
   lang?: string;
-  // Style of
+  /** Date appearance */
   dateStyle?: DateStyle;
-  // The canonical URL of the blog
+  /** The canonical URL of the blog */
   canonicalUrl?: string;
-  // UnoCSS configuration
+  /** UnoCSS configuration */
   unocss?: UnoConfig;
-  // Color scheme
+  /** Color scheme */
   theme?: "dark" | "light" | "auto";
-  // URL to favicon. Can be relative.
+  /** URL to favicon. Can be relative. */
   favicon?: string;
-  // The port to serve the blog on
+  /** The port to serve the blog on */
   port?: number;
-  // The hostname to serve the blog on
+  /** The hostname to serve the blog on */
   hostname?: string;
 }
 
