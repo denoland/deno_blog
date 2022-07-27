@@ -55,7 +55,7 @@ export interface BlogSettings {
   middlewares?: BlogMiddleware[];
   // The ISO code of the language the blog is in
   lang?: string;
-  // Style of 
+  // Style of
   dateStyle?: DateStyle;
   // The canonical URL of the blog
   canonicalUrl?: string;
