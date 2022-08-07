@@ -220,10 +220,9 @@ async function loadPost(postsDirectory: string, path: string) {
   // Remove .md extension.
   pathname = pathname.slice(0, -3);
 
-  const { content, data: _data } = frontMatter(contents) as {
-    data: Record<string, string | string[] | Date>;
-    content: string;
-  };
+  const { body: content, attrs: _data } = frontMatter<Record<string, unknown>>(
+    contents,
+  );
 
   const data = recordGetter(_data);
 
