@@ -264,6 +264,7 @@ export async function handler(
   const { state: blogState } = ctx;
   const { pathname, searchParams } = new URL(req.url);
   const canonicalUrl = blogState.canonicalUrl || new URL(req.url).origin;
+  const twitterCard = blogState.twitterCard || "summary_large_image";
 
   if (pathname === "/feed") {
     return serveRSS(req, blogState, POSTS);
@@ -318,7 +319,7 @@ export async function handler(
         "twitter:title": blogState.title,
         "twitter:description": blogState.description,
         "twitter:image": blogState.ogImage ?? blogState.cover,
-        "twitter:card": blogState.ogImage ? "summary_large_image" : undefined,
+        "twitter:card": blogState.ogImage ? twitterCard : undefined,
       },
       styles: [
         ...(blogState.style ? [blogState.style] : []),
@@ -345,7 +346,7 @@ export async function handler(
         "twitter:title": post.title,
         "twitter:description": post.snippet,
         "twitter:image": post.ogImage,
-        "twitter:card": post.ogImage ? "summary_large_image" : undefined,
+        "twitter:card": post.ogImage ? twitterCard : undefined,
       },
       styles: [
         gfm.CSS,

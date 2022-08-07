@@ -52,6 +52,8 @@ export interface BlogSettings {
   style?: string;
   /** URL to open graph image. Can be relative. */
   ogImage?: string;
+  /** Twitter card type */
+  twitterCard?: "summary" | "summary_large_image" | "app" | "player";
   /** Functions that are called before rendering and can modify the content or make other changes. */
   middlewares?: BlogMiddleware[];
   /** The ISO code of the language the blog is in */
