@@ -16,6 +16,7 @@ import {
   frontMatter,
   gfm,
   h,
+  hasFrontMatter,
   html,
   HtmlOptions,
   join,
@@ -33,6 +34,7 @@ import type {
   BlogMiddleware,
   BlogSettings,
   BlogState,
+  FrontMatterOptions,
   Post,
 } from "./types.d.ts";
 
@@ -174,37 +176,37 @@ export async function configureBlog(
     ...settings,
   };
 
-  await loadContent(directory, isDev);
+  await loadContent(state, isDev);
 
   return state;
 }
 
-async function loadContent(blogDirectory: string, isDev: boolean) {
+async function loadContent(blogState: BlogState, isDev: boolean) {
   // Read posts from the current directory and store them in memory.
-  const postsDirectory = join(blogDirectory, "posts");
+  const postsDirectory = join(blogState.directory, "posts");
 
   // TODO(@satyarohith): not efficient for large number of posts.
   for await (
     const entry of walk(postsDirectory)
   ) {
     if (entry.isFile && entry.path.endsWith(".md")) {
-      await loadPost(postsDirectory, entry.path);
+      await loadPost(postsDirectory, entry.path, blogState);
     }
   }
 
   if (isDev) {
-    watchForChanges(postsDirectory).catch(() => {});
+    watchForChanges(postsDirectory, blogState).catch(() => {});
   }
 }
 
 // Watcher watches for .md file changes and updates the posts.
-async function watchForChanges(postsDirectory: string) {
+async function watchForChanges(postsDirectory: string, blogState: BlogState) {
   const watcher = Deno.watchFs(postsDirectory);
   for await (const event of watcher) {
     if (event.kind === "modify" || event.kind === "create") {
       for (const path of event.paths) {
         if (path.endsWith(".md")) {
-          await loadPost(postsDirectory, path);
+          await loadPost(postsDirectory, path, blogState);
           HMR_SOCKETS.forEach((socket) => {
             socket.send("refresh");
           });
@@ -214,24 +216,35 @@ async function watchForChanges(postsDirectory: string) {
   }
 }
 
-async function loadPost(postsDirectory: string, path: string) {
-  const contents = await Deno.readTextFile(path);
+async function loadPost(
+  postsDirectory: string,
+  path: string,
+  { defaultFrontMatter }: BlogState,
+) {
+  let contents = await Deno.readTextFile(path);
   let pathname = "/" + relative(postsDirectory, path);
   // Remove .md extension.
   pathname = pathname.slice(0, -3);
 
-  const { body: content, attrs: _data } = frontMatter<Record<string, unknown>>(
-    contents,
-  );
+  const lastModifiedDate = Deno.statSync(path)
+    .mtime!.toISOString()
+    .split("T")[0];
 
-  const data = recordGetter(_data);
+  if (!hasFrontMatter(contents)) {
+    // Using default front matter if no front matter is found.
+    contents = frontMatterToString(defaultFrontMatter) + contents;
+  }
 
+  const { body, attrs } = frontMatter<Record<string, unknown>>(contents);
+
+  const data = recordGetter(attrs);
+  
   let snippet: string | undefined = data.get("snippet") ??
     data.get("abstract") ??
     data.get("summary") ??
     data.get("description");
   if (!snippet) {
-    const maybeSnippet = content.split("\n\n")[0];
+    const maybeSnippet = body.split("\n\n")[0];
     if (maybeSnippet) {
       snippet = removeMarkdown(maybeSnippet.replace("\n", " "));
     } else {
@@ -240,17 +253,19 @@ async function loadPost(postsDirectory: string, path: string) {
   }
 
   const post: Post = {
-    title: data.get("title") ?? "Untitled",
-    author: data.get("author"),
+    title: data.get("title") ?? defaultFrontMatter?.title ?? "Untitled",
+    author: data.get("author") ?? defaultFrontMatter?.author,
     // Note: users can override path of a blog post using
     // pathname in front matter.
     pathname: data.get("pathname") ?? pathname,
-    publishDate: data.get("publish_date")!,
+    publishDate: data.get("publish_date")
+      ? new Date(data.get("publish_date")!)
+      : new Date(lastModifiedDate),
     snippet,
-    markdown: content,
-    coverHtml: data.get("cover_html"),
-    ogImage: data.get("og:image"),
-    tags: data.get("tags"),
+    markdown: body,
+    coverHtml: data.get("cover_html") ?? defaultFrontMatter?.cover_html,
+    ogImage: data.get("og:image") ?? defaultFrontMatter?.["og:image"],
+    tags: data.get("tags") ?? defaultFrontMatter?.tags,
   };
   POSTS.set(pathname, post);
   console.log("Load: ", post.pathname);
@@ -497,10 +512,28 @@ function filterPosts(
   );
 }
 
-function recordGetter(data: Record<string, unknown>) {
+function recordGetter(data: Record<string, unknown> = {}) {
   return {
     get<T>(key: string): T | undefined {
       return data[key] as T;
     },
   };
+}
+
+function frontMatterToString(frontMatter: Record<string, unknown> = {}) {
+  const line = "---";
+  const attrs = Object.entries(frontMatter).flatMap(([key, value]) => {
+    switch (typeof value) {
+      case "number":
+      case "boolean":
+      case "string":
+        return [`${key}: ${value}`];
+      case "object":
+        return [`${key}: ${JSON.stringify(value)}`];
+      default:
+        return [];
+    }
+  }).join("\n");
+
+  return `${line}\n${attrs}\n${line}\n`;
 }

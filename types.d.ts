@@ -14,6 +14,20 @@ export interface BlogMiddleware {
 
 export type DateStyle = "full" | "long" | "medium" | "short";
 
+export interface FrontMatterOptions {
+  title?: string;
+  author?: string;
+  snippet?: string;
+  abstract?: string;
+  summary?: string;
+  description?: string;
+  pathname?: string;
+  publish_date?: string | Date;
+  cover_html?: string;
+  "og:image"?: string;
+  tags?: string[];
+}
+
 export interface BlogSettings {
   /** The blog title */
   title?: string;
@@ -73,6 +87,16 @@ export interface BlogSettings {
   port?: number;
   /** The hostname to serve the blog on */
   hostname?: string;
+  /** Default front matter setting */
+  defaultFrontMatter?: Omit<
+    FrontMatterOptions,
+    | "pathname"
+    | "publish_date"
+    | "snippet"
+    | "abstract"
+    | "summary"
+    | "description"
+  >;
 }
 
 export interface BlogState extends BlogSettings {
