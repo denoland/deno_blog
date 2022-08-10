@@ -265,7 +265,7 @@ async function loadPost(
     markdown: body,
     coverHtml: data.get("cover_html") ?? defaultFrontMatter?.cover_html,
     ogImage: data.get("og:image") ?? defaultFrontMatter?.["og:image"],
-    tags: data.get("tags") ?? defaultFrontMatter?.tags,
+    tags: covertTagsToArray(data.get("tags") ?? defaultFrontMatter?.tags),
   };
   POSTS.set(pathname, post);
   console.log("Load: ", post.pathname);
@@ -536,4 +536,18 @@ function frontMatterToString(frontMatter: Record<string, unknown> = {}) {
   }).join("\n");
 
   return `${line}\n${attrs}\n${line}\n`;
+}
+
+function covertTagsToArray(tags: unknown): string[] {
+  switch (typeof tags) {
+    case "string":
+      return tags.split(",").map((value) => value.trim());
+    case "boolean":
+    case "number":
+      return [`${tags}`];
+    case "object":
+      return Array.isArray(tags) ? tags : [];
+    default:
+      return tags = [];
+  }
 }
