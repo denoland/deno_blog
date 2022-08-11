@@ -6,6 +6,7 @@ export {
   dirname,
   fromFileUrl,
   join,
+  normalize,
   relative,
 } from "https://deno.land/std@0.151.0/path/mod.ts";
 export {
@@ -13,8 +14,8 @@ export {
   serve,
 } from "https://deno.land/std@0.151.0/http/mod.ts";
 export {
-  test as hasFrontMatter,
   extract as frontMatter,
+  test as hasFrontMatter,
 } from "https://deno.land/std@0.151.0/encoding/front_matter.ts";
 
 export * as gfm from "https://deno.land/x/gfm@0.1.22/mod.ts";

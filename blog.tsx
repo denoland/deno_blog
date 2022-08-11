@@ -20,6 +20,7 @@ import {
   html,
   HtmlOptions,
   join,
+  normalize,
   relative,
   removeMarkdown,
   serve,
@@ -238,7 +239,7 @@ async function loadPost(
   const { body, attrs } = frontMatter<Record<string, unknown>>(contents);
 
   const data = recordGetter(attrs);
-  
+
   let snippet: string | undefined = data.get("snippet") ??
     data.get("abstract") ??
     data.get("summary") ??
@@ -257,7 +258,7 @@ async function loadPost(
     author: data.get("author") ?? defaultFrontMatter?.author,
     // Note: users can override path of a blog post using
     // pathname in front matter.
-    pathname: data.get("pathname") ?? pathname,
+    pathname: normalize(data.get("pathname") ?? pathname),
     publishDate: data.get("publish_date")
       ? new Date(data.get("publish_date")!)
       : new Date(lastModifiedDate),
@@ -267,7 +268,8 @@ async function loadPost(
     ogImage: data.get("og:image") ?? defaultFrontMatter?.["og:image"],
     tags: covertTagsToArray(data.get("tags") ?? defaultFrontMatter?.tags),
   };
-  POSTS.set(pathname, post);
+
+  POSTS.set(post.pathname, post);
   console.log("Load: ", post.pathname);
 }
 
@@ -352,7 +354,7 @@ export async function handler(
     });
   }
 
-  const post = POSTS.get(pathname);
+  const post = POSTS.get(normalize(decodeURI(pathname)));
   if (post) {
     return html({
       ...sharedHtmlOptions,
