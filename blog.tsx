@@ -309,8 +309,8 @@ export async function handler(
       type: "image/x-icon",
       rel: "icon",
     });
-  } else if (blogState.favicon) {
-    if (blogState.favicon.light) {
+  } else {
+    if (blogState.favicon?.light) {
       sharedHtmlOptions.links?.push({
         href: blogState.favicon.light,
         type: "image/x-icon",
@@ -319,7 +319,7 @@ export async function handler(
       });
     }
 
-    if (blogState.favicon.dark) {
+    if (blogState.favicon?.dark) {
       sharedHtmlOptions.links?.push({
         href: blogState.favicon.dark,
         type: "image/x-icon",
