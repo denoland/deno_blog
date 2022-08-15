@@ -303,12 +303,30 @@ export async function handler(
     ],
   };
 
-  if (blogState.favicon) {
+  if (typeof blogState.favicon === "string") {
     sharedHtmlOptions.links?.push({
       href: blogState.favicon,
       type: "image/x-icon",
       rel: "icon",
     });
+  } else if (blogState.favicon) {
+    if (blogState.favicon.light) {
+      sharedHtmlOptions.links?.push({
+        href: blogState.favicon.light,
+        type: "image/x-icon",
+        media: "(prefers-color-scheme:light)",
+        rel: "icon",
+      });
+    }
+
+    if (blogState.favicon.dark) {
+      sharedHtmlOptions.links?.push({
+        href: blogState.favicon.dark,
+        type: "image/x-icon",
+        media: "(prefers-color-scheme:dark)",
+        rel: "icon",
+      });
+    }
   }
 
   if (pathname === "/") {
