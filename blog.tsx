@@ -204,9 +204,12 @@ async function watchForChanges(postsDirectory: string) {
     if (event.kind === "modify" || event.kind === "create") {
       for (const path of event.paths) {
         if (path.endsWith(".md")) {
-          await loadPost(postsDirectory, path);
-          HMR_SOCKETS.forEach((socket) => {
-            socket.send("refresh");
+          await loadPost(postsDirectory, path).then(() => {
+            HMR_SOCKETS.forEach((socket) => {
+              socket.send("refresh");
+            });
+          }, (err) => {
+            console.error(`loadPost ${path} error:`, err.message);
           });
         }
       }
