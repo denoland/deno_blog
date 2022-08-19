@@ -165,7 +165,9 @@ interface PostPageProps {
 }
 
 export function PostPage({ post, state }: PostPageProps) {
-  const html = gfm.render(post.markdown);
+  const html = gfm.render(post.markdown, {
+    allowIframes: post.allowIframes,
+  });
   return (
     <div className={`post ${post.pathname.substring(1)}`}>
       {state.showHeaderOnPostPage && state.header}
