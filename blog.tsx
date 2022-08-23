@@ -172,7 +172,7 @@ export async function configureBlog(
     const blogPath = fromFileUrl(url);
     directory = dirname(blogPath);
   } catch (e) {
-    console.log(e);
+    console.error(e);
     throw new Error("Cannot run blog from a remote URL.");
   }
 
@@ -485,7 +485,7 @@ export function redirects(redirectMap: Record<string, string>): BlogMiddleware {
     try {      
       return await ctx.next();
     } catch (e) {
-      console.log(e)
+      console.error(e)
       return new Response(`Internal server error: ${e.message}`, {
         status: 500,
       });
