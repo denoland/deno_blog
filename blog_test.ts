@@ -92,6 +92,24 @@ Deno.test("posts/ second", async () => {
   assertStringIncludes(body, `<p>Lorem Ipsum is simply dummy text`);
 });
 
+Deno.test("posts/ third", async () => {
+  const resp = await testHandler(new Request("https://blog.deno.dev/third"));
+  assert(resp);
+  assertEquals(resp.status, 200);
+  assertEquals(resp.headers.get("content-type"), "text/html; charset=utf-8");
+  const body = await resp.text();
+  assertStringIncludes(body, `<html lang="en-GB">`);
+  assertStringIncludes(body, `Third post`);
+  assertStringIncludes(body, `By CUSTOM AUTHOR NAME`);
+  assertStringIncludes(body, `© ${new Date().getFullYear()} The author`);
+  assertStringIncludes(
+    body,
+    `<time dateTime="2022-08-19T00:00:00.000Z">19 Aug 2022</time>`,
+  );
+  assertStringIncludes(body, `<iframe width="560" height="315"`);
+  assertStringIncludes(body, `<p>Lorem Ipsum is simply dummy text`);
+});
+
 Deno.test("posts/ trailing slash redirects", async () => {
   const resp = await testHandler(new Request("https://blog.deno.dev/second/"));
   assert(resp);

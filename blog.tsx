@@ -251,6 +251,7 @@ async function loadPost(postsDirectory: string, path: string) {
     coverHtml: data.get("cover_html"),
     ogImage: data.get("og:image"),
     tags: data.get("tags"),
+    allowIframes: data.get("allow_iframes"),
   };
   POSTS.set(pathname, post);
   console.log("Load: ", post.pathname);
