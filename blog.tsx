@@ -78,6 +78,12 @@ function hmrSocket(callback) {
 }
 `;
 
+function errorHandler(err: unknown) {
+  return new Response(`Internal server error: ${(err as Error)?.message}`, {
+    status: 500,
+  });
+}
+
 /** The main function of the library.
  *
  * ```jsx
@@ -103,6 +109,7 @@ export default async function blog(settings?: BlogSettings) {
   serve(blogHandler, {
     port: blogState.port,
     hostname: blogState.hostname,
+    onError: errorHandler,
   });
 }
 
@@ -165,7 +172,7 @@ export async function configureBlog(
     const blogPath = fromFileUrl(url);
     directory = dirname(blogPath);
   } catch (e) {
-    console.log(e);
+    console.error(e);
     throw new Error("Cannot run blog from a remote URL.");
   }
 
@@ -249,7 +256,10 @@ async function loadPost(postsDirectory: string, path: string) {
     // Note: users can override path of a blog post using
     // pathname in front matter.
     pathname: data.get("pathname") ?? pathname,
-    publishDate: data.get("publish_date")!,
+    // Note: no error when publish_date is wrong or missed
+    publishDate: data.get("publish_date") instanceof Date
+      ? data.get("publish_date")!
+      : new Date(),
     snippet,
     markdown: content,
     coverHtml: data.get("cover_html"),
@@ -466,8 +476,8 @@ export function ga(gaKey: string): BlogMiddleware {
     try {
       res = await ctx.next() as Response;
     } catch (e) {
-      err = e;
-      res = new Response("Internal server error", {
+      err = e as Error;
+      res = new Response(`Internal server error: ${err.message}`, {
         status: 500,
       });
     } finally {
@@ -502,8 +512,14 @@ export function redirects(redirectMap: Record<string, string>): BlogMiddleware {
         },
       });
     }
-
-    return await ctx.next();
+    try {
+      return await ctx.next();
+    } catch (e) {
+      console.error(e);
+      return new Response(`Internal server error: ${e.message}`, {
+        status: 500,
+      });
+    }
   };
 }
 
