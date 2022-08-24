@@ -109,7 +109,7 @@ export default async function blog(settings?: BlogSettings) {
   serve(blogHandler, {
     port: blogState.port,
     hostname: blogState.hostname,
-    onError: errorHandler 
+    onError: errorHandler,
   });
 }
 
@@ -254,7 +254,9 @@ async function loadPost(postsDirectory: string, path: string) {
     // pathname in front matter.
     pathname: data.get("pathname") ?? pathname,
     // Note: no error when publish_date is wrong or missed
-    publishDate: data.get("publish_date") instanceof Date ? data.get("publish_date")! : new Date(),
+    publishDate: data.get("publish_date") instanceof Date
+      ? data.get("publish_date")!
+      : new Date(),
     snippet,
     markdown: content,
     coverHtml: data.get("cover_html"),
@@ -482,10 +484,10 @@ export function redirects(redirectMap: Record<string, string>): BlogMiddleware {
         },
       });
     }
-    try {      
+    try {
       return await ctx.next();
     } catch (e) {
-      console.error(e)
+      console.error(e);
       return new Response(`Internal server error: ${e.message}`, {
         status: 500,
       });
