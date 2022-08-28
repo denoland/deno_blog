@@ -563,7 +563,7 @@ function getPostsPage(
     );
   }
   return new Map(
-    Array.from(posts.entries()).slice(i*10, i*10+10).filter(([, p]) => p.tags?.includes(tag)),
+    Array.from(posts.entries()).filter(([, p]) => p.tags?.includes(tag)).slice(i*10, i*10+10),
   );
 }
 
