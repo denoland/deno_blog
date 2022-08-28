@@ -343,6 +343,30 @@ export async function handler(
       });
     }
   }
+  
+  if(pathname === "/" && searchParams.get('page')?.match(/^[0-9]+$/)){
+    const index = Number(searchParams.get('page'));
+    return html({
+      ...sharedHtmlOptions,
+      title: blogState.title ?? "My Blog",
+      meta: {
+        "description": blogState.description,
+        "og:title": blogState.title,
+        "og:description": blogState.description,
+        "og:image": ogImage ?? blogState.cover,
+        "twitter:title": blogState.title,
+        "twitter:description": blogState.description,
+        "twitter:image": ogImage ?? blogState.cover,
+        "twitter:card": ogImage ? twitterCard : undefined,
+      },
+      styles: [
+        ...(blogState.style ? [blogState.style] : []),
+      ],
+      body: (
+        <Index state={blogState} index={index} postsLength={POSTS.size} posts={getPostsPage(POSTS, index)} />
+      )
+    })
+  }
 
   if (pathname === "/") {
     return html({
@@ -364,7 +388,9 @@ export async function handler(
       body: (
         <Index
           state={blogState}
+          postsLength={POSTS.size}
           posts={filterPosts(POSTS, searchParams)}
+          index={0}
         />
       ),
     });
@@ -521,6 +547,17 @@ export function redirects(redirectMap: Record<string, string>): BlogMiddleware {
       });
     }
   };
+}
+
+function getPostsPage(
+  posts: Map<string, Post>,
+  index: number
+) {
+  const i = Math.round(index);
+  if(i<0) return new Map();
+  return new Map(
+    Array.from(posts.entries()).slice(i*10, i*10+10),
+  )
 }
 
 function filterPosts(

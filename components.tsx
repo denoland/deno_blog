@@ -17,12 +17,46 @@ const socialAppIcons = new Map([
   ["linkedin.com", IconLinkedin],
 ]);
 
+interface PaginationProps {
+  index: number;
+  type: "forward" | "backward" | "both";
+}
+function Pagination({ index, type }: PaginationProps) {
+  const page = (
+    <div class="mt-3 flex gap-2 items-center justify-center">
+      {(type === "backward" || type === "both")
+        ? (
+          <a
+            href={`/?page=${index - 1}`}
+            class="relative flex items-center justify-center w-8 h-8 rounded-full bg-gray-600/10 dark:bg-gray-400/10 text-gray-700 dark:text-gray-400 hover:bg-gray-600/15 dark:hover:bg-gray-400/15 hover:text-black dark:hover:text-white transition-colors group"
+          >
+            <IconPrevious />
+          </a>
+        )
+        : ""}
+      {(type === "forward" || type === "both")
+        ? (
+          <a
+            href={`/?page=${index + 1}`}
+            class="relative flex items-center justify-center w-8 h-8 rounded-full bg-gray-600/10 dark:bg-gray-400/10 text-gray-700 dark:text-gray-400 hover:bg-gray-600/15 dark:hover:bg-gray-400/15 hover:text-black dark:hover:text-white transition-colors group"
+          >
+            <IconNext />
+          </a>
+        )
+        : ""}
+    </div>
+  );
+  return page;
+}
+
 interface IndexProps {
   state: BlogState;
   posts: Map<string, Post>;
+  index: number;
+  postsLength: number;
 }
 
-export function Index({ state, posts }: IndexProps) {
+export function Index({ state, posts, index, postsLength }: IndexProps) {
   const postIndex = [];
   for (const [_key, post] of posts.entries()) {
     postIndex.push(post);
@@ -30,6 +64,14 @@ export function Index({ state, posts }: IndexProps) {
   postIndex.sort(
     (a, b) => (b.publishDate?.getTime() ?? 0) - (a.publishDate?.getTime() ?? 0),
   );
+  let page;
+  if ((index + 1) * 10 >= postsLength && index !== 0) {
+    page = <Pagination index={index} type={"backward"} />;
+  } else if (index === 0) {
+    page = <Pagination index={index} type={"forward"} />;
+  } else {
+    page = <Pagination index={index} type={"both"} />;
+  }
 
   return (
     <div class="home">
@@ -114,6 +156,7 @@ export function Index({ state, posts }: IndexProps) {
             />
           ))}
         </div>
+        {page}
 
         {state.footer || <Footer author={state.author} />}
       </div>
@@ -352,6 +395,32 @@ function IconExternalLink() {
       />
     </svg>
   );
+}
+
+function IconPrevious() {
+  return (
+    <svg
+      className="inline-block w-5 h-5"
+      viewBox="0 0 512 512"
+      fill="black"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path fill="currentColor" d="M257.5 445.1l-22.2 22.2c-9.4 9.4-24.6 9.4-33.9 0L7 273c-9.4-9.4-9.4-24.6 0-33.9L201.4 44.7c9.4-9.4 24.6-9.4 33.9 0l22.2 22.2c9.5 9.5 9.3 25-.4 34.3L136.6 216H424c13.3 0 24 10.7 24 24v32c0 13.3-10.7 24-24 24H136.6l120.5 114.8c9.8 9.3 10 24.8.4 34.3z"/>
+    </svg>
+  );
+}
+
+function IconNext(){
+  return (
+    <svg
+      className="inline-block w-5 h-5"
+      viewBox="0 0 512 512"
+      fill="black"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path d="M190.5 66.9l22.2-22.2c9.4-9.4 24.6-9.4 33.9 0L441 239c9.4 9.4 9.4 24.6 0 33.9L246.6 467.3c-9.4 9.4-24.6 9.4-33.9 0l-22.2-22.2c-9.5-9.5-9.3-25 .4-34.3L311.4 296H24c-13.3 0-24-10.7-24-24v-32c0-13.3 10.7-24 24-24h287.4L190.9 101.2c-9.8-9.3-10-24.8-.4-34.3z"/>
+    </svg>
+  )
 }
 
 function IconGithub() {
