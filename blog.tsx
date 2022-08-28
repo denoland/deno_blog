@@ -346,6 +346,7 @@ export async function handler(
   
   if(pathname === "/" && searchParams.get('page')?.match(/^[0-9]+$/)){
     const index = Number(searchParams.get('page'));
+    const tagPosts = filterPosts(POSTS, searchParams);
     return html({
       ...sharedHtmlOptions,
       title: blogState.title ?? "My Blog",
@@ -363,12 +364,19 @@ export async function handler(
         ...(blogState.style ? [blogState.style] : []),
       ],
       body: (
-        <Index state={blogState} index={index} postsLength={POSTS.size} posts={getPostsPage(POSTS, index, searchParams)} />
+        <Index 
+          state={blogState} 
+          index={index} 
+          postsLength={tagPosts.size} 
+          posts={getPostsPage(tagPosts, index)} 
+          searchParams={searchParams}
+        />
       )
     })
   }
 
   if (pathname === "/") {
+    const tagPosts = filterPosts(POSTS, searchParams);
     return html({
       ...sharedHtmlOptions,
       title: blogState.title ?? "My Blog",
@@ -388,9 +396,10 @@ export async function handler(
       body: (
         <Index
           state={blogState}
-          postsLength={POSTS.size}
-          posts={getPostsPage(POSTS, 0, searchParams)}
+          postsLength={tagPosts.size}
+          posts={getPostsPage(tagPosts, 0)}
           index={0}
+          searchParams={searchParams}
         />
       ),
     });
@@ -552,18 +561,11 @@ export function redirects(redirectMap: Record<string, string>): BlogMiddleware {
 function getPostsPage(
   posts: Map<string, Post>,
   index: number,
-  searchParams: URLSearchParams,
 ) {
   const i = Math.round(index);
   if(i<0) return new Map();
-  const tag = searchParams.get("tag");
-  if(!tag){
-    return new Map(
-      Array.from(posts.entries()).slice(i*10, i*10+10),
-    );
-  }
   return new Map(
-    Array.from(posts.entries()).filter(([, p]) => p.tags?.includes(tag)).slice(i*10, i*10+10),
+    Array.from(posts.entries()).slice(i*10, i*10+10),
   );
 }
 

@@ -20,14 +20,18 @@ const socialAppIcons = new Map([
 interface PaginationProps {
   index: number;
   type: "forward" | "backward" | "both";
+  tag: string | null;
 }
-function Pagination({ index, type }: PaginationProps) {
+function Pagination({ index, type, tag }: PaginationProps) {
+  let t;
+  if(tag) t = "&tag="+tag;
+  else t = "";
   const page = (
     <div class="mt-3 flex gap-2 items-center justify-center">
       {(type === "backward" || type === "both")
         ? (
           <a
-            href={`/?page=${index - 1}`}
+            href={`/?page=${index - 1}${t}`}
             class="relative flex items-center justify-center w-8 h-8 rounded-full bg-gray-600/10 dark:bg-gray-400/10 text-gray-700 dark:text-gray-400 hover:bg-gray-600/15 dark:hover:bg-gray-400/15 hover:text-black dark:hover:text-white transition-colors group"
           >
             <IconPrevious />
@@ -37,7 +41,7 @@ function Pagination({ index, type }: PaginationProps) {
       {(type === "forward" || type === "both")
         ? (
           <a
-            href={`/?page=${index + 1}`}
+            href={`/?page=${index + 1}${t}`}
             class="relative flex items-center justify-center w-8 h-8 rounded-full bg-gray-600/10 dark:bg-gray-400/10 text-gray-700 dark:text-gray-400 hover:bg-gray-600/15 dark:hover:bg-gray-400/15 hover:text-black dark:hover:text-white transition-colors group"
           >
             <IconNext />
@@ -54,9 +58,10 @@ interface IndexProps {
   posts: Map<string, Post>;
   index: number;
   postsLength: number;
+  searchParams: URLSearchParams;
 }
 
-export function Index({ state, posts, index, postsLength }: IndexProps) {
+export function Index({ state, posts, index, postsLength, searchParams }: IndexProps) {
   const postIndex = [];
   for (const [_key, post] of posts.entries()) {
     postIndex.push(post);
@@ -65,14 +70,15 @@ export function Index({ state, posts, index, postsLength }: IndexProps) {
     (a, b) => (b.publishDate?.getTime() ?? 0) - (a.publishDate?.getTime() ?? 0),
   );
   let page;
+  const tag = searchParams.get("tag");
   if ((index + 1) * 10 >= postsLength && index !== 0) {
-    page = <Pagination index={index} type={"backward"} />;
+    page = <Pagination tag={tag} index={index} type={"backward"} />;
   } else if(index === 0 && (index + 1) * 10 >= postsLength) {
     page = "";
   } else if (index === 0) {
-    page = <Pagination index={index} type={"forward"} />;
+    page = <Pagination tag={tag} index={index} type={"forward"} />;
   } else {
-    page = <Pagination index={index} type={"both"} />;
+    page = <Pagination tag={tag} index={index} type={"both"} />;
   }
 
   return (
