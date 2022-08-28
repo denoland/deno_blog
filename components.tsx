@@ -67,6 +67,8 @@ export function Index({ state, posts, index, postsLength }: IndexProps) {
   let page;
   if ((index + 1) * 10 >= postsLength && index !== 0) {
     page = <Pagination index={index} type={"backward"} />;
+  } else if(index === 0 && (index + 1) * 10 >= postsLength) {
+    page = "";
   } else if (index === 0) {
     page = <Pagination index={index} type={"forward"} />;
   } else {
