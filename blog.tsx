@@ -363,7 +363,7 @@ export async function handler(
         ...(blogState.style ? [blogState.style] : []),
       ],
       body: (
-        <Index state={blogState} index={index} postsLength={POSTS.size} posts={getPostsPage(POSTS, index)} />
+        <Index state={blogState} index={index} postsLength={POSTS.size} posts={getPostsPage(POSTS, index, searchParams)} />
       )
     })
   }
@@ -389,7 +389,7 @@ export async function handler(
         <Index
           state={blogState}
           postsLength={POSTS.size}
-          posts={filterPosts(POSTS, searchParams)}
+          posts={getPostsPage(POSTS, 0, searchParams)}
           index={0}
         />
       ),
@@ -551,13 +551,20 @@ export function redirects(redirectMap: Record<string, string>): BlogMiddleware {
 
 function getPostsPage(
   posts: Map<string, Post>,
-  index: number
+  index: number,
+  searchParams: URLSearchParams,
 ) {
   const i = Math.round(index);
   if(i<0) return new Map();
+  const tag = searchParams.get("tag");
+  if(!tag){
+    return new Map(
+      Array.from(posts.entries()).slice(i*10, i*10+10),
+    );
+  }
   return new Map(
-    Array.from(posts.entries()).slice(i*10, i*10+10),
-  )
+    Array.from(posts.entries()).slice(i*10, i*10+10).filter(([, p]) => p.tags?.includes(tag)),
+  );
 }
 
 function filterPosts(
