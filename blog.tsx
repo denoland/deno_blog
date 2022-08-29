@@ -39,7 +39,7 @@ import type {
 export { Fragment, h };
 
 const IS_DEV = Deno.args.includes("--dev") && "watchFs" in Deno;
-const POSTS = new Map<string, Post>();
+let POSTS = new Map<string, Post>();
 const HMR_SOCKETS: Set<WebSocket> = new Set();
 
 const HMR_CLIENT = `let socket;
@@ -198,6 +198,8 @@ async function loadContent(blogDirectory: string, isDev: boolean) {
       await loadPost(postsDirectory, entry.path);
     }
   }
+
+  POSTS = new Map(Array.from(POSTS).sort(([,a], [,b])=>b.publishDate.getTime() - a.publishDate.getTime()))
 
   if (isDev) {
     watchForChanges(postsDirectory).catch(() => {});
