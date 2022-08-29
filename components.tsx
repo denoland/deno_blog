@@ -24,7 +24,7 @@ interface PaginationProps {
 }
 function Pagination({ index, type, tag }: PaginationProps) {
   let t;
-  if(tag) t = "&tag="+tag;
+  if (tag) t = "&tag=" + tag;
   else t = "";
   const page = (
     <div class="mt-3 flex gap-2 items-center justify-center">
@@ -61,7 +61,9 @@ interface IndexProps {
   searchParams: URLSearchParams;
 }
 
-export function Index({ state, posts, index, postsLength, searchParams }: IndexProps) {
+export function Index(
+  { state, posts, index, postsLength, searchParams }: IndexProps,
+) {
   const postIndex = [];
   for (const [_key, post] of posts.entries()) {
     postIndex.push(post);
@@ -73,7 +75,7 @@ export function Index({ state, posts, index, postsLength, searchParams }: IndexP
   const tag = searchParams.get("tag");
   if ((index + 1) * 10 >= postsLength && index !== 0) {
     page = <Pagination tag={tag} index={index} type={"backward"} />;
-  } else if(index === 0 && (index + 1) * 10 >= postsLength) {
+  } else if (index === 0 && (index + 1) * 10 >= postsLength) {
     page = "";
   } else if (index === 0) {
     page = <Pagination tag={tag} index={index} type={"forward"} />;
@@ -413,12 +415,15 @@ function IconPrevious() {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <path fill="currentColor" d="M257.5 445.1l-22.2 22.2c-9.4 9.4-24.6 9.4-33.9 0L7 273c-9.4-9.4-9.4-24.6 0-33.9L201.4 44.7c9.4-9.4 24.6-9.4 33.9 0l22.2 22.2c9.5 9.5 9.3 25-.4 34.3L136.6 216H424c13.3 0 24 10.7 24 24v32c0 13.3-10.7 24-24 24H136.6l120.5 114.8c9.8 9.3 10 24.8.4 34.3z"/>
+      <path
+        fill="currentColor"
+        d="M257.5 445.1l-22.2 22.2c-9.4 9.4-24.6 9.4-33.9 0L7 273c-9.4-9.4-9.4-24.6 0-33.9L201.4 44.7c9.4-9.4 24.6-9.4 33.9 0l22.2 22.2c9.5 9.5 9.3 25-.4 34.3L136.6 216H424c13.3 0 24 10.7 24 24v32c0 13.3-10.7 24-24 24H136.6l120.5 114.8c9.8 9.3 10 24.8.4 34.3z"
+      />
     </svg>
   );
 }
 
-function IconNext(){
+function IconNext() {
   return (
     <svg
       className="inline-block w-5 h-5"
@@ -426,9 +431,12 @@ function IconNext(){
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <path fill="currentColor" d="M190.5 66.9l22.2-22.2c9.4-9.4 24.6-9.4 33.9 0L441 239c9.4 9.4 9.4 24.6 0 33.9L246.6 467.3c-9.4 9.4-24.6 9.4-33.9 0l-22.2-22.2c-9.5-9.5-9.3-25 .4-34.3L311.4 296H24c-13.3 0-24-10.7-24-24v-32c0-13.3 10.7-24 24-24h287.4L190.9 101.2c-9.8-9.3-10-24.8-.4-34.3z"/>
+      <path
+        fill="currentColor"
+        d="M190.5 66.9l22.2-22.2c9.4-9.4 24.6-9.4 33.9 0L441 239c9.4 9.4 9.4 24.6 0 33.9L246.6 467.3c-9.4 9.4-24.6 9.4-33.9 0l-22.2-22.2c-9.5-9.5-9.3-25 .4-34.3L311.4 296H24c-13.3 0-24-10.7-24-24v-32c0-13.3 10.7-24 24-24h287.4L190.9 101.2c-9.8-9.3-10-24.8-.4-34.3z"
+      />
     </svg>
-  )
+  );
 }
 
 function IconGithub() {

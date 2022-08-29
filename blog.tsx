@@ -343,9 +343,9 @@ export async function handler(
       });
     }
   }
-  
-  if(pathname === "/" && searchParams.get('page')?.match(/^[0-9]+$/)){
-    const index = Number(searchParams.get('page'));
+
+  if (pathname === "/" && searchParams.get("page")?.match(/^[0-9]+$/)) {
+    const index = Number(searchParams.get("page"));
     const tagPosts = filterPosts(POSTS, searchParams);
     return html({
       ...sharedHtmlOptions,
@@ -364,15 +364,15 @@ export async function handler(
         ...(blogState.style ? [blogState.style] : []),
       ],
       body: (
-        <Index 
-          state={blogState} 
-          index={index} 
-          postsLength={tagPosts.size} 
-          posts={getPostsPage(tagPosts, index)} 
+        <Index
+          state={blogState}
+          index={index}
+          postsLength={tagPosts.size}
+          posts={getPostsPage(tagPosts, index)}
           searchParams={searchParams}
         />
-      )
-    })
+      ),
+    });
   }
 
   if (pathname === "/") {
@@ -563,9 +563,9 @@ function getPostsPage(
   index: number,
 ) {
   const i = Math.round(index);
-  if(i<0) return new Map();
+  if (i < 0) return new Map();
   return new Map(
-    Array.from(posts.entries()).slice(i*10, i*10+10),
+    Array.from(posts.entries()).slice(i * 10, i * 10 + 10),
   );
 }
 
