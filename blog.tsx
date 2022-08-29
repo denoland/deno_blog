@@ -199,7 +199,11 @@ async function loadContent(blogDirectory: string, isDev: boolean) {
     }
   }
 
-  POSTS = new Map(Array.from(POSTS).sort(([,a], [,b])=>b.publishDate.getTime() - a.publishDate.getTime()))
+  POSTS = new Map(
+    Array.from(POSTS).sort(([, a], [, b]) =>
+      b.publishDate.getTime() - a.publishDate.getTime()
+    ),
+  );
 
   if (isDev) {
     watchForChanges(postsDirectory).catch(() => {});
