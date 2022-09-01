@@ -76,6 +76,8 @@ export interface BlogSettings {
   port?: number;
   /** The hostname to serve the blog on */
   hostname?: string;
+  /** When true, readtime will not be displayed */
+  disableReadtime?: boolean;
 }
 
 export interface BlogState extends BlogSettings {
