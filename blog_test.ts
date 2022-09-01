@@ -72,6 +72,7 @@ Deno.test("posts/ first", async () => {
   assertStringIncludes(body, `<img src="first/hello.png" />`);
   assertStringIncludes(body, `<p>Lorem Ipsum is simply dummy text`);
   assertStringIncludes(body, `$100, $200, $300, $400, $500`);
+  assertStringIncludes(body, `min read`);
 });
 
 Deno.test("posts/ second", async () => {
