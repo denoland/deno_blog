@@ -58,11 +58,11 @@ interface IndexProps {
   posts: Map<string, Post>;
   index: number;
   postsLength: number;
-  searchParams: URLSearchParams;
+  tag: URLSearchParams;
 }
 
 export function Index(
-  { state, posts, index, postsLength, searchParams }: IndexProps,
+  { state, posts, index, postsLength, tag }: IndexProps,
 ) {
   const postIndex = [];
   for (const [_key, post] of posts.entries()) {
@@ -72,15 +72,15 @@ export function Index(
     (a, b) => (b.publishDate?.getTime() ?? 0) - (a.publishDate?.getTime() ?? 0),
   );
   let page;
-  const tag = searchParams.get("tag");
+  const t = tag.get("tag");
   if ((index + 1) * 10 >= postsLength && index !== 0) {
-    page = <Pagination tag={tag} index={index} type={"backward"} />;
+    page = <Pagination tag={t} index={index} type={"backward"} />;
   } else if (index === 0 && (index + 1) * 10 >= postsLength) {
     page = "";
   } else if (index === 0) {
-    page = <Pagination tag={tag} index={index} type={"forward"} />;
+    page = <Pagination tag={t} index={index} type={"forward"} />;
   } else {
-    page = <Pagination tag={tag} index={index} type={"both"} />;
+    page = <Pagination tag={t} index={index} type={"both"} />;
   }
 
   return (

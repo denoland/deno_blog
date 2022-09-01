@@ -378,7 +378,7 @@ export async function handler(
           index={index}
           postsLength={tagPosts.size}
           posts={getPostsPage(tagPosts, index)}
-          searchParams={searchParams}
+          tag={searchParams}
         />
       ),
     });
