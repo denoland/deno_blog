@@ -352,7 +352,7 @@ export async function handler(
 
   if (pathname === "/") {
     let index = 0;
-    if(searchParams.get("page")?.match(/^[0-9]+$/)){
+    if (searchParams.get("page")?.match(/^[0-9]+$/)) {
       index = Number(searchParams.get("page"));
     }
     const tagPosts = filterPosts(POSTS, searchParams);
