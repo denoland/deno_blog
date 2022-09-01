@@ -377,7 +377,7 @@ export async function handler(
           state={blogState}
           index={index}
           postsLength={tagPosts.size}
-          posts={getPostsPage(tagPosts, index)}
+          posts={getPostsByPage(tagPosts, index)}
           tag={searchParams}
         />
       ),
@@ -567,7 +567,7 @@ export function redirects(redirectMap: Record<string, string>): BlogMiddleware {
   };
 }
 
-function getPostsPage(
+function getPostsByPage(
   posts: Map<string, Post>,
   index: number,
 ) {
