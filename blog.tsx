@@ -350,8 +350,11 @@ export async function handler(
     }
   }
 
-  if (pathname === "/" && searchParams.get("page")?.match(/^[0-9]+$/)) {
-    const index = Number(searchParams.get("page"));
+  if (pathname === "/") {
+    let index = 0;
+    if(searchParams.get("page")?.match(/^[0-9]+$/)){
+      index = Number(searchParams.get("page"));
+    }
     const tagPosts = filterPosts(POSTS, searchParams);
     return html({
       ...sharedHtmlOptions,
@@ -381,35 +384,35 @@ export async function handler(
     });
   }
 
-  if (pathname === "/") {
-    const tagPosts = filterPosts(POSTS, searchParams);
-    return html({
-      ...sharedHtmlOptions,
-      title: blogState.title ?? "My Blog",
-      meta: {
-        "description": blogState.description,
-        "og:title": blogState.title,
-        "og:description": blogState.description,
-        "og:image": ogImage ?? blogState.cover,
-        "twitter:title": blogState.title,
-        "twitter:description": blogState.description,
-        "twitter:image": ogImage ?? blogState.cover,
-        "twitter:card": ogImage ? twitterCard : undefined,
-      },
-      styles: [
-        ...(blogState.style ? [blogState.style] : []),
-      ],
-      body: (
-        <Index
-          state={blogState}
-          postsLength={tagPosts.size}
-          posts={getPostsPage(tagPosts, 0)}
-          index={0}
-          searchParams={searchParams}
-        />
-      ),
-    });
-  }
+  // if (pathname === "/") {
+  //   const tagPosts = filterPosts(POSTS, searchParams);
+  //   return html({
+  //     ...sharedHtmlOptions,
+  //     title: blogState.title ?? "My Blog",
+  //     meta: {
+  //       "description": blogState.description,
+  //       "og:title": blogState.title,
+  //       "og:description": blogState.description,
+  //       "og:image": ogImage ?? blogState.cover,
+  //       "twitter:title": blogState.title,
+  //       "twitter:description": blogState.description,
+  //       "twitter:image": ogImage ?? blogState.cover,
+  //       "twitter:card": ogImage ? twitterCard : undefined,
+  //     },
+  //     styles: [
+  //       ...(blogState.style ? [blogState.style] : []),
+  //     ],
+  //     body: (
+  //       <Index
+  //         state={blogState}
+  //         postsLength={tagPosts.size}
+  //         posts={getPostsPage(tagPosts, 0)}
+  //         index={0}
+  //         searchParams={searchParams}
+  //       />
+  //     ),
+  //   });
+  // }
 
   const post = POSTS.get(pathname);
   if (post) {
