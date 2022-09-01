@@ -95,4 +95,5 @@ export interface Post {
   ogImage?: string;
   tags?: string[];
   allowIframes?: boolean;
+  readTime : number;
 }
