@@ -202,8 +202,7 @@ export function PostPage({ post, state }: PostPageProps) {
             {post.title}
           </h1>
           {!state.disableReadtime &&
-            <p>{post.readTime} min read</p>
-          }
+            <p>{post.readTime} min read</p>}
           <Tags tags={post.tags} />
           <p class="mt-1 text-gray-500">
             {(post.author || state.author) && (
