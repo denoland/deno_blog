@@ -35,7 +35,6 @@ import type {
   BlogState,
   Post,
 } from "./types.d.ts";
-import { test } from "https://deno.land/std@0.153.0/encoding/front_matter.ts";
 
 export { Fragment, h };
 
