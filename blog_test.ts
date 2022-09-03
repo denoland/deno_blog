@@ -63,11 +63,11 @@ Deno.test("posts/ first", async () => {
   const body = await resp.text();
   assertStringIncludes(body, `<html lang="en-GB">`);
   assertStringIncludes(body, `First post`);
-  assertStringIncludes(body, `By The author`);
+  assertStringIncludes(body, `The author`);
   assertStringIncludes(body, `© ${new Date().getFullYear()} The author`);
   assertStringIncludes(
     body,
-    `<time dateTime="2022-03-20T00:00:00.000Z">20 Mar 2022</time>`,
+    `<time dateTime="2022-03-20T00:00:00.000Z">`,
   );
   assertStringIncludes(body, `<img src="first/hello.png" />`);
   assertStringIncludes(body, `<p>Lorem Ipsum is simply dummy text`);
@@ -82,11 +82,11 @@ Deno.test("posts/ second", async () => {
   const body = await resp.text();
   assertStringIncludes(body, `<html lang="en-GB">`);
   assertStringIncludes(body, `Second post`);
-  assertStringIncludes(body, `By CUSTOM AUTHOR NAME`);
+  assertStringIncludes(body, `CUSTOM AUTHOR NAME`);
   assertStringIncludes(body, `© ${new Date().getFullYear()} The author`);
   assertStringIncludes(
     body,
-    `<time dateTime="2022-05-02T00:00:00.000Z">2 May 2022</time>`,
+    `<time dateTime="2022-05-02T00:00:00.000Z">`,
   );
   assertStringIncludes(body, `<img src="second/hello2.png" />`);
   assertStringIncludes(body, `<p>Lorem Ipsum is simply dummy text`);
@@ -100,11 +100,11 @@ Deno.test("posts/ third", async () => {
   const body = await resp.text();
   assertStringIncludes(body, `<html lang="en-GB">`);
   assertStringIncludes(body, `Third post`);
-  assertStringIncludes(body, `By CUSTOM AUTHOR NAME`);
+  assertStringIncludes(body, `CUSTOM AUTHOR NAME`);
   assertStringIncludes(body, `© ${new Date().getFullYear()} The author`);
   assertStringIncludes(
     body,
-    `<time dateTime="2022-08-19T00:00:00.000Z">19 Aug 2022</time>`,
+    `<time dateTime="2022-08-19T00:00:00.000Z">`,
   );
   assertStringIncludes(body, `<iframe width="560" height="315"`);
   assertStringIncludes(body, `<p>Lorem Ipsum is simply dummy text`);

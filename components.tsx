@@ -137,8 +137,7 @@ function PostCard(
       </h3>
       <Tags tags={post.tags} />
       <p class="text-gray-500/80">
-        {(post.author) &&
-          <span>By {post.author || ""} at{" "}</span>}
+        {post.author && <span>{post.author} {" "}</span>}
         <PrettyDate
           date={post.publishDate}
           dateStyle={dateStyle}
@@ -204,7 +203,7 @@ export function PostPage({ post, state }: PostPageProps) {
           <Tags tags={post.tags} />
           <p class="mt-1 text-gray-500">
             {(post.author || state.author) && (
-              <span>By {post.author || state.author} at{" "}</span>
+              <span>{post.author || state.author} {" "}</span>
             )}
             <PrettyDate
               date={post.publishDate}
