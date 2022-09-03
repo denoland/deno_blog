@@ -8,7 +8,7 @@
 /// <reference lib="deno.ns" />
 
 import { Fragment, gfm, h } from "./deps.ts";
-import type { BlogState, DateStyle, Post } from "./types.d.ts";
+import type { BlogState, DateFormat, Post } from "./types.d.ts";
 
 const socialAppIcons = new Map([
   ["github.com", IconGithub],
@@ -109,7 +109,7 @@ export function Index({ state, posts }: IndexProps) {
             <PostCard
               post={post}
               key={post.pathname}
-              dateStyle={state.dateStyle}
+              dateFormat={state.dateFormat}
               lang={state.lang}
             />
           ))}
@@ -122,9 +122,9 @@ export function Index({ state, posts }: IndexProps) {
 }
 
 function PostCard(
-  { post, dateStyle, lang }: {
+  { post, dateFormat, lang }: {
     post: Post;
-    dateStyle?: DateStyle;
+    dateFormat?: DateFormat;
     lang?: string;
   },
 ) {
@@ -140,8 +140,7 @@ function PostCard(
         {post.author && <span>{post.author} {" "}</span>}
         <PrettyDate
           date={post.publishDate}
-          dateStyle={dateStyle}
-          lang={lang}
+          dateFormat={dateFormat}
         />
       </p>
       <p class="mt-3 text-gray-600 dark:text-gray-400">{post.snippet}</p>
@@ -187,7 +186,7 @@ export function PostPage({ post, state }: PostPageProps) {
                 fill="currentColor"
               />
             </svg>
-            INDEX
+            Home
           </a>
         </div>
         {post.coverHtml && (
@@ -203,12 +202,11 @@ export function PostPage({ post, state }: PostPageProps) {
           <Tags tags={post.tags} />
           <p class="mt-1 text-gray-500">
             {(post.author || state.author) && (
-              <span>{post.author || state.author} {" "}</span>
+              <p>{post.author || state.author}</p>
             )}
             <PrettyDate
               date={post.publishDate}
-              dateStyle={state.dateStyle}
-              lang={state.lang}
+              dateFormat={state.dateFormat}
             />
           </p>
           <div
@@ -233,8 +231,7 @@ function Footer(props: { author?: string }) {
     <footer class="mt-20 pb-16 lt-sm:pb-8 lt-sm:mt-16">
       <p class="flex items-center gap-2.5 text-gray-400/800 dark:text-gray-500/800 text-sm">
         <span>
-          &copy; {new Date().getFullYear()} {props.author} &middot; Powered by
-          {" "}
+          Powered by{" "}
           <a
             class="inline-flex items-center gap-1 underline hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
             href="https://deno.land/x/blog"
@@ -283,13 +280,17 @@ function Tooltip({ children }: { children: string }) {
 }
 
 function PrettyDate(
-  { date, dateStyle, lang }: {
+  { date, dateFormat }: {
     date: Date;
-    dateStyle?: DateStyle;
-    lang?: string;
+    dateFormat?: DateFormat;
   },
 ) {
-  const formatted = date.toLocaleDateString(lang ?? "en-US", { dateStyle });
+  let formatted;
+  if (dateFormat) {
+    formatted = dateFormat(date);
+  } else {
+    formatted = date.toISOString().split("T")[0];
+  }
   return <time dateTime={date.toISOString()}>{formatted}</time>;
 }
 
