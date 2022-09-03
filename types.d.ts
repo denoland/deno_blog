@@ -12,7 +12,7 @@ export interface BlogMiddleware {
   (req: Request, ctx: BlogContext): Promise<Response>;
 }
 
-export type DateStyle = "full" | "long" | "medium" | "short";
+type DateFormat = (date: Date) => string;
 
 export interface BlogSettings {
   /** The blog title */
@@ -60,7 +60,7 @@ export interface BlogSettings {
   /** The ISO code of the language the blog is in */
   lang?: string;
   /** Date appearance */
-  dateStyle?: DateStyle;
+  dateFormat?: DateFormat;
   /** The canonical URL of the blog */
   canonicalUrl?: string;
   /** UnoCSS configuration */

@@ -15,7 +15,6 @@ const BLOG_SETTINGS = await configureBlog(BLOG_URL, false, {
   title: "Test blog",
   description: "This is some description.",
   lang: "en-GB",
-  dateStyle: "medium",
   middlewares: [
     redirects({
       "/to_second": "second",
@@ -64,7 +63,6 @@ Deno.test("posts/ first", async () => {
   assertStringIncludes(body, `<html lang="en-GB">`);
   assertStringIncludes(body, `First post`);
   assertStringIncludes(body, `The author`);
-  assertStringIncludes(body, `© ${new Date().getFullYear()} The author`);
   assertStringIncludes(
     body,
     `<time dateTime="2022-03-20T00:00:00.000Z">`,
@@ -83,7 +81,6 @@ Deno.test("posts/ second", async () => {
   assertStringIncludes(body, `<html lang="en-GB">`);
   assertStringIncludes(body, `Second post`);
   assertStringIncludes(body, `CUSTOM AUTHOR NAME`);
-  assertStringIncludes(body, `© ${new Date().getFullYear()} The author`);
   assertStringIncludes(
     body,
     `<time dateTime="2022-05-02T00:00:00.000Z">`,
@@ -101,7 +98,6 @@ Deno.test("posts/ third", async () => {
   assertStringIncludes(body, `<html lang="en-GB">`);
   assertStringIncludes(body, `Third post`);
   assertStringIncludes(body, `CUSTOM AUTHOR NAME`);
-  assertStringIncludes(body, `© ${new Date().getFullYear()} The author`);
   assertStringIncludes(
     body,
     `<time dateTime="2022-08-19T00:00:00.000Z">`,
