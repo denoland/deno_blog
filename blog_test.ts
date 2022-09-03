@@ -63,7 +63,7 @@ Deno.test("posts/ first", async () => {
   const body = await resp.text();
   assertStringIncludes(body, `<html lang="en-GB">`);
   assertStringIncludes(body, `First post`);
-  assertStringIncludes(body, `By The author`);
+  assertStringIncludes(body, `The author`);
   assertStringIncludes(body, `© ${new Date().getFullYear()} The author`);
   assertStringIncludes(
     body,
@@ -82,7 +82,7 @@ Deno.test("posts/ second", async () => {
   const body = await resp.text();
   assertStringIncludes(body, `<html lang="en-GB">`);
   assertStringIncludes(body, `Second post`);
-  assertStringIncludes(body, `By CUSTOM AUTHOR NAME`);
+  assertStringIncludes(body, `CUSTOM AUTHOR NAME`);
   assertStringIncludes(body, `© ${new Date().getFullYear()} The author`);
   assertStringIncludes(
     body,
@@ -100,7 +100,7 @@ Deno.test("posts/ third", async () => {
   const body = await resp.text();
   assertStringIncludes(body, `<html lang="en-GB">`);
   assertStringIncludes(body, `Third post`);
-  assertStringIncludes(body, `By CUSTOM AUTHOR NAME`);
+  assertStringIncludes(body, `CUSTOM AUTHOR NAME`);
   assertStringIncludes(body, `© ${new Date().getFullYear()} The author`);
   assertStringIncludes(
     body,
