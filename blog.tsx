@@ -269,7 +269,6 @@ async function loadPost(postsDirectory: string, path: string) {
     readTime: readingTime(content),
   };
   POSTS.set(pathname, post);
-  console.log("Load: ", post.pathname);
 }
 
 export async function handler(
