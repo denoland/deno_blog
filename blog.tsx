@@ -370,6 +370,12 @@ export async function handler(
     });
   }
 
+  if (pathname === "/robots.txt") {
+    const response = new Response("User-agent: *\nAllow: /");
+
+    return response
+  }
+
   const post = POSTS.get(pathname);
   if (post) {
     return html({
