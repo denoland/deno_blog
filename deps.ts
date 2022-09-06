@@ -32,7 +32,7 @@ export { Feed, type Item as FeedItem } from "https://esm.sh/feed@4.2.2";
 export { default as removeMarkdown } from "https://esm.sh/remove-markdown@0.5.0";
 
 // Add syntax highlighting support for C by default
-import "https://esm.sh/prismjs@1.28.0/components/prism-c?no-check";
+import "https://esm.sh/prismjs@1.29.0/components/prism-c?no-check";
 
 export { UnoCSS };
 export type UnoConfig = typeof UnoCSS extends (
