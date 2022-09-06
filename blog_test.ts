@@ -35,6 +35,7 @@ const CONN_INFO = {
     hostname: "0.0.0.0",
     port: 8001,
   },
+  readtime: true,
 };
 
 const blogHandler = createBlogHandler(BLOG_SETTINGS);
