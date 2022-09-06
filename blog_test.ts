@@ -23,6 +23,7 @@ const BLOG_SETTINGS = await configureBlog(BLOG_URL, false, {
       "second.html": "second",
     }),
   ],
+  readtime: true,
 });
 const CONN_INFO = {
   localAddr: {
@@ -35,7 +36,6 @@ const CONN_INFO = {
     hostname: "0.0.0.0",
     port: 8001,
   },
-  readtime: true,
 };
 
 const blogHandler = createBlogHandler(BLOG_SETTINGS);
