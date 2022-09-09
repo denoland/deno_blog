@@ -48,6 +48,10 @@ Deno.test("index page", async () => {
   assertEquals(resp.headers.get("content-type"), "text/html; charset=utf-8");
   const body = await resp.text();
   assertStringIncludes(body, `<html lang="en-GB">`);
+  assertStringIncludes(
+    body,
+    `<link rel="canonical" href="https://blog.deno.dev/" />`,
+  );
   assertStringIncludes(body, `Test blog`);
   assertStringIncludes(body, `This is some description.`);
   assertStringIncludes(body, `href="/first"`);
@@ -61,6 +65,10 @@ Deno.test("posts/ first", async () => {
   assertEquals(resp.headers.get("content-type"), "text/html; charset=utf-8");
   const body = await resp.text();
   assertStringIncludes(body, `<html lang="en-GB">`);
+  assertStringIncludes(
+    body,
+    `<link rel="canonical" href="https://blog.deno.dev/first" />`,
+  );
   assertStringIncludes(body, `First post`);
   assertStringIncludes(body, `The author`);
   assertStringIncludes(
@@ -72,6 +80,20 @@ Deno.test("posts/ first", async () => {
   assertStringIncludes(body, `$100, $200, $300, $400, $500`);
 });
 
+Deno.test("posts/ first (check canonical with params)", async () => {
+  const resp = await testHandler(
+    new Request("https://blog.deno.dev/first?foo=bar"),
+  );
+  assert(resp);
+  assertEquals(resp.status, 200);
+  assertEquals(resp.headers.get("content-type"), "text/html; charset=utf-8");
+  const body = await resp.text();
+  assertStringIncludes(
+    body,
+    `<link rel="canonical" href="https://blog.deno.dev/first" />`,
+  );
+});
+
 Deno.test("posts/ second", async () => {
   const resp = await testHandler(new Request("https://blog.deno.dev/second"));
   assert(resp);
@@ -79,6 +101,10 @@ Deno.test("posts/ second", async () => {
   assertEquals(resp.headers.get("content-type"), "text/html; charset=utf-8");
   const body = await resp.text();
   assertStringIncludes(body, `<html lang="en-GB">`);
+  assertStringIncludes(
+    body,
+    `<link rel="canonical" href="https://blog.deno.dev/second" />`,
+  );
   assertStringIncludes(body, `Second post`);
   assertStringIncludes(body, `CUSTOM AUTHOR NAME`);
   assertStringIncludes(
@@ -96,6 +122,10 @@ Deno.test("posts/ third", async () => {
   assertEquals(resp.headers.get("content-type"), "text/html; charset=utf-8");
   const body = await resp.text();
   assertStringIncludes(body, `<html lang="en-GB">`);
+  assertStringIncludes(
+    body,
+    `<link rel="canonical" href="https://blog.deno.dev/third" />`,
+  );
   assertStringIncludes(body, `Third post`);
   assertStringIncludes(body, `CUSTOM AUTHOR NAME`);
   assertStringIncludes(
