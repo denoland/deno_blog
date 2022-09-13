@@ -2,9 +2,10 @@
 
 Minimal boilerplate blogging. All you need is one boilerplate JavaScript file
 that has 2 lines of code:
+> fork to solve:  `error sending request for url (https://raw.githubusercontent.com/kt3k/callsites/v1.0.0/mod.ts)`
 
 ```js
-import blog from "https://deno.land/x/blog/blog.tsx";
+import blog from "https://deno.land/x/deno_blog/blog.tsx";
 
 blog();
 ```
@@ -14,7 +15,7 @@ blog();
 To initialize your own blog you can run following script:
 
 ```shellsession
-$ deno run -r --allow-read --allow-write https://deno.land/x/blog/init.ts ./directory/for/blog/
+$ deno run -r --allow-read --allow-write https://deno.land/x/deno_blog/init.ts ./directory/for/blog/
 ```
 
 _This command will setup a blog with a "Hello world" post so you can start
@@ -74,7 +75,7 @@ settings. You can customize them as follows:
 ```jsx
 /** @jsx h */
 
-import blog, { h } from "https://deno.land/x/blog/blog.tsx";
+import blog, { h } from "https://deno.land/x/deno_blog/blog.tsx";
 
 blog({
   title: "My Blog",
