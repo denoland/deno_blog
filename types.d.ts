@@ -44,8 +44,8 @@ export interface BlogSettings {
   header?: VNode;
   /** Whether to show the header on post pages */
   showHeaderOnPostPage?: boolean;
-  /** The element to use as section */
-  section?: VNode;
+  /** The element to use as section. Access to Post props. */
+  section?: (post: Post) => VNode;
   /** The element to use as footer */
   footer?: VNode;
   /** Custom CSS */
