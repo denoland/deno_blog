@@ -7,7 +7,6 @@
 /// <reference lib="deno.ns" />
 
 import {
-  callsites,
   createReporter,
   dirname,
   Feed,
@@ -26,6 +25,7 @@ import {
   UnoCSS,
   walk,
 } from "./deps.ts";
+import { default as callsites } from "./deps/callsites.ts";
 import { Index, PostPage } from "./components.tsx";
 import type { ConnInfo, FeedItem } from "./deps.ts";
 import type {
