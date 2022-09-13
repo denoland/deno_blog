@@ -2,7 +2,8 @@
 
 Minimal boilerplate blogging. All you need is one boilerplate JavaScript file
 that has 2 lines of code:
-> fork to solve:  `error sending request for url (https://raw.githubusercontent.com/kt3k/callsites/v1.0.0/mod.ts)`
+
+fork to solve error sending request for url (https://raw.githubusercontent.com/kt3k/callsites/v1.0.0/mod.ts)
 
 ```js
 import blog from "https://deno.land/x/deno_blog/blog.tsx";
