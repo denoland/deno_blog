@@ -266,9 +266,9 @@ async function loadPost(postsDirectory: string, path: string) {
     ogImage: data.get("og:image"),
     tags: data.get("tags"),
     allowIframes: data.get("allow_iframes"),
+    readTime: readingTime(content),
   };
   POSTS.set(pathname, post);
-  console.log("Load: ", post.pathname);
 }
 
 export async function handler(
@@ -542,4 +542,10 @@ function recordGetter(data: Record<string, unknown>) {
       return data[key] as T;
     },
   };
+}
+
+function readingTime(text: string) {
+  const wpm = 225;
+  const words = text.split(/\s+/).length;
+  return Math.ceil(words / wpm);
 }

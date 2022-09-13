@@ -76,6 +76,8 @@ export interface BlogSettings {
   port?: number;
   /** The hostname to serve the blog on */
   hostname?: string;
+  /** Whether to display readtime or not */
+  readtime?: boolean;
 }
 
 export interface BlogState extends BlogSettings {
@@ -95,4 +97,5 @@ export interface Post {
   ogImage?: string;
   tags?: string[];
   allowIframes?: boolean;
+  readTime: number;
 }
