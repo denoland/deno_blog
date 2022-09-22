@@ -435,7 +435,7 @@ function serveRSS(
 
   for (const [_key, post] of posts.entries()) {
     const item: FeedItem = {
-      id: `${origin}/${post.title}`,
+      id: `${origin}${post.pathname}`,
       title: post.title,
       description: post.snippet,
       date: post.publishDate,
