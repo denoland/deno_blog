@@ -228,5 +228,5 @@ Deno.test("Plaintext response", async () => {
     "text/plain;charset=UTF-8",
   );
   const body = await resp.text();
-  assert(body.startsWith('It was popularised in the 1960s'));
+  assert(body.startsWith("It was popularised in the 1960s"));
 });
