@@ -135,7 +135,7 @@ function composeMiddlewares(state: BlogState) {
     connInfo: ConnInfo,
     inner: (req: Request, ctx: BlogContext) => Promise<Response>,
   ) => {
-    const mws = state.middlewares?.reverse();
+    const mws = state.middlewares?.slice().reverse();
 
     const handlers: (() => Response | Promise<Response>)[] = [];
 
