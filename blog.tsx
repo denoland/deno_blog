@@ -289,6 +289,10 @@ export async function handler(
     return serveRSS(req, blogState, POSTS);
   }
 
+  if (pathname === "/sitemap.xml") {
+    return serveSiteMap(req, blogState, POSTS)
+  }
+
   if (IS_DEV) {
     if (pathname == "/hmr.js") {
       return new Response(HMR_CLIENT, {
@@ -456,6 +460,35 @@ function serveRSS(
       "content-type": "application/atom+xml; charset=utf-8",
     },
   });
+}
+
+/** Serve the sitemap of the blog. */
+function serveSiteMap(req: Request, state: BlogState, posts: Map<string, Post>): Response {
+  const url = state.canonicalUrl
+  ? new URL(state.canonicalUrl)
+  : new URL(req.url);
+  const origin = url.origin;
+  const sitemapTemplate = (urls: Array<string>) => 
+  `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  ${urls.join('\n')}
+</urlset>`
+  const url_item = (loc: string, lastmod: string) => 
+  `<url>
+  <loc>${loc}</loc>
+  <lastmod>${lastmod}</lastmod>
+</url>`
+  const urls: string[] = [];
+
+  posts.forEach((post) => {
+    urls.push(url_item(origin + post.pathname, post.publishDate.toISOString()))
+  })
+
+  return new Response(sitemapTemplate(urls), {
+    headers: {
+      "content-type": "application/xml; charset=utf-8",
+    },
+  })
 }
 
 export function ga(gaKey: string): BlogMiddleware {

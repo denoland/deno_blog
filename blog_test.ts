@@ -211,3 +211,19 @@ Deno.test("RSS feed", async () => {
   assertStringIncludes(body, `Second post`);
   assertStringIncludes(body, `https://blog.deno.dev/second`);
 });
+
+Deno.test("sitemap", async () => {
+  const resp = await testHandler(new Request("https://blog.deno.dev/sitemap.xml"));
+  assert(resp);
+  assertEquals(resp.status, 200);
+  assertEquals(
+    resp.headers.get("content-type"),
+    "application/xml; charset=utf-8",
+  );
+  const body = await resp.text();
+  assertStringIncludes(body, `https://blog.deno.dev/first`);
+  assertStringIncludes(body, `2022-03-20`);
+  assertStringIncludes(body, `https://blog.deno.dev/second`);
+  assertStringIncludes(body, `2022-05-02`);
+});
+
