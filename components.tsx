@@ -424,7 +424,7 @@ function IconLinkedin() {
 function IconMastodon() {
   return (
     <svg 
-      className="inline-block w-5 h-5" 
+      className="inline-block w-4 h-4" 
       viewBox="0 0 20 20" fill="none" 
       xmlns="http://www.w3.org/2000/svg"
     >
