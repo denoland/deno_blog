@@ -7,7 +7,7 @@
 /// <reference lib="dom.asynciterable" />
 /// <reference lib="deno.ns" />
 
-import { Fragment, gfm, h } from "./deps.ts";
+import { Fragment, gfm, h, katex } from "./deps.ts";
 import type { BlogState, DateFormat, Post } from "./types.d.ts";
 
 const socialAppIcons = new Map([
@@ -37,7 +37,7 @@ export function Index({ state, posts }: IndexProps) {
         <header
           class="w-full h-90 lt-sm:h-80 bg-cover bg-center bg-no-repeat"
           style={{
-            backgroundImage: state.cover ? `url(${state.cover})` : undefined,
+            backgroundImage: state.cover ? `url(${ state.cover })` : undefined,
           }}
         >
           <div class="max-w-screen-sm h-full px-6 mx-auto flex flex-col items-center justify-center">
@@ -50,7 +50,7 @@ export function Index({ state, posts }: IndexProps) {
                 ]
                   .filter(Boolean)
                   .join(" ")}
-                style={{ backgroundImage: `url(${state.avatar})` }}
+                style={{ backgroundImage: `url(${ state.avatar })` }}
               />
             )}
             <h1
@@ -148,7 +148,7 @@ function PostCard(
         <a
           class="leading-tight text-gray-900 dark:text-gray-100 inline-block border-b-1 border-gray-600 hover:text-gray-500 hover:border-gray-500 transition-colors"
           href={post.pathname}
-          title={`Read "${post.title}"`}
+          title={`Read "${ post.title }"`}
         >
           Read More
         </a>
@@ -162,12 +162,40 @@ interface PostPageProps {
   post: Post;
 }
 
+const inlineMathRegex = /\s\$([^\s$].+[^\s])\$/g;
+const blockMathRegex = /\$\$([^\$]+)\$\$/g;
+const katexOptions = {
+  throwOnError: false,
+  output: "mathml",
+};
+
 export function PostPage({ post, state }: PostPageProps) {
-  const html = gfm.render(post.markdown, {
+  let html = gfm.render(post.markdown, {
     allowIframes: post.allowIframes,
   });
+
+  if (post.renderMath) {
+    html = html.replace(inlineMathRegex, (_, math) => {
+      try {
+        return ` <span class="inline-math">${ katex.renderToString(math, katexOptions) }</span> `;
+      } catch (e) {
+        console.error(e);
+        return ` <span class="inline-math">${ math }</span> `;
+      }
+    });
+
+    html = html.replace(blockMathRegex, (_, math) => {
+      try {
+        return ` <div class="block-math">${ katex.renderToString(math, katexOptions) }</div> `;
+      } catch (e) {
+        console.error(e);
+        return ` <div class="block-math">${ math }</div> `;
+      }
+    });
+  }
+
   return (
-    <div className={`post ${post.pathname.substring(1)}`}>
+    <div className={`post ${ post.pathname.substring(1) }`}>
       {state.showHeaderOnPostPage && state.header}
       <div class="max-w-screen-sm px-6 pt-8 mx-auto">
         <div class="pb-16">
@@ -301,7 +329,7 @@ function Tags({ tags }: { tags?: string[] }) {
     ? (
       <section class="flex gap-x-2 flex-wrap">
         {tags?.map((tag) => (
-          <a class="text-bluegray-500 font-bold" href={`/?tag=${tag}`}>
+          <a class="text-bluegray-500 font-bold" href={`/?tag=${ tag }`}>
             #{tag}
           </a>
         ))}

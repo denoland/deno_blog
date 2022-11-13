@@ -98,4 +98,5 @@ export interface Post {
   tags?: string[];
   allowIframes?: boolean;
   readTime: number;
+  renderMath?: boolean;
 }

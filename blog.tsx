@@ -79,7 +79,7 @@ function hmrSocket(callback) {
 `;
 
 function errorHandler(err: unknown) {
-  return new Response(`Internal server error: ${(err as Error)?.message}`, {
+  return new Response(`Internal server error: ${ (err as Error)?.message }`, {
     status: 500,
   });
 }
@@ -200,7 +200,7 @@ async function loadContent(blogDirectory: string, isDev: boolean) {
   }
 
   if (isDev) {
-    watchForChanges(postsDirectory).catch(() => {});
+    watchForChanges(postsDirectory).catch(() => { });
   }
 }
 
@@ -217,7 +217,7 @@ async function watchForChanges(postsDirectory: string) {
               socket.send("refresh");
             });
           } catch (err) {
-            console.error(`loadPost ${path} error:`, err.message);
+            console.error(`loadPost ${ path } error:`, err.message);
           }
         }
       }
@@ -267,6 +267,7 @@ async function loadPost(postsDirectory: string, path: string) {
     tags: data.get("tags"),
     allowIframes: data.get("allow_iframes"),
     readTime: readingTime(content),
+    renderMath: data.get("render_math"),
   };
   POSTS.set(pathname, post);
 }
@@ -418,28 +419,28 @@ function serveRSS(
     ? new URL(state.canonicalUrl)
     : new URL(req.url);
   const origin = url.origin;
-  const copyright = `Copyright ${new Date().getFullYear()} ${origin}`;
+  const copyright = `Copyright ${ new Date().getFullYear() } ${ origin }`;
   const feed = new Feed({
     title: state.title ?? "Blog",
     description: state.description,
-    id: `${origin}/blog`,
-    link: `${origin}/blog`,
+    id: `${ origin }/blog`,
+    link: `${ origin }/blog`,
     language: state.lang ?? "en",
-    favicon: `${origin}/favicon.ico`,
+    favicon: `${ origin }/favicon.ico`,
     copyright: copyright,
     generator: "Feed (https://github.com/jpmonette/feed) for Deno",
     feedLinks: {
-      atom: `${origin}/feed`,
+      atom: `${ origin }/feed`,
     },
   });
 
   for (const [_key, post] of posts.entries()) {
     const item: FeedItem = {
-      id: `${origin}/${post.title}`,
+      id: `${ origin }/${ post.title }`,
       title: post.title,
       description: post.snippet,
       date: post.publishDate,
-      link: `${origin}${post.pathname}`,
+      link: `${ origin }${ post.pathname }`,
       author: post.author?.split(",").map((author: string) => ({
         name: author.trim(),
       })),
@@ -477,7 +478,7 @@ export function ga(gaKey: string): BlogMiddleware {
       res = await ctx.next() as Response;
     } catch (e) {
       err = e as Error;
-      res = new Response(`Internal server error: ${err.message}`, {
+      res = new Response(`Internal server error: ${ err.message }`, {
         status: 500,
       });
     } finally {
@@ -516,7 +517,7 @@ export function redirects(redirectMap: Record<string, string>): BlogMiddleware {
       return await ctx.next();
     } catch (e) {
       console.error(e);
-      return new Response(`Internal server error: ${e.message}`, {
+      return new Response(`Internal server error: ${ e.message }`, {
         status: 500,
       });
     }

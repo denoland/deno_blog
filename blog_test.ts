@@ -211,3 +211,12 @@ Deno.test("RSS feed", async () => {
   assertStringIncludes(body, `Second post`);
   assertStringIncludes(body, `https://blog.deno.dev/second`);
 });
+
+Deno.test("Math in posts", async () => {
+  const resp = await testHandler(new Request("https://blog.deno.dev/first"));
+  assert(resp);
+  assertEquals(resp.status, 200);
+  assertEquals(resp.headers.get("content-type"), "text/html; charset=utf-8");
+  const body = await resp.text();
+  assertStringIncludes(body, `<semantics><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">f(x)</annotation></semantics></math></span></span>`);
+});

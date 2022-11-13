@@ -39,3 +39,5 @@ export type UnoConfig = typeof UnoCSS extends (
   arg: infer P | undefined,
 ) => unknown ? P
   : never;
+
+export { default as katex } from "https://cdn.jsdelivr.net/npm/katex@0.16.3/dist/katex.mjs";
