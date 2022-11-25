@@ -12,7 +12,7 @@ export interface BlogMiddleware {
   (req: Request, ctx: BlogContext): Promise<Response>;
 }
 
-export type DateStyle = "full" | "long" | "medium" | "short";
+type DateFormat = (date: Date) => string;
 
 export interface BlogSettings {
   /** The blog title */
@@ -44,8 +44,8 @@ export interface BlogSettings {
   header?: VNode;
   /** Whether to show the header on post pages */
   showHeaderOnPostPage?: boolean;
-  /** The element to use as section */
-  section?: VNode;
+  /** The element to use as section. Access to Post props. */
+  section?: (post: Post) => VNode;
   /** The element to use as footer */
   footer?: VNode;
   /** Custom CSS */
@@ -60,7 +60,7 @@ export interface BlogSettings {
   /** The ISO code of the language the blog is in */
   lang?: string;
   /** Date appearance */
-  dateStyle?: DateStyle;
+  dateFormat?: DateFormat;
   /** The canonical URL of the blog */
   canonicalUrl?: string;
   /** UnoCSS configuration */
@@ -76,6 +76,8 @@ export interface BlogSettings {
   port?: number;
   /** The hostname to serve the blog on */
   hostname?: string;
+  /** Whether to display readtime or not */
+  readtime?: boolean;
 }
 
 export interface BlogState extends BlogSettings {
@@ -95,4 +97,5 @@ export interface Post {
   ogImage?: string;
   tags?: string[];
   allowIframes?: boolean;
+  readTime: number;
 }

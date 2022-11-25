@@ -37,7 +37,7 @@ blog({
   title: "My Blog",
   description: "This is my new blog.",
   // header: <header>Your custom header</header>,
-  // section: <section>Your custom section</section>,
+  // section: (post: Post) => <section>Your custom section with access to Post props.</section>,
   // footer: <footer>Your custom footer</footer>,
   avatar: "https://deno-avatar.deno.dev/avatar/blog.svg",
   avatarClass: "rounded-full",
