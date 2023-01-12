@@ -211,3 +211,33 @@ Deno.test("RSS feed", async () => {
   assertStringIncludes(body, `Second post`);
   assertStringIncludes(body, `https://blog.deno.dev/second`);
 });
+
+Deno.test("theme-color meta tag when dark theme is used [index page]", async () => {
+  const darkThemeBlogHandler = createBlogHandler({
+    ...BLOG_SETTINGS,
+    theme: "dark",
+  });
+  const darkThemeTestHandler = (req: Request) => {
+    return darkThemeBlogHandler(req, CONN_INFO);
+  };
+
+  const resp = await darkThemeTestHandler(new Request("https://blog.deno.dev"));
+  const body = await resp.text();
+  assertStringIncludes(body, `<meta name="theme-color" content="#000" />`);
+});
+
+Deno.test("theme-color meta tag when dark theme is used [post page]", async () => {
+  const darkThemeBlogHandler = createBlogHandler({
+    ...BLOG_SETTINGS,
+    theme: "dark",
+  });
+  const darkThemeTestHandler = (req: Request) => {
+    return darkThemeBlogHandler(req, CONN_INFO);
+  };
+
+  const resp = await darkThemeTestHandler(
+    new Request("https://blog.deno.dev/first"),
+  );
+  const body = await resp.text();
+  assertStringIncludes(body, `<meta name="theme-color" content="#000" />`);
+});
