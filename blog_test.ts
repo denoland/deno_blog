@@ -211,3 +211,22 @@ Deno.test("RSS feed", async () => {
   assertStringIncludes(body, `Second post`);
   assertStringIncludes(body, `https://blog.deno.dev/second`);
 });
+
+Deno.test("Plaintext response", async () => {
+  const plaintext = new Headers({
+    "Accept": "text/plain",
+  });
+  const resp = await testHandler(
+    new Request("https://blog.deno.dev/first", {
+      headers: plaintext,
+    }),
+  );
+  assert(resp);
+  assertEquals(resp.status, 200);
+  assertEquals(
+    resp.headers.get("content-type"),
+    "text/plain;charset=UTF-8",
+  );
+  const body = await resp.text();
+  assert(body.startsWith("It was popularised in the 1960s"));
+});
