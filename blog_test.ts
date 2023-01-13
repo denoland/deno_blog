@@ -64,10 +64,7 @@ Deno.test("posts/ first", async () => {
   assertStringIncludes(body, `<html lang="en-GB">`);
   assertStringIncludes(body, `First post`);
   assertStringIncludes(body, `The author`);
-  assertStringIncludes(
-    body,
-    `<time dateTime="2022-03-20T00:00:00.000Z">`,
-  );
+  assertStringIncludes(body, `<time dateTime="2022-03-20T00:00:00.000Z">`);
   assertStringIncludes(body, `<img src="first/hello.png" />`);
   assertStringIncludes(body, `<p>Lorem Ipsum is simply dummy text`);
   assertStringIncludes(body, `$100, $200, $300, $400, $500`);
@@ -83,10 +80,7 @@ Deno.test("posts/ second", async () => {
   assertStringIncludes(body, `<html lang="en-GB">`);
   assertStringIncludes(body, `Second post`);
   assertStringIncludes(body, `CUSTOM AUTHOR NAME`);
-  assertStringIncludes(
-    body,
-    `<time dateTime="2022-05-02T00:00:00.000Z">`,
-  );
+  assertStringIncludes(body, `<time dateTime="2022-05-02T00:00:00.000Z">`);
   assertStringIncludes(body, `<img src="second/hello2.png" />`);
   assertStringIncludes(body, `<p>Lorem Ipsum is simply dummy text`);
 });
@@ -100,10 +94,7 @@ Deno.test("posts/ third", async () => {
   assertStringIncludes(body, `<html lang="en-GB">`);
   assertStringIncludes(body, `Third post`);
   assertStringIncludes(body, `CUSTOM AUTHOR NAME`);
-  assertStringIncludes(
-    body,
-    `<time dateTime="2022-08-19T00:00:00.000Z">`,
-  );
+  assertStringIncludes(body, `<time dateTime="2022-08-19T00:00:00.000Z">`);
   assertStringIncludes(body, `<iframe width="560" height="315"`);
   assertStringIncludes(body, `<p>Lorem Ipsum is simply dummy text`);
 });
@@ -119,7 +110,7 @@ Deno.test("posts/ trailing slash redirects", async () => {
 Deno.test("redirect map", async () => {
   {
     const resp = await testHandler(
-      new Request("https://blog.deno.dev/second.html"),
+      new Request("https://blog.deno.dev/second.html")
     );
     assert(resp);
     assertEquals(resp.status, 307);
@@ -128,7 +119,7 @@ Deno.test("redirect map", async () => {
   }
   {
     const resp = await testHandler(
-      new Request("https://blog.deno.dev/to_second"),
+      new Request("https://blog.deno.dev/to_second")
     );
     assert(resp);
     assertEquals(resp.status, 307);
@@ -137,7 +128,7 @@ Deno.test("redirect map", async () => {
   }
   {
     const resp = await testHandler(
-      new Request("https://blog.deno.dev/to_second_with_slash"),
+      new Request("https://blog.deno.dev/to_second_with_slash")
     );
     assert(resp);
     assertEquals(resp.status, 307);
@@ -149,7 +140,7 @@ Deno.test("redirect map", async () => {
 Deno.test("static files in posts/ directory", async () => {
   {
     const resp = await testHandler(
-      new Request("https://blog.deno.dev/first/hello.png"),
+      new Request("https://blog.deno.dev/first/hello.png")
     );
     assert(resp);
     assertEquals(resp.status, 200);
@@ -157,14 +148,12 @@ Deno.test("static files in posts/ directory", async () => {
     const bytes = new Uint8Array(await resp.arrayBuffer());
     assertEquals(
       bytes,
-      await Deno.readFile(
-        join(TESTDATA_PATH, "./posts/first/hello.png"),
-      ),
+      await Deno.readFile(join(TESTDATA_PATH, "./posts/first/hello.png"))
     );
   }
   {
     const resp = await testHandler(
-      new Request("https://blog.deno.dev/second/hello2.png"),
+      new Request("https://blog.deno.dev/second/hello2.png")
     );
     assert(resp);
     assertEquals(resp.status, 200);
@@ -172,12 +161,7 @@ Deno.test("static files in posts/ directory", async () => {
     const bytes = new Uint8Array(await resp.arrayBuffer());
     assertEquals(
       bytes,
-      await Deno.readFile(
-        join(
-          TESTDATA_PATH,
-          "./posts/second/hello2.png",
-        ),
-      ),
+      await Deno.readFile(join(TESTDATA_PATH, "./posts/second/hello2.png"))
     );
   }
 });
@@ -188,12 +172,7 @@ Deno.test("static files in root directory", async () => {
   assertEquals(resp.status, 200);
   assertEquals(resp.headers.get("content-type"), "image/png");
   const bytes = new Uint8Array(await resp.arrayBuffer());
-  assertEquals(
-    bytes,
-    await Deno.readFile(
-      join(TESTDATA_PATH, "./cat.png"),
-    ),
-  );
+  assertEquals(bytes, await Deno.readFile(join(TESTDATA_PATH, "./cat.png")));
 });
 
 Deno.test("RSS feed", async () => {
@@ -202,7 +181,7 @@ Deno.test("RSS feed", async () => {
   assertEquals(resp.status, 200);
   assertEquals(
     resp.headers.get("content-type"),
-    "application/atom+xml; charset=utf-8",
+    "application/atom+xml; charset=utf-8"
   );
   const body = await resp.text();
   assertStringIncludes(body, `<title>Test blog</title>`);
@@ -212,32 +191,56 @@ Deno.test("RSS feed", async () => {
   assertStringIncludes(body, `https://blog.deno.dev/second`);
 });
 
-Deno.test("theme-color meta tag when dark theme is used [index page]", async () => {
-  const darkThemeBlogHandler = createBlogHandler({
-    ...BLOG_SETTINGS,
-    theme: "dark",
+Deno.test(
+  "theme-color meta tag when dark theme is used [index page]",
+  async () => {
+    const darkThemeBlogHandler = createBlogHandler({
+      ...BLOG_SETTINGS,
+      theme: "dark",
+    });
+    const darkThemeTestHandler = (req: Request) => {
+      return darkThemeBlogHandler(req, CONN_INFO);
+    };
+
+    const resp = await darkThemeTestHandler(
+      new Request("https://blog.deno.dev")
+    );
+    const body = await resp.text();
+    assertStringIncludes(body, `<meta name="theme-color" content="#000" />`);
+  }
+);
+
+Deno.test(
+  "theme-color meta tag when dark theme is used [post page]",
+  async () => {
+    const darkThemeBlogHandler = createBlogHandler({
+      ...BLOG_SETTINGS,
+      theme: "dark",
+    });
+    const darkThemeTestHandler = (req: Request) => {
+      return darkThemeBlogHandler(req, CONN_INFO);
+    };
+
+    const resp = await darkThemeTestHandler(
+      new Request("https://blog.deno.dev/first")
+    );
+    const body = await resp.text();
+    assertStringIncludes(body, `<meta name="theme-color" content="#000" />`);
+  }
+);
+
+Deno.test("Plaintext response", async () => {
+  const plaintext = new Headers({
+    Accept: "text/plain",
   });
-  const darkThemeTestHandler = (req: Request) => {
-    return darkThemeBlogHandler(req, CONN_INFO);
-  };
-
-  const resp = await darkThemeTestHandler(new Request("https://blog.deno.dev"));
-  const body = await resp.text();
-  assertStringIncludes(body, `<meta name="theme-color" content="#000" />`);
-});
-
-Deno.test("theme-color meta tag when dark theme is used [post page]", async () => {
-  const darkThemeBlogHandler = createBlogHandler({
-    ...BLOG_SETTINGS,
-    theme: "dark",
-  });
-  const darkThemeTestHandler = (req: Request) => {
-    return darkThemeBlogHandler(req, CONN_INFO);
-  };
-
-  const resp = await darkThemeTestHandler(
-    new Request("https://blog.deno.dev/first"),
+  const resp = await testHandler(
+    new Request("https://blog.deno.dev/first", {
+      headers: plaintext,
+    })
   );
+  assert(resp);
+  assertEquals(resp.status, 200);
+  assertEquals(resp.headers.get("content-type"), "text/plain;charset=UTF-8");
   const body = await resp.text();
-  assertStringIncludes(body, `<meta name="theme-color" content="#000" />`);
+  assert(body.startsWith("It was popularised in the 1960s"));
 });

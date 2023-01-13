@@ -377,6 +377,12 @@ export async function handler(
 
   const post = POSTS.get(pathname);
   if (post) {
+    // Check for an Accept: text/plain header
+    if (
+      req.headers.has("Accept") && req.headers.get("Accept") === "text/plain"
+    ) {
+      return new Response(post.markdown);
+    }
     return html({
       ...sharedHtmlOptions,
       title: post.title,
