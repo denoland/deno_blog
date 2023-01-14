@@ -314,7 +314,7 @@ export async function handler(
     lang: blogState.lang ?? "en",
     scripts: IS_DEV ? [{ src: "/hmr.js" }] : undefined,
     links: [
-      { href: canonicalUrl, rel: "canonical" },
+      { href: `${canonicalUrl}${new URL(req.url).pathname}`, rel: "canonical" },
     ],
   };
 
