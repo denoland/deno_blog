@@ -18,12 +18,53 @@ const socialAppIcons = new Map([
   ["mastodon.social", IconMastodon],
 ]);
 
+interface PaginationProps {
+  index: number;
+  type: "forward" | "backward" | "both";
+  tag: string | null;
+}
+function Pagination({ index, type, tag }: PaginationProps) {
+  let t;
+  if (tag) t = "&tag=" + tag;
+  else t = "";
+  const page = (
+    <div class="mt-3 flex gap-2 items-center justify-center">
+      {(type === "backward" || type === "both")
+        ? (
+          <a
+            href={`/?page=${index - 1}${t}`}
+            class="relative flex items-center justify-center w-8 h-8 rounded-full bg-gray-600/10 dark:bg-gray-400/10 text-gray-700 dark:text-gray-400 hover:bg-gray-600/15 dark:hover:bg-gray-400/15 hover:text-black dark:hover:text-white transition-colors group"
+          >
+            <IconPrevious />
+          </a>
+        )
+        : ""}
+      {(type === "forward" || type === "both")
+        ? (
+          <a
+            href={`/?page=${index + 1}${t}`}
+            class="relative flex items-center justify-center w-8 h-8 rounded-full bg-gray-600/10 dark:bg-gray-400/10 text-gray-700 dark:text-gray-400 hover:bg-gray-600/15 dark:hover:bg-gray-400/15 hover:text-black dark:hover:text-white transition-colors group"
+          >
+            <IconNext />
+          </a>
+        )
+        : ""}
+    </div>
+  );
+  return page;
+}
+
 interface IndexProps {
   state: BlogState;
   posts: Map<string, Post>;
+  index: number;
+  postsLength: number;
+  tag: URLSearchParams;
 }
 
-export function Index({ state, posts }: IndexProps) {
+export function Index(
+  { state, posts, index, postsLength, tag }: IndexProps,
+) {
   const postIndex = [];
   for (const [_key, post] of posts.entries()) {
     postIndex.push(post);
@@ -31,6 +72,17 @@ export function Index({ state, posts }: IndexProps) {
   postIndex.sort(
     (a, b) => (b.publishDate?.getTime() ?? 0) - (a.publishDate?.getTime() ?? 0),
   );
+  let page;
+  const t = tag.get("tag");
+  if ((index + 1) * 10 >= postsLength && index !== 0) {
+    page = <Pagination tag={t} index={index} type={"backward"} />;
+  } else if (index === 0 && (index + 1) * 10 >= postsLength) {
+    page = "";
+  } else if (index === 0) {
+    page = <Pagination tag={t} index={index} type={"forward"} />;
+  } else {
+    page = <Pagination tag={t} index={index} type={"both"} />;
+  }
 
   return (
     <div class="home">
@@ -115,6 +167,7 @@ export function Index({ state, posts }: IndexProps) {
             />
           ))}
         </div>
+        {page}
 
         {state.footer || <Footer author={state.author} />}
       </div>
@@ -352,6 +405,38 @@ function IconExternalLink() {
       <path
         d="M6.66715 5.83333C6.66715 5.3731 7.04025 5 7.50049 5L14.1672 5C14.6274 5 15.0005 5.3731 15.0005 5.83333V12.5C15.0005 12.9602 14.6274 13.3333 14.1672 13.3333C13.7069 13.3333 13.3338 12.9602 13.3338 12.5V7.84518L6.42308 14.7559C6.09764 15.0814 5.57 15.0814 5.24457 14.7559C4.91913 14.4305 4.91913 13.9028 5.24457 13.5774L12.1553 6.66667L7.50049 6.66667C7.04025 6.66667 6.66715 6.29357 6.66715 5.83333Z"
         fill="currentColor"
+      />
+    </svg>
+  );
+}
+
+function IconPrevious() {
+  return (
+    <svg
+      className="inline-block w-5 h-5"
+      viewBox="0 0 512 512"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        fill="currentColor"
+        d="M257.5 445.1l-22.2 22.2c-9.4 9.4-24.6 9.4-33.9 0L7 273c-9.4-9.4-9.4-24.6 0-33.9L201.4 44.7c9.4-9.4 24.6-9.4 33.9 0l22.2 22.2c9.5 9.5 9.3 25-.4 34.3L136.6 216H424c13.3 0 24 10.7 24 24v32c0 13.3-10.7 24-24 24H136.6l120.5 114.8c9.8 9.3 10 24.8.4 34.3z"
+      />
+    </svg>
+  );
+}
+
+function IconNext() {
+  return (
+    <svg
+      className="inline-block w-5 h-5"
+      viewBox="0 0 512 512"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        fill="currentColor"
+        d="M190.5 66.9l22.2-22.2c9.4-9.4 24.6-9.4 33.9 0L441 239c9.4 9.4 9.4 24.6 0 33.9L246.6 467.3c-9.4 9.4-24.6 9.4-33.9 0l-22.2-22.2c-9.5-9.5-9.3-25 .4-34.3L311.4 296H24c-13.3 0-24-10.7-24-24v-32c0-13.3 10.7-24 24-24h287.4L190.9 101.2c-9.8-9.3-10-24.8-.4-34.3z"
       />
     </svg>
   );

@@ -39,7 +39,7 @@ import type {
 export { Fragment, h };
 
 const IS_DEV = Deno.args.includes("--dev") && "watchFs" in Deno;
-const POSTS = new Map<string, Post>();
+let POSTS = new Map<string, Post>();
 const HMR_SOCKETS: Set<WebSocket> = new Set();
 
 const HMR_CLIENT = `let socket;
@@ -199,6 +199,12 @@ async function loadContent(blogDirectory: string, isDev: boolean) {
     }
   }
 
+  POSTS = new Map(
+    Array.from(POSTS).sort(([, a], [, b]) =>
+      b.publishDate.getTime() - a.publishDate.getTime()
+    ),
+  );
+
   if (isDev) {
     watchForChanges(postsDirectory).catch(() => {});
   }
@@ -345,6 +351,11 @@ export async function handler(
   }
 
   if (pathname === "/") {
+    let index = 0;
+    if (searchParams.get("page")?.match(/^[0-9]+$/)) {
+      index = Number(searchParams.get("page"));
+    }
+    const tagPosts = filterPosts(POSTS, searchParams);
     return html({
       ...sharedHtmlOptions,
       title: blogState.title ?? "My Blog",
@@ -364,11 +375,44 @@ export async function handler(
       body: (
         <Index
           state={blogState}
-          posts={filterPosts(POSTS, searchParams)}
+          index={index}
+          postsLength={tagPosts.size}
+          posts={getPostsByPage(tagPosts, index)}
+          tag={searchParams}
         />
       ),
     });
   }
+
+  // if (pathname === "/") {
+  //   const tagPosts = filterPosts(POSTS, searchParams);
+  //   return html({
+  //     ...sharedHtmlOptions,
+  //     title: blogState.title ?? "My Blog",
+  //     meta: {
+  //       "description": blogState.description,
+  //       "og:title": blogState.title,
+  //       "og:description": blogState.description,
+  //       "og:image": ogImage ?? blogState.cover,
+  //       "twitter:title": blogState.title,
+  //       "twitter:description": blogState.description,
+  //       "twitter:image": ogImage ?? blogState.cover,
+  //       "twitter:card": ogImage ? twitterCard : undefined,
+  //     },
+  //     styles: [
+  //       ...(blogState.style ? [blogState.style] : []),
+  //     ],
+  //     body: (
+  //       <Index
+  //         state={blogState}
+  //         postsLength={tagPosts.size}
+  //         posts={getPostsPage(tagPosts, 0)}
+  //         index={0}
+  //         searchParams={searchParams}
+  //       />
+  //     ),
+  //   });
+  // }
 
   const post = POSTS.get(pathname);
   if (post) {
@@ -527,6 +571,17 @@ export function redirects(redirectMap: Record<string, string>): BlogMiddleware {
       });
     }
   };
+}
+
+function getPostsByPage(
+  posts: Map<string, Post>,
+  index: number,
+) {
+  const i = Math.round(index);
+  if (i < 0) return new Map();
+  return new Map(
+    Array.from(posts.entries()).slice(i * 10, i * 10 + 10),
+  );
 }
 
 function filterPosts(
