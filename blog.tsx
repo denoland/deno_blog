@@ -314,7 +314,7 @@ export async function handler(
     lang: blogState.lang ?? "en",
     scripts: IS_DEV ? [{ src: "/hmr.js" }] : undefined,
     links: [
-      { href: canonicalUrl, rel: "canonical" },
+      { href: `${canonicalUrl}${new URL(req.url).pathname}`, rel: "canonical" },
     ],
   };
 
@@ -375,7 +375,7 @@ export async function handler(
     });
   }
 
-  const post = POSTS.get(pathname);
+  const post = POSTS.get(decodeURIComponent(pathname));
   if (post) {
     // Check for an Accept: text/plain header
     if (
