@@ -155,7 +155,7 @@ Deno.test("posts/ trailing slash redirects", async () => {
 Deno.test("redirect map", async () => {
   {
     const resp = await testHandler(
-      new Request("https://blog.deno.dev/second.html")
+      new Request("https://blog.deno.dev/second.html"),
     );
     assert(resp);
     assertEquals(resp.status, 307);
@@ -164,7 +164,7 @@ Deno.test("redirect map", async () => {
   }
   {
     const resp = await testHandler(
-      new Request("https://blog.deno.dev/to_second")
+      new Request("https://blog.deno.dev/to_second"),
     );
     assert(resp);
     assertEquals(resp.status, 307);
@@ -173,7 +173,7 @@ Deno.test("redirect map", async () => {
   }
   {
     const resp = await testHandler(
-      new Request("https://blog.deno.dev/to_second_with_slash")
+      new Request("https://blog.deno.dev/to_second_with_slash"),
     );
     assert(resp);
     assertEquals(resp.status, 307);
@@ -185,7 +185,7 @@ Deno.test("redirect map", async () => {
 Deno.test("static files in posts/ directory", async () => {
   {
     const resp = await testHandler(
-      new Request("https://blog.deno.dev/first/hello.png")
+      new Request("https://blog.deno.dev/first/hello.png"),
     );
     assert(resp);
     assertEquals(resp.status, 200);
@@ -193,12 +193,12 @@ Deno.test("static files in posts/ directory", async () => {
     const bytes = new Uint8Array(await resp.arrayBuffer());
     assertEquals(
       bytes,
-      await Deno.readFile(join(TESTDATA_PATH, "./posts/first/hello.png"))
+      await Deno.readFile(join(TESTDATA_PATH, "./posts/first/hello.png")),
     );
   }
   {
     const resp = await testHandler(
-      new Request("https://blog.deno.dev/second/hello2.png")
+      new Request("https://blog.deno.dev/second/hello2.png"),
     );
     assert(resp);
     assertEquals(resp.status, 200);
@@ -206,7 +206,7 @@ Deno.test("static files in posts/ directory", async () => {
     const bytes = new Uint8Array(await resp.arrayBuffer());
     assertEquals(
       bytes,
-      await Deno.readFile(join(TESTDATA_PATH, "./posts/second/hello2.png"))
+      await Deno.readFile(join(TESTDATA_PATH, "./posts/second/hello2.png")),
     );
   }
 });
@@ -226,7 +226,7 @@ Deno.test("RSS feed", async () => {
   assertEquals(resp.status, 200);
   assertEquals(
     resp.headers.get("content-type"),
-    "application/atom+xml; charset=utf-8"
+    "application/atom+xml; charset=utf-8",
   );
   const body = await resp.text();
   assertStringIncludes(body, `<title>Test blog</title>`);
@@ -248,11 +248,11 @@ Deno.test(
     };
 
     const resp = await darkThemeTestHandler(
-      new Request("https://blog.deno.dev")
+      new Request("https://blog.deno.dev"),
     );
     const body = await resp.text();
     assertStringIncludes(body, `<meta name="theme-color" content="#000" />`);
-  }
+  },
 );
 
 Deno.test(
@@ -267,11 +267,11 @@ Deno.test(
     };
 
     const resp = await darkThemeTestHandler(
-      new Request("https://blog.deno.dev/first")
+      new Request("https://blog.deno.dev/first"),
     );
     const body = await resp.text();
     assertStringIncludes(body, `<meta name="theme-color" content="#000" />`);
-  }
+  },
 );
 
 Deno.test("Plaintext response", async () => {
@@ -281,7 +281,7 @@ Deno.test("Plaintext response", async () => {
   const resp = await testHandler(
     new Request("https://blog.deno.dev/first", {
       headers: plaintext,
-    })
+    }),
   );
   assert(resp);
   assertEquals(resp.status, 200);
