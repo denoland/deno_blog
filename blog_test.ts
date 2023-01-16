@@ -138,6 +138,21 @@ Deno.test("posts/ third", async () => {
   assertStringIncludes(body, `<p>Lorem Ipsum is simply dummy text`);
 });
 
+Deno.test("posts/ 中文", async () => {
+  const resp = await testHandler(new Request("https://blog.deno.dev/中文"));
+  assert(resp);
+  assertEquals(resp.status, 200);
+  assertEquals(resp.headers.get("content-type"), "text/html; charset=utf-8");
+  const body = await resp.text();
+  assertStringIncludes(body, `<html lang="en-GB">`);
+  assertStringIncludes(
+    body,
+    `<link rel="canonical" href="https://blog.deno.dev/%E4%B8%AD%E6%96%87" />`,
+  );
+  assertStringIncludes(body, `中文`);
+  assertStringIncludes(body, `<p>你好，世界！`);
+});
+
 Deno.test("posts/ trailing slash redirects", async () => {
   const resp = await testHandler(new Request("https://blog.deno.dev/second/"));
   assert(resp);
