@@ -1,28 +1,32 @@
 // Copyright 2022 the Deno authors. All rights reserved. MIT license.
 
-export { serveDir } from "https://deno.land/std@0.171.0/http/file_server.ts";
-export { walk } from "https://deno.land/std@0.171.0/fs/walk.ts";
+export { serveDir } from "https://deno.land/std@0.175.0/http/file_server.ts";
+export { walk } from "https://deno.land/std@0.175.0/fs/walk.ts";
 export {
   dirname,
   fromFileUrl,
   join,
   relative,
-} from "https://deno.land/std@0.171.0/path/mod.ts";
+} from "https://deno.land/std@0.175.0/path/mod.ts";
 export {
   type ConnInfo,
   serve,
-} from "https://deno.land/std@0.171.0/http/mod.ts";
-export { extract as frontMatter } from "https://deno.land/std@0.171.0/encoding/front_matter.ts";
+} from "https://deno.land/std@0.175.0/http/mod.ts";
+export { extract as frontMatter } from "https://deno.land/std@0.175.0/encoding/front_matter/any.ts";
 
-export * as gfm from "https://deno.land/x/gfm@0.1.27/mod.ts";
+export * as gfm from "https://deno.land/x/gfm@0.1.29/mod.ts";
 export {
   Fragment,
   h,
-  html,
+} from "https://deno.land/x/htm@0.1.3/mod.ts";
+export {
+  default as html,
   type HtmlOptions,
   type VNode,
-} from "https://deno.land/x/htm@0.0.10/mod.tsx";
-import { UnoCSS } from "https://deno.land/x/htm@0.0.10/plugins.ts";
+} from "https://deno.land/x/htm@0.1.3/html.tsx"
+import UnoCSS from "https://deno.land/x/htm@0.1.3/plugins/unocss.ts";
+import ColorScheme from "https://deno.land/x/htm@0.1.3/plugins/color-scheme.ts";
+
 export {
   createReporter,
   type Reporter as GaReporter,
@@ -34,7 +38,7 @@ export { default as removeMarkdown } from "https://esm.sh/remove-markdown@0.5.0"
 // Add syntax highlighting support for C by default
 import "https://esm.sh/prismjs@1.29.0/components/prism-c?no-check";
 
-export { UnoCSS };
+export { UnoCSS, ColorScheme };
 export type UnoConfig = typeof UnoCSS extends (
   arg: infer P | undefined,
 ) => unknown ? P
