@@ -97,5 +97,6 @@ export interface Post {
   ogImage?: string;
   tags?: string[];
   allowIframes?: boolean;
+  disableHtmlSanitization?: boolean;
   readTime: number;
 }

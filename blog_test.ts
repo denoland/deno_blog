@@ -138,6 +138,25 @@ Deno.test("posts/ third", async () => {
   assertStringIncludes(body, `<p>Lorem Ipsum is simply dummy text`);
 });
 
+Deno.test("posts/ fourth", async () => {
+  const resp = await testHandler(new Request("https://blog.deno.dev/fourth"));
+  assert(resp);
+  assertEquals(resp.status, 200);
+  assertEquals(resp.headers.get("content-type"), "text/html; charset=utf-8");
+  const body = await resp.text();
+  assertStringIncludes(body, `<html lang="en-GB">`);
+  assertStringIncludes(
+    body,
+    `<link rel="canonical" href="https://blog.deno.dev/fourth" />`,
+  );
+  assertStringIncludes(body, `Fourth post`);
+  assertStringIncludes(
+    body,
+    `<time dateTime="2023-01-30T00:00:00.000Z">`,
+  );
+  assertStringIncludes(body, `<button onclick="alert('hi!')">Click me!!!!!!</button>`);
+});
+
 Deno.test("posts/ 中文", async () => {
   const resp = await testHandler(new Request("https://blog.deno.dev/中文"));
   assert(resp);

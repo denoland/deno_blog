@@ -166,6 +166,7 @@ interface PostPageProps {
 export function PostPage({ post, state }: PostPageProps) {
   const html = gfm.render(post.markdown, {
     allowIframes: post.allowIframes,
+    disableHtmlSanitization: post.disableHtmlSanitization
   });
   return (
     <div className={`post ${post.pathname.substring(1)}`}>

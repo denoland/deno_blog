@@ -268,6 +268,7 @@ async function loadPost(postsDirectory: string, path: string) {
     ogImage: data.get("og:image"),
     tags: data.get("tags"),
     allowIframes: data.get("allow_iframes"),
+    disableHtmlSanitization: data.get("disable_html_sanitization"),
     readTime: readingTime(content),
   };
   POSTS.set(pathname, post);
