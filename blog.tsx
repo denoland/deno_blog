@@ -8,6 +8,7 @@
 
 import {
   callsites,
+  ColorScheme,
   createReporter,
   dirname,
   Feed,
@@ -101,6 +102,7 @@ function errorHandler(err: unknown) {
  */
 export default async function blog(settings?: BlogSettings) {
   html.use(UnoCSS(settings?.unocss)); // Load custom unocss module if provided
+  html.use(ColorScheme("auto"));
 
   const url = callsites()[1].getFileName()!;
   const blogState = await configureBlog(url, IS_DEV, settings);
@@ -266,6 +268,7 @@ async function loadPost(postsDirectory: string, path: string) {
     ogImage: data.get("og:image"),
     tags: data.get("tags"),
     allowIframes: data.get("allow_iframes"),
+    disableHtmlSanitization: data.get("disable_html_sanitization"),
     readTime: readingTime(content),
   };
   POSTS.set(pathname, post);
@@ -310,7 +313,6 @@ export async function handler(
   }
 
   const sharedHtmlOptions: HtmlOptions = {
-    colorScheme: blogState.theme ?? "auto",
     lang: blogState.lang ?? "en",
     scripts: IS_DEV ? [{ src: "/hmr.js" }] : undefined,
     links: [
