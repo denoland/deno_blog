@@ -5,8 +5,8 @@ import {
   assert,
   assertEquals,
   assertStringIncludes,
-} from "https://deno.land/std@0.175.0/testing/asserts.ts";
-import { fromFileUrl, join } from "https://deno.land/std@0.175.0/path/mod.ts";
+} from "https://deno.land/std@0.176.0/testing/asserts.ts";
+import { fromFileUrl, join } from "https://deno.land/std@0.176.0/path/mod.ts";
 
 const BLOG_URL = new URL("./testdata/main.js", import.meta.url).href;
 const TESTDATA_PATH = fromFileUrl(new URL("./testdata/", import.meta.url));
@@ -154,7 +154,10 @@ Deno.test("posts/ fourth", async () => {
     body,
     `<time dateTime="2023-01-30T00:00:00.000Z">`,
   );
-  assertStringIncludes(body, `<button onclick="alert('hi!')">Click me!!!!!!</button>`);
+  assertStringIncludes(
+    body,
+    `<button onclick="alert('hi!')">Click me!!!!!!</button>`,
+  );
 });
 
 Deno.test("posts/ 中文", async () => {

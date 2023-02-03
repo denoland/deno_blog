@@ -8,6 +8,7 @@
 
 import {
   callsites,
+  ColorScheme,
   createReporter,
   dirname,
   Feed,
@@ -24,7 +25,6 @@ import {
   serve,
   serveDir,
   UnoCSS,
-  ColorScheme,
   walk,
 } from "./deps.ts";
 import { Index, PostPage } from "./components.tsx";
@@ -102,7 +102,7 @@ function errorHandler(err: unknown) {
  */
 export default async function blog(settings?: BlogSettings) {
   html.use(UnoCSS(settings?.unocss)); // Load custom unocss module if provided
-  html.use(ColorScheme("auto"))
+  html.use(ColorScheme("auto"));
 
   const url = callsites()[1].getFileName()!;
   const blogState = await configureBlog(url, IS_DEV, settings);
