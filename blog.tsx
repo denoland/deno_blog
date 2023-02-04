@@ -192,25 +192,19 @@ async function loadContent(blogDirectory: string, isDev: boolean) {
   // Read posts from the current directory and store them in memory.
   const postsDirectory = join(blogDirectory, "posts");
 
-  
-  
-  
-  
-  
-  
   const loadingPromises: Promise<void>[] = [];
-  
+
   // TODO(@satyarohith): not efficient for large number of posts.
   for await (
     const entry of walk(postsDirectory)
-    ) {
-      if (entry.isFile && entry.path.endsWith(".md")) {
-        // Switch to async to speed larger blogs
-        // await loadPost(postsDirectory, entry.path);
-        loadingPromises.push(loadPost(postsDirectory, entry.path));
-      }
+  ) {
+    if (entry.isFile && entry.path.endsWith(".md")) {
+      // Switch to async to speed larger blogs
+      // await loadPost(postsDirectory, entry.path);
+      loadingPromises.push(loadPost(postsDirectory, entry.path));
     }
-    await Promise.all(loadingPromises);
+  }
+  await Promise.all(loadingPromises);
 
   if (isDev) {
     watchForChanges(postsDirectory).catch(() => {});
