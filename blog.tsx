@@ -194,13 +194,10 @@ async function loadContent(blogDirectory: string, isDev: boolean) {
 
   const loadingPromises: Promise<void>[] = [];
 
-  // TODO(@satyarohith): not efficient for large number of posts.
   for await (
     const entry of walk(postsDirectory)
   ) {
     if (entry.isFile && entry.path.endsWith(".md")) {
-      // Switch to async to speed larger blogs
-      // await loadPost(postsDirectory, entry.path);
       loadingPromises.push(loadPost(postsDirectory, entry.path));
     }
   }
