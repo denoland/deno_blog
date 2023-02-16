@@ -99,4 +99,5 @@ export interface Post {
   allowIframes?: boolean;
   disableHtmlSanitization?: boolean;
   readTime: number;
+  renderMath?: boolean;
 }

@@ -1,10 +1,28 @@
 ---
 title: Fourth post
-publish_date: 2023-01-30
-abstract: Image deno_blog but with unsantized HTML...
-disable_html_sanitization: true
+author: CUSTOM AUTHOR NAME
+publish_date: 2023-02-17
+abstract: This is the fourth post showcasing math rendering
+render_math: true
 ---
 
-## Cool Button Demo
+# Math rendering
 
-<button onclick="alert('hi!')">Click me!!!!!!</button>
+This post showcases math rendering using [KaTeX](https://katex.org/) in [deno-gfm](https://github.com/denoland/deno-gfm)
+
+## Inline math
+
+Inline math is rendered using `$` delimiters, e.g. `$\sqrt{3x-1}+(1+x)^2$` renders as $ \sqrt{3x-1}+(1+x)^2 $.
+## Block math
+
+Block math is rendered using `$$` delimiters, e.g. `$$\sqrt{3x-1}+(1+x)^2$$` renders as 
+
+$$ \sqrt{3x-1}+(1+x)^2 $$
+
+## Math in code blocks
+
+Math can be rendered in code blocks by using the `math` language tag, e.g. ```math \sqrt{3x-1}+(1+x)^2 ``` renders as
+
+```math
+\sqrt{3x-1}+(1+x)^2
+```
