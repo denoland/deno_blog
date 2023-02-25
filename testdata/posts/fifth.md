@@ -12,7 +12,10 @@ This post showcases math rendering using [KaTeX](https://katex.org/) in [deno-gf
 
 ## Inline math
 
-Inline math is rendered using `$` delimiters, e.g. `$\sqrt{3x-1}+(1+x)^2$` renders as $ \sqrt{3x-1}+(1+x)^2 $.
+Inline math is rendered using `$` delimiters, e.g. `$\sqrt{3x-1}+(1+x)^2$` renders as $\sqrt{3x-1}+(1+x)^2$ .
+
+And the letter `i` is rendered as $i$.
+
 ## Block math
 
 Block math is rendered using `$$` delimiters, e.g. `$$\sqrt{3x-1}+(1+x)^2$$` renders as 
@@ -26,3 +29,5 @@ Math can be rendered in code blocks by using the `math` language tag, e.g. ```ma
 ```math
 \sqrt{3x-1}+(1+x)^2
 ```
+
+<!-- $i$ -->
