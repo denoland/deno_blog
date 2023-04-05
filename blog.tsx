@@ -490,7 +490,7 @@ export function ga(gaKey: string): BlogMiddleware {
       });
     } finally {
       if (gaReporter) {
-        gaReporter(request, ctx.connInfo, res!, start, err);
+        await gaReporter(request, ctx.connInfo, res!, start, err);
       }
     }
     return res;
