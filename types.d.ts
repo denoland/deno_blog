@@ -1,6 +1,6 @@
 // Copyright 2022 the Deno authors. All rights reserved. MIT license.
 
-import type { ConnInfo, UnoConfig, VNode } from "./deps.ts";
+import type { ConnInfo, HtmlOptions, UnoConfig, VNode } from "./deps.ts";
 
 export interface BlogContext {
   state: BlogState;
@@ -78,6 +78,8 @@ export interface BlogSettings {
   hostname?: string;
   /** Whether to display readtime or not */
   readtime?: boolean;
+  /** Scripts to include in head tag */
+  scripts?: HtmlOptions['scripts'];
 }
 
 export interface BlogState extends BlogSettings {

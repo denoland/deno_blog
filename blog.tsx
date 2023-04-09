@@ -320,6 +320,10 @@ export async function handler(
     ],
   };
 
+  if (blogState.scripts?.length) {
+    sharedHtmlOptions.scripts = (sharedHtmlOptions.scripts ?? []).concat(blogState.scripts);
+  }
+
   if (typeof blogState.favicon === "string") {
     sharedHtmlOptions.links?.push({
       href: blogState.favicon,
