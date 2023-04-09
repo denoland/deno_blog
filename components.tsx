@@ -34,6 +34,8 @@ export function Index({ state, posts }: IndexProps) {
 
   return (
     <div class="home">
+      <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PQR6T5Z"
+  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       {state.header || (
         <header
           class="w-full h-90 lt-sm:h-80 bg-cover bg-center bg-no-repeat"
