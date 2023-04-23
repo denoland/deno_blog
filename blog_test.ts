@@ -19,6 +19,7 @@ const BLOG_SETTINGS = await configureBlog(BLOG_URL, false, {
     redirects({
       "/to_second": "second",
       "/to_second_with_slash": "/second",
+      "/external_redirect": "https://example.com",
       "second.html": "second",
     }),
   ],
@@ -180,6 +181,16 @@ Deno.test("posts/ trailing slash redirects", async () => {
   assert(resp);
   assertEquals(resp.status, 307);
   assertEquals(resp.headers.get("location"), "https://blog.deno.dev/second");
+  await resp.text();
+});
+
+Deno.test("external redirects", async () => {
+  const resp = await testHandler(
+    new Request("https://blog.deno.dev/external_redirect"),
+  );
+  assert(resp);
+  assertEquals(resp.status, 307);
+  assertEquals(resp.headers.get("location"), "https://example.com");
   await resp.text();
 });
 
