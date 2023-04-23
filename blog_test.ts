@@ -185,7 +185,9 @@ Deno.test("posts/ trailing slash redirects", async () => {
 });
 
 Deno.test("external redirects", async () => {
-  const resp = await testHandler(new Request("https://blog.deno.dev/external_redirect"));
+  const resp = await testHandler(
+    new Request("https://blog.deno.dev/external_redirect"),
+  );
   assert(resp);
   assertEquals(resp.status, 307);
   assertEquals(resp.headers.get("location"), "https://example.com");
