@@ -252,12 +252,14 @@ async function loadPost(postsDirectory: string, path: string) {
     }
   }
 
+  // Note: users can override path of a blog post using
+    // pathname in front matter.
+  pathname = data.get("pathname") ?? pathname
+
   const post: Post = {
     title: data.get("title") ?? "Untitled",
     author: data.get("author"),
-    // Note: users can override path of a blog post using
-    // pathname in front matter.
-    pathname: data.get("pathname") ?? pathname,
+    pathname,
     // Note: no error when publish_date is wrong or missed
     publishDate: data.get("publish_date") instanceof Date
       ? data.get("publish_date")!
