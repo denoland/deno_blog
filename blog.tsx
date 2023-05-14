@@ -102,7 +102,7 @@ function errorHandler(err: unknown) {
  */
 export default async function blog(settings?: BlogSettings) {
   html.use(UnoCSS(settings?.unocss)); // Load custom unocss module if provided
-  html.use(ColorScheme("auto"));
+  html.use(ColorScheme(settings?.theme ?? 'auto'));
 
   const url = callsites()[1].getFileName()!;
   const blogState = await configureBlog(url, IS_DEV, settings);
