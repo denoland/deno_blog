@@ -8,6 +8,7 @@
 
 import {
   callsites,
+  ColorScheme,
   createReporter,
   dirname,
   Feed,
@@ -101,6 +102,7 @@ function errorHandler(err: unknown) {
  */
 export default async function blog(settings?: BlogSettings) {
   html.use(UnoCSS(settings?.unocss)); // Load custom unocss module if provided
+  html.use(ColorScheme("auto"));
 
   const url = callsites()[1].getFileName()!;
   const blogState = await configureBlog(url, IS_DEV, settings);
@@ -135,7 +137,7 @@ function composeMiddlewares(state: BlogState) {
     connInfo: ConnInfo,
     inner: (req: Request, ctx: BlogContext) => Promise<Response>,
   ) => {
-    const mws = state.middlewares?.reverse();
+    const mws = state.middlewares?.slice().reverse();
 
     const handlers: (() => Response | Promise<Response>)[] = [];
 
@@ -266,6 +268,7 @@ async function loadPost(postsDirectory: string, path: string) {
     ogImage: data.get("og:image"),
     tags: data.get("tags"),
     allowIframes: data.get("allow_iframes"),
+    disableHtmlSanitization: data.get("disable_html_sanitization"),
     readTime: readingTime(content),
   };
   POSTS.set(pathname, post);
@@ -310,11 +313,10 @@ export async function handler(
   }
 
   const sharedHtmlOptions: HtmlOptions = {
-    colorScheme: blogState.theme ?? "auto",
     lang: blogState.lang ?? "en",
     scripts: IS_DEV ? [{ src: "/hmr.js" }] : undefined,
     links: [
-      { href: canonicalUrl, rel: "canonical" },
+      { href: `${canonicalUrl}${new URL(req.url).pathname}`, rel: "canonical" },
     ],
   };
 
@@ -370,8 +372,14 @@ export async function handler(
     });
   }
 
-  const post = POSTS.get(pathname);
+  const post = POSTS.get(decodeURIComponent(pathname));
   if (post) {
+    // Check for an Accept: text/plain header
+    if (
+      req.headers.has("Accept") && req.headers.get("Accept") === "text/plain"
+    ) {
+      return new Response(post.markdown);
+    }
     return html({
       ...sharedHtmlOptions,
       title: post.title,
@@ -501,7 +509,9 @@ export function redirects(redirectMap: Record<string, string>): BlogMiddleware {
     }
 
     if (maybeRedirect) {
-      if (!maybeRedirect.startsWith("/")) {
+      if (
+        !maybeRedirect.startsWith("/") && !(maybeRedirect.startsWith("http"))
+      ) {
         maybeRedirect = "/" + maybeRedirect;
       }
 

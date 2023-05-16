@@ -5,8 +5,8 @@ import {
   assert,
   assertEquals,
   assertStringIncludes,
-} from "https://deno.land/std@0.153.0/testing/asserts.ts";
-import { fromFileUrl, join } from "https://deno.land/std@0.153.0/path/mod.ts";
+} from "https://deno.land/std@0.176.0/testing/asserts.ts";
+import { fromFileUrl, join } from "https://deno.land/std@0.176.0/path/mod.ts";
 
 const BLOG_URL = new URL("./testdata/main.js", import.meta.url).href;
 const TESTDATA_PATH = fromFileUrl(new URL("./testdata/", import.meta.url));
@@ -19,6 +19,7 @@ const BLOG_SETTINGS = await configureBlog(BLOG_URL, false, {
     redirects({
       "/to_second": "second",
       "/to_second_with_slash": "/second",
+      "/external_redirect": "https://example.com",
       "second.html": "second",
     }),
   ],
@@ -49,6 +50,10 @@ Deno.test("index page", async () => {
   assertEquals(resp.headers.get("content-type"), "text/html; charset=utf-8");
   const body = await resp.text();
   assertStringIncludes(body, `<html lang="en-GB">`);
+  assertStringIncludes(
+    body,
+    `<link rel="canonical" href="https://blog.deno.dev/" />`,
+  );
   assertStringIncludes(body, `Test blog`);
   assertStringIncludes(body, `This is some description.`);
   assertStringIncludes(body, `href="/first"`);
@@ -62,6 +67,10 @@ Deno.test("posts/ first", async () => {
   assertEquals(resp.headers.get("content-type"), "text/html; charset=utf-8");
   const body = await resp.text();
   assertStringIncludes(body, `<html lang="en-GB">`);
+  assertStringIncludes(
+    body,
+    `<link rel="canonical" href="https://blog.deno.dev/first" />`,
+  );
   assertStringIncludes(body, `First post`);
   assertStringIncludes(body, `The author`);
   assertStringIncludes(
@@ -74,6 +83,20 @@ Deno.test("posts/ first", async () => {
   assertStringIncludes(body, `min read`);
 });
 
+Deno.test("posts/ first (check canonical with params)", async () => {
+  const resp = await testHandler(
+    new Request("https://blog.deno.dev/first?foo=bar"),
+  );
+  assert(resp);
+  assertEquals(resp.status, 200);
+  assertEquals(resp.headers.get("content-type"), "text/html; charset=utf-8");
+  const body = await resp.text();
+  assertStringIncludes(
+    body,
+    `<link rel="canonical" href="https://blog.deno.dev/first" />`,
+  );
+});
+
 Deno.test("posts/ second", async () => {
   const resp = await testHandler(new Request("https://blog.deno.dev/second"));
   assert(resp);
@@ -81,6 +104,10 @@ Deno.test("posts/ second", async () => {
   assertEquals(resp.headers.get("content-type"), "text/html; charset=utf-8");
   const body = await resp.text();
   assertStringIncludes(body, `<html lang="en-GB">`);
+  assertStringIncludes(
+    body,
+    `<link rel="canonical" href="https://blog.deno.dev/second" />`,
+  );
   assertStringIncludes(body, `Second post`);
   assertStringIncludes(body, `CUSTOM AUTHOR NAME`);
   assertStringIncludes(
@@ -98,6 +125,10 @@ Deno.test("posts/ third", async () => {
   assertEquals(resp.headers.get("content-type"), "text/html; charset=utf-8");
   const body = await resp.text();
   assertStringIncludes(body, `<html lang="en-GB">`);
+  assertStringIncludes(
+    body,
+    `<link rel="canonical" href="https://blog.deno.dev/third" />`,
+  );
   assertStringIncludes(body, `Third post`);
   assertStringIncludes(body, `CUSTOM AUTHOR NAME`);
   assertStringIncludes(
@@ -108,11 +139,58 @@ Deno.test("posts/ third", async () => {
   assertStringIncludes(body, `<p>Lorem Ipsum is simply dummy text`);
 });
 
+Deno.test("posts/ fourth", async () => {
+  const resp = await testHandler(new Request("https://blog.deno.dev/fourth"));
+  assert(resp);
+  assertEquals(resp.status, 200);
+  assertEquals(resp.headers.get("content-type"), "text/html; charset=utf-8");
+  const body = await resp.text();
+  assertStringIncludes(body, `<html lang="en-GB">`);
+  assertStringIncludes(
+    body,
+    `<link rel="canonical" href="https://blog.deno.dev/fourth" />`,
+  );
+  assertStringIncludes(body, `Fourth post`);
+  assertStringIncludes(
+    body,
+    `<time dateTime="2023-01-30T00:00:00.000Z">`,
+  );
+  assertStringIncludes(
+    body,
+    `<button onclick="alert('hi!')">Click me!!!!!!</button>`,
+  );
+});
+
+Deno.test("posts/ 中文", async () => {
+  const resp = await testHandler(new Request("https://blog.deno.dev/中文"));
+  assert(resp);
+  assertEquals(resp.status, 200);
+  assertEquals(resp.headers.get("content-type"), "text/html; charset=utf-8");
+  const body = await resp.text();
+  assertStringIncludes(body, `<html lang="en-GB">`);
+  assertStringIncludes(
+    body,
+    `<link rel="canonical" href="https://blog.deno.dev/%E4%B8%AD%E6%96%87" />`,
+  );
+  assertStringIncludes(body, `中文`);
+  assertStringIncludes(body, `<p>你好，世界！`);
+});
+
 Deno.test("posts/ trailing slash redirects", async () => {
   const resp = await testHandler(new Request("https://blog.deno.dev/second/"));
   assert(resp);
   assertEquals(resp.status, 307);
   assertEquals(resp.headers.get("location"), "https://blog.deno.dev/second");
+  await resp.text();
+});
+
+Deno.test("external redirects", async () => {
+  const resp = await testHandler(
+    new Request("https://blog.deno.dev/external_redirect"),
+  );
+  assert(resp);
+  assertEquals(resp.status, 307);
+  assertEquals(resp.headers.get("location"), "https://example.com");
   await resp.text();
 });
 
@@ -210,4 +288,23 @@ Deno.test("RSS feed", async () => {
   assertStringIncludes(body, `https://blog.deno.dev/first`);
   assertStringIncludes(body, `Second post`);
   assertStringIncludes(body, `https://blog.deno.dev/second`);
+});
+
+Deno.test("Plaintext response", async () => {
+  const plaintext = new Headers({
+    "Accept": "text/plain",
+  });
+  const resp = await testHandler(
+    new Request("https://blog.deno.dev/first", {
+      headers: plaintext,
+    }),
+  );
+  assert(resp);
+  assertEquals(resp.status, 200);
+  assertEquals(
+    resp.headers.get("content-type"),
+    "text/plain;charset=UTF-8",
+  );
+  const body = await resp.text();
+  assert(body.startsWith("It was popularised in the 1960s"));
 });
