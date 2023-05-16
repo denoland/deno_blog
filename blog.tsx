@@ -253,8 +253,8 @@ async function loadPost(postsDirectory: string, path: string) {
   }
 
   // Note: users can override path of a blog post using
-    // pathname in front matter.
-  pathname = data.get("pathname") ?? pathname
+  // pathname in front matter.
+  pathname = data.get("pathname") ?? pathname;
 
   const post: Post = {
     title: data.get("title") ?? "Untitled",
