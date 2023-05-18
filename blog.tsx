@@ -202,7 +202,7 @@ async function loadContent(blogDirectory: string, isDev: boolean) {
   }
 
   const pool = pooledMap(
-    10,
+    25,
     traversal,
     (entry) => loadPost(postsDirectory, entry.path),
   );
