@@ -282,6 +282,7 @@ async function loadPost(postsDirectory: string, path: string) {
     allowIframes: data.get("allow_iframes"),
     disableHtmlSanitization: data.get("disable_html_sanitization"),
     readTime: readingTime(content),
+    renderMath: data.get("render_math"),
   };
   POSTS.set(pathname, post);
 }
@@ -409,6 +410,7 @@ export async function handler(
         gfm.CSS,
         `.markdown-body { --color-canvas-default: transparent !important; --color-canvas-subtle: #edf0f2; --color-border-muted: rgba(128,128,128,0.2); } .markdown-body img + p { margin-top: 16px; }`,
         ...(blogState.style ? [blogState.style] : []),
+        ...(post.renderMath ? [gfm.KATEX_CSS] : []),
       ],
       body: <PostPage post={post} state={blogState} />,
     });
