@@ -333,6 +333,10 @@ export async function handler(
     ],
   };
 
+  const sharedMetaTags = {
+    "theme-color": blogState.theme === "dark" ? "#000" : null,
+  };
+
   if (typeof blogState.favicon === "string") {
     sharedHtmlOptions.links?.push({
       href: blogState.favicon,
@@ -364,6 +368,7 @@ export async function handler(
       ...sharedHtmlOptions,
       title: blogState.title ?? "My Blog",
       meta: {
+        ...sharedMetaTags,
         "description": blogState.description,
         "og:title": blogState.title,
         "og:description": blogState.description,
@@ -397,6 +402,7 @@ export async function handler(
       ...sharedHtmlOptions,
       title: post.title,
       meta: {
+        ...sharedMetaTags,
         "description": post.snippet,
         "og:title": post.title,
         "og:description": post.snippet,
@@ -457,7 +463,7 @@ function serveRSS(
 
   for (const [_key, post] of posts.entries()) {
     const item: FeedItem = {
-      id: `${origin}/${post.title}`,
+      id: `${origin}${post.pathname}`,
       title: post.title,
       description: post.snippet,
       date: post.publishDate,
