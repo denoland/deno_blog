@@ -1,6 +1,6 @@
 // Copyright 2022 the Deno authors. All rights reserved. MIT license.
 
-import { join, resolve } from "https://deno.land/std@0.176.0/path/mod.ts";
+import { join, resolve } from "https://deno.land/std@0.193.0/path/mod.ts";
 
 const HELP = `deno_blog
 
@@ -62,16 +62,10 @@ const DENO_JSONC_NAME = "deno.jsonc";
 const DENO_JSONC_CONTENTS = `{
   "tasks": {
     "dev": "deno run --allow-net --allow-read --allow-env --watch main.tsx --dev",
-    "serve": "deno run --allow-net --allow-read --allow-env --no-check main.tsx",
+    "serve": "deno run --allow-net --allow-read --allow-env --no-check main.tsx"
   },
-  "importMap": "./import_map.json"
-}
-`;
-
-const IMPORT_MAP_JSON_NAME = "import_map.json";
-const IMPORT_MAP_JSON_CONTENTS = `{
   "imports": {
-    "blog": "https://deno.land/x/blog@0.5.0/blog.tsx"
+    "blog": "https://deno.land/x/blog@0.7.0/blog.tsx"
   }
 }
 `;
@@ -105,10 +99,6 @@ async function init(directory: string) {
   await Deno.writeTextFile(
     join(directory, DENO_JSONC_NAME),
     DENO_JSONC_CONTENTS,
-  );
-  await Deno.writeTextFile(
-    join(directory, IMPORT_MAP_JSON_NAME),
-    IMPORT_MAP_JSON_CONTENTS,
   );
 
   console.log("Blog initialized, run `deno task dev` to get started.");
