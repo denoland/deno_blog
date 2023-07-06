@@ -65,7 +65,7 @@ const DENO_JSONC_CONTENTS = `{
     "serve": "deno run --allow-net --allow-read --allow-env --no-check main.tsx",
   },
   "imports": {
-    "blog": "https://deno.land/x/blog@0.6.0/blog.tsx"
+    "blog": "https://deno.land/x/blog@0.7.0/blog.tsx"
   }
 }
 `;
