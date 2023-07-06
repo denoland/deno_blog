@@ -19,6 +19,7 @@ const BLOG_SETTINGS = await configureBlog(BLOG_URL, false, {
     redirects({
       "/to_second": "second",
       "/to_second_with_slash": "/second",
+      "/external_redirect": "https://example.com",
       "second.html": "second",
     }),
   ],
@@ -160,6 +161,22 @@ Deno.test("posts/ fourth", async () => {
   );
 });
 
+Deno.test("posts/ fifth", async () => {
+  const resp = await testHandler(new Request("https://blog.deno.dev/fifth"));
+  assert(resp);
+  assertEquals(resp.status, 200);
+  assertEquals(resp.headers.get("content-type"), "text/html; charset=utf-8");
+  const body = await resp.text();
+  assertStringIncludes(body, `<html lang="en-GB">`);
+  assertStringIncludes(
+    body,
+    `<link rel="canonical" href="https://blog.deno.dev/fifth" />`,
+  );
+  assertStringIncludes(body, `fifth post`);
+  assertStringIncludes(body, `<time dateTime="2022-05-02T00:00:00.000Z">`);
+  assertStringIncludes(body, `<p>Lorem Ipsum is simply dummy text`);
+});
+
 Deno.test("posts/ 中文", async () => {
   const resp = await testHandler(new Request("https://blog.deno.dev/中文"));
   assert(resp);
@@ -180,6 +197,16 @@ Deno.test("posts/ trailing slash redirects", async () => {
   assert(resp);
   assertEquals(resp.status, 307);
   assertEquals(resp.headers.get("location"), "https://blog.deno.dev/second");
+  await resp.text();
+});
+
+Deno.test("external redirects", async () => {
+  const resp = await testHandler(
+    new Request("https://blog.deno.dev/external_redirect"),
+  );
+  assert(resp);
+  assertEquals(resp.status, 307);
+  assertEquals(resp.headers.get("location"), "https://example.com");
   await resp.text();
 });
 

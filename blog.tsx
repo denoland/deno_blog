@@ -27,6 +27,7 @@ import {
   UnoCSS,
   walk,
 } from "./deps.ts";
+import { pooledMap } from "https://deno.land/std@0.187.0/async/pool.ts";
 import { Index, PostPage } from "./components.tsx";
 import type { ConnInfo, FeedItem } from "./deps.ts";
 import type {
@@ -36,6 +37,7 @@ import type {
   BlogState,
   Post,
 } from "./types.d.ts";
+import { WalkEntry } from "https://deno.land/std@0.176.0/fs/walk.ts";
 
 export { Fragment, h };
 
@@ -192,13 +194,21 @@ async function loadContent(blogDirectory: string, isDev: boolean) {
   // Read posts from the current directory and store them in memory.
   const postsDirectory = join(blogDirectory, "posts");
 
-  // TODO(@satyarohith): not efficient for large number of posts.
-  for await (
-    const entry of walk(postsDirectory)
-  ) {
+  const traversal: WalkEntry[] = [];
+  for await (const entry of walk(postsDirectory)) {
     if (entry.isFile && entry.path.endsWith(".md")) {
-      await loadPost(postsDirectory, entry.path);
+      traversal.push(entry);
     }
+  }
+
+  const pool = pooledMap(
+    25,
+    traversal,
+    (entry) => loadPost(postsDirectory, entry.path),
+  );
+
+  for await (const _ of pool) {
+    // noop
   }
 
   if (isDev) {
@@ -252,12 +262,14 @@ async function loadPost(postsDirectory: string, path: string) {
     }
   }
 
+  // Note: users can override path of a blog post using
+  // pathname in front matter.
+  pathname = data.get("pathname") ?? pathname;
+
   const post: Post = {
     title: data.get("title") ?? "Untitled",
     author: data.get("author"),
-    // Note: users can override path of a blog post using
-    // pathname in front matter.
-    pathname: data.get("pathname") ?? pathname,
+    pathname,
     // Note: no error when publish_date is wrong or missed
     publishDate: data.get("publish_date") instanceof Date
       ? data.get("publish_date")!
@@ -270,6 +282,7 @@ async function loadPost(postsDirectory: string, path: string) {
     allowIframes: data.get("allow_iframes"),
     disableHtmlSanitization: data.get("disable_html_sanitization"),
     readTime: readingTime(content),
+    renderMath: data.get("render_math"),
   };
   POSTS.set(pathname, post);
 }
@@ -397,6 +410,7 @@ export async function handler(
         gfm.CSS,
         `.markdown-body { --color-canvas-default: transparent !important; --color-canvas-subtle: #edf0f2; --color-border-muted: rgba(128,128,128,0.2); } .markdown-body img + p { margin-top: 16px; }`,
         ...(blogState.style ? [blogState.style] : []),
+        ...(post.renderMath ? [gfm.KATEX_CSS] : []),
       ],
       body: <PostPage post={post} state={blogState} />,
     });
@@ -509,7 +523,9 @@ export function redirects(redirectMap: Record<string, string>): BlogMiddleware {
     }
 
     if (maybeRedirect) {
-      if (!maybeRedirect.startsWith("/")) {
+      if (
+        !maybeRedirect.startsWith("/") && !(maybeRedirect.startsWith("http"))
+      ) {
         maybeRedirect = "/" + maybeRedirect;
       }
 
