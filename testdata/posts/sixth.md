@@ -13,6 +13,7 @@ render_math: true
 ---
 
 # Tags
+
 - Tags make it easier for readers to find the desired article.
 
 ```markdown
@@ -20,6 +21,7 @@ render_math: true
 tags: ["deno", "tags"]
 ---
 ```
+
 or
 
 ```markdown
