@@ -78,6 +78,8 @@ export interface BlogSettings {
   hostname?: string;
   /** Whether to display readtime or not */
   readtime?: boolean;
+  /** Custom directory to looking for blog content */
+  customDirectory?: string;
 }
 
 export interface BlogState extends BlogSettings {
