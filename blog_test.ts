@@ -340,20 +340,20 @@ Deno.test("Plaintext response", async () => {
 });
 
 Deno.test(
-  "custom directory for blog",
+  "custom root directory for blog",
   async () => {
     const blogState = await configureBlog(BLOG_URL, false, {
       author: "The author",
       title: "Test blog",
       description: "This is some description.",
       lang: "en-GB",
-      customDirectory: join(TESTDATA_PATH, "./customDir"),
+      rootDirectory: join(TESTDATA_PATH, "./customRootDir"),
     });
-    const customDirectoryBlogHandler = createBlogHandler(blogState);
-    const customDirectoryTestHandler = (req: Request) => {
-      return customDirectoryBlogHandler(req, CONN_INFO);
+    const customRootDirectoryBlogHandler = createBlogHandler(blogState);
+    const customRootDirectoryTestHandler = (req: Request) => {
+      return customRootDirectoryBlogHandler(req, CONN_INFO);
     };
-    const resp = await customDirectoryTestHandler(
+    const resp = await customRootDirectoryTestHandler(
       new Request("https://blog.deno.dev/custom"),
     );
     assert(resp);

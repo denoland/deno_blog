@@ -185,7 +185,7 @@ export async function configureBlog(
     ...settings,
   };
 
-  await loadContent(settings?.customDirectory ?? directory, isDev);
+  await loadContent(settings?.rootDirectory ?? directory, isDev);
 
   return state;
 }
