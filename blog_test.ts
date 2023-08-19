@@ -340,7 +340,7 @@ Deno.test("Plaintext response", async () => {
 });
 
 Deno.test(
-  "custom root directory for blog",
+  "custom root directory",
   async () => {
     const blogState = await configureBlog(BLOG_URL, false, {
       author: "The author",

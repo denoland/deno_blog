@@ -78,7 +78,7 @@ export interface BlogSettings {
   hostname?: string;
   /** Whether to display readtime or not */
   readtime?: boolean;
-  /** Custom root directory to looking for blog files and content */
+  /** The root directory of the blog contents */
   rootDirectory?: string;
 }
 

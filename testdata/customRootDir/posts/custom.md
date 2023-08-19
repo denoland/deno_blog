@@ -1,7 +1,7 @@
 ---
 title: Custom post
 publish_date: 2022-03-20
-abstract: This is the first post in custom directory.
+abstract: This is the first post with a custom root directory.
 ---
 
 It was popularised in the 1960s with the release of Letraset sheets containing
