@@ -338,3 +338,28 @@ Deno.test("Plaintext response", async () => {
   const body = await resp.text();
   assert(body.startsWith("It was popularised in the 1960s"));
 });
+
+Deno.test(
+  "custom directory for blog",
+  async () => {
+    const blogState = await configureBlog(BLOG_URL, false, {
+      author: "The author",
+      title: "Test blog",
+      description: "This is some description.",
+      lang: "en-GB",
+      customDirectory: join(TESTDATA_PATH, "./customDir"),
+    });
+    const customDirectoryBlogHandler = createBlogHandler(blogState);
+    const customDirectoryTestHandler = (req: Request) => {
+      return customDirectoryBlogHandler(req, CONN_INFO);
+    };
+    const resp = await customDirectoryTestHandler(
+      new Request("https://blog.deno.dev/custom"),
+    );
+    assert(resp);
+    assertEquals(resp.status, 200);
+    assertEquals(resp.headers.get("content-type"), "text/html; charset=utf-8");
+    const body = await resp.text();
+    assertStringIncludes(body, `Custom post`);
+  },
+);
