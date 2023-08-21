@@ -153,7 +153,9 @@ Deno.test("posts/ fourth", async () => {
 });
 
 Deno.test("posts/ seventh", async () => {
-  const resp = await testHandler(new Request("https://blog.deno.dev/uses-pathname"));
+  const resp = await testHandler(
+    new Request("https://blog.deno.dev/uses-pathname"),
+  );
   assert(resp);
   assertEquals(resp.status, 200);
   assertEquals(resp.headers.get("content-type"), "text/html; charset=utf-8");
