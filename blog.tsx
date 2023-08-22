@@ -284,6 +284,10 @@ async function loadPost(postsDirectory: string, path: string) {
     readTime: readingTime(content),
     renderMath: data.get("render_math"),
   };
+
+  if (POSTS.get(pathname)) {
+    console.warn(`Duplicate blog post path: ${pathname}`);
+  }
   POSTS.set(pathname, post);
 }
 

@@ -1,8 +1,8 @@
 ---
-title: Fifth post
-pathname: "/fifth"
+title: Seventh post
+pathname: "/uses-pathname"
 publish_date: 2022-05-02
-abstract: This is the fifth post.
+abstract: This is the seventh post.
 ---
 
 Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem
