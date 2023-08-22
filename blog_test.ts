@@ -185,6 +185,30 @@ Deno.test("posts/ 中文", async () => {
   assertStringIncludes(body, `<p>你好，世界！`);
 });
 
+Deno.test("posts/ sixth", async () => {
+  const resp = await testHandler(new Request("https://blog.deno.dev/sixth"));
+  assert(resp);
+  assertEquals(resp.status, 200);
+  assertEquals(resp.headers.get("content-type"), "text/html; charset=utf-8");
+  const body = await resp.text();
+  assertStringIncludes(
+    body,
+    `<a class="text-bluegray-500 font-bold" href="/?tag=sample">#sample</a>`,
+  );
+  assertStringIncludes(
+    body,
+    `<a class="text-bluegray-500 font-bold" href="/?tag=tags">#tags</a>`,
+  );
+  assertStringIncludes(body, `<html lang="en-GB">`);
+  assertStringIncludes(
+    body,
+    `<link rel="canonical" href="https://blog.deno.dev/sixth" />`,
+  );
+  assertStringIncludes(body, `Sixth post`);
+  assertStringIncludes(body, `<time dateTime="2023-08-17T00:00:00.000Z">`);
+  assertStringIncludes(body, `Tags make it easier for readers`);
+});
+
 Deno.test("posts/ trailing slash redirects", async () => {
   const resp = await testHandler(new Request("https://blog.deno.dev/second/"));
   assert(resp);
