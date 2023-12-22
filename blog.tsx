@@ -180,12 +180,15 @@ export async function configureBlog(
     throw new Error("Cannot run blog from a remote URL.");
   }
 
+  // Override blog directory, if `rootDirectory` is provided
+  directory = settings?.rootDirectory ?? directory;
+
   const state: BlogState = {
     directory,
     ...settings,
   };
 
-  await loadContent(settings?.rootDirectory ?? directory, isDev);
+  await loadContent(directory, isDev);
 
   return state;
 }
