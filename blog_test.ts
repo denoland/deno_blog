@@ -362,11 +362,16 @@ Deno.test(
     const body = await resp.text();
     assertStringIncludes(body, `Custom post`);
     const respStaticFile = await customRootDirectoryTestHandler(
-        new Request("https://blog.deno.dev/cat_custom_path.png"),
+      new Request("https://blog.deno.dev/cat_custom_path.png"),
     );
     assertEquals(respStaticFile.status, 200);
     assertEquals(respStaticFile.headers.get("content-type"), "image/png");
     const bytes = new Uint8Array(await respStaticFile.arrayBuffer());
-    assertEquals(bytes, await Deno.readFile(join(TESTDATA_PATH, "./customRootDir/cat_custom_path.png")));
+    assertEquals(
+      bytes,
+      await Deno.readFile(
+        join(TESTDATA_PATH, "./customRootDir/cat_custom_path.png"),
+      ),
+    );
   },
 );
