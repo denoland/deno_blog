@@ -5,7 +5,7 @@ import {
   assert,
   assertEquals,
   assertStringIncludes,
-} from "https://deno.land/std@0.214.0/testing/asserts.ts";
+} from "https://deno.land/std@0.214.0/assert/mod.ts";
 import { fromFileUrl, join } from "https://deno.land/std@0.214.0/path/mod.ts";
 
 const BLOG_URL = new URL("./testdata/main.js", import.meta.url).href;
