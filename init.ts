@@ -1,6 +1,6 @@
 // Copyright 2022 the Deno authors. All rights reserved. MIT license.
 
-import { join, resolve } from "https://deno.land/std@0.193.0/path/mod.ts";
+import { join, resolve } from "https://deno.land/std@0.214.0/path/mod.ts";
 
 const HELP = `deno_blog
 
