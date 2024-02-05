@@ -8,10 +8,6 @@ export {
   join,
   relative,
 } from "https://deno.land/std@0.214.0/path/mod.ts";
-export {
-  type ConnInfo,
-  serve,
-} from "https://deno.land/std@0.214.0/http/mod.ts";
 export { extract as frontMatter } from "https://deno.land/std@0.214.0/front_matter/any.ts";
 
 export * as gfm from "https://deno.land/x/gfm@0.2.5/mod.ts";
