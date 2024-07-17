@@ -228,11 +228,16 @@ async function watchForChanges(postsDirectory: string) {
         if (path.endsWith(".md")) {
           try {
             await loadPost(postsDirectory, path);
+          } catch (err) {
+            if (err instanceof Deno.errors.NotFound) {
+              POSTS.delete(("/" + relative(postsDirectory, path)).slice(0, -3));
+            } else {
+              console.error(`loadPost ${path} error:`, err.message);
+            }
+          } finally {
             HMR_SOCKETS.forEach((socket) => {
               socket.send("refresh");
             });
-          } catch (err) {
-            console.error(`loadPost ${path} error:`, err.message);
           }
         }
       }
