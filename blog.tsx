@@ -106,8 +106,8 @@ export default async function blog(settings?: BlogSettings) {
   html.use(UnoCSS(settings?.unocss)); // Load custom unocss module if provided
   html.use(ColorScheme("auto"));
 
-  const url = callsites()[1].getFileName()!;
-  const blogState = await configureBlog(url, IS_DEV, settings);
+  const blogPath = callsites()[1].getFileName()!;
+  const blogState = await configureBlog(blogPath, IS_DEV, settings);
 
   const blogHandler = createBlogHandler(blogState);
   serve(blogHandler, {
@@ -166,14 +166,14 @@ function composeMiddlewares(state: BlogState) {
 }
 
 export async function configureBlog(
-  url: string,
+  blogPath: string,
   isDev: boolean,
   settings?: BlogSettings,
 ): Promise<BlogState> {
   let directory;
 
   try {
-    const blogPath = fromFileUrl(url);
+    // const blogPath = fromFileUrl(`file://${url}`);
     directory = dirname(blogPath);
   } catch (e) {
     console.error(e);
