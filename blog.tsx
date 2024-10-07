@@ -22,14 +22,13 @@ import {
   join,
   relative,
   removeMarkdown,
-  serve,
   serveDir,
   UnoCSS,
   walk,
 } from "./deps.ts";
-import { pooledMap } from "https://deno.land/std@0.187.0/async/pool.ts";
+import { pooledMap } from "https://deno.land/std@0.214.0/async/pool.ts";
 import { Index, PostPage } from "./components.tsx";
-import type { ConnInfo, FeedItem } from "./deps.ts";
+import type { FeedItem } from "./deps.ts";
 import type {
   BlogContext,
   BlogMiddleware,
@@ -37,7 +36,7 @@ import type {
   BlogState,
   Post,
 } from "./types.d.ts";
-import { WalkEntry } from "https://deno.land/std@0.176.0/fs/walk.ts";
+import { WalkEntry } from "https://deno.land/std@0.214.0/fs/walk.ts";
 
 export { Fragment, h };
 
@@ -110,17 +109,17 @@ export default async function blog(settings?: BlogSettings) {
   const blogState = await configureBlog(url, IS_DEV, settings);
 
   const blogHandler = createBlogHandler(blogState);
-  serve(blogHandler, {
+  Deno.serve({
     port: blogState.port,
     hostname: blogState.hostname,
     onError: errorHandler,
-  });
+  }, blogHandler);
 }
 
 export function createBlogHandler(state: BlogState) {
   const inner = handler;
   const withMiddlewares = composeMiddlewares(state);
-  return function handler(req: Request, connInfo: ConnInfo) {
+  return function handler(req: Request, connInfo: Deno.ServeHandlerInfo) {
     // Redirect requests that end with a trailing slash
     // to their non-trailing slash counterpart.
     // Ex: /about/ -> /about
@@ -136,7 +135,7 @@ export function createBlogHandler(state: BlogState) {
 function composeMiddlewares(state: BlogState) {
   return (
     req: Request,
-    connInfo: ConnInfo,
+    connInfo: Deno.ServeHandlerInfo,
     inner: (req: Request, ctx: BlogContext) => Promise<Response>,
   ) => {
     const mws = state.middlewares?.slice().reverse();

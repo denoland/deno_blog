@@ -1,18 +1,14 @@
 // Copyright 2022 the Deno authors. All rights reserved. MIT license.
 
-export { serveDir } from "https://deno.land/std@0.193.0/http/file_server.ts";
-export { walk } from "https://deno.land/std@0.193.0/fs/walk.ts";
+export { serveDir } from "https://deno.land/std@0.214.0/http/file_server.ts";
+export { walk } from "https://deno.land/std@0.214.0/fs/walk.ts";
 export {
   dirname,
   fromFileUrl,
   join,
   relative,
-} from "https://deno.land/std@0.193.0/path/mod.ts";
-export {
-  type ConnInfo,
-  serve,
-} from "https://deno.land/std@0.193.0/http/mod.ts";
-export { extract as frontMatter } from "https://deno.land/std@0.193.0/front_matter/any.ts";
+} from "https://deno.land/std@0.214.0/path/mod.ts";
+export { extract as frontMatter } from "https://deno.land/std@0.214.0/front_matter/any.ts";
 
 export * as gfm from "https://deno.land/x/gfm@0.2.5/mod.ts";
 export { Fragment, h } from "https://deno.land/x/htm@0.1.3/mod.ts";

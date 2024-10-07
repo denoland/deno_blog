@@ -1,10 +1,10 @@
 // Copyright 2022 the Deno authors. All rights reserved. MIT license.
 
-import type { ConnInfo, UnoConfig, VNode } from "./deps.ts";
+import type { UnoConfig, VNode } from "./deps.ts";
 
 export interface BlogContext {
   state: BlogState;
-  connInfo: ConnInfo;
+  connInfo: Deno.ServeHandlerInfo;
   next: () => Promise<Response>;
 }
 
