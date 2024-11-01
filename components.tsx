@@ -17,6 +17,8 @@ const socialAppIcons = new Map([
   ["instagram.com", IconInstagram],
   ["linkedin.com", IconLinkedin],
   ["mastodon.social", IconMastodon],
+  ["youtube.com", IconYoutube],
+  ["orcid.org", IconOrcid],
 ]);
 
 interface IndexProps {
@@ -455,3 +457,36 @@ function IconMastodon() {
     </svg>
   );
 }
+
+function IconYoutube() {
+  return (
+    <svg
+      className="inline-block w-4 h-4"
+      viewBox="0 0 121.4 85"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M118.9,13.3C121.5,22.8 121.4,42.6 121.4,42.6C121.4,42.6 121.4,62.3 118.9,71.8C117.5,77 113.4,81.1 108.2,82.5C98.7,85 60.7,85 60.7,85C60.7,85 22.8,85 13.2,82.4C8,81 3.9,76.9 2.5,71.7C0,62.3 0,42.5 0,42.5C0,42.5 0,22.8 2.5,13.3C3.9,8.1 8.1,3.9 13.2,2.5C22.7,0 60.7,0 60.7,0C60.7,0 98.7,0 108.2,2.6C113.4,4 117.5,8.1 118.9,13.3ZM80.2,42.5L48.6,24.3L48.6,60.7L80.2,42.5Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
+function IconOrcid() {
+  return (
+    <svg
+      className="inline-block w-4 h-4"
+      viewBox="0 0 256 256"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M256,128C256,198.7 198.7,256 128,256C57.3,256 0,198.7 0,128C0,57.3 57.3,0 128,0C198.7,0 256,57.3 256,128ZM86.3,186.2L86.3,79.1L70.9,79.1L70.9,186.2L86.3,186.2ZM108.9,79.1L108.9,186.3L150.7,186.3C186,186.3 207.5,160.2 207.5,132.7C207.5,107.4 190.1,79.1 150.5,79.1L108.9,79.1ZM124.3,172.4L124.3,93L148,93C178,93 191.7,111.2 191.7,132.7C191.7,145.9 183.7,172.4 148.8,172.4L124.3,172.4ZM88.7,56.8C88.7,51.3 84.2,46.7 78.6,46.7C73,46.7 68.5,51.2 68.5,56.8C68.5,62.3 73,66.9 78.6,66.9C84.2,66.9 88.7,62.3 88.7,56.8Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
+
+
