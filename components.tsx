@@ -473,6 +473,7 @@ function IconYoutube() {
     </svg>
   );
 }
+
 function IconOrcid() {
   return (
     <svg
@@ -488,5 +489,3 @@ function IconOrcid() {
     </svg>
   );
 }
-
-
