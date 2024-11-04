@@ -107,5 +107,5 @@ To deploy the project to the live internet, you can use
 You can also self-host the blog, in such case run:
 
 ```sh
-$ deno task serve
+deno task serve
 ```
