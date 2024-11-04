@@ -7,8 +7,9 @@
 /// <reference lib="dom.asynciterable" />
 /// <reference lib="deno.ns" />
 
-import { Fragment, gfm, h } from "./deps.ts";
-import type { BlogState, DateFormat, Post } from "./types.d.ts";
+import * as gfm from "@deno/gfm";
+import { h } from "@denoland/htm";
+import type { BlogState, DateFormat, Post } from "../types.d.ts";
 
 const socialAppIcons = new Map([
   ["github.com", IconGithub],

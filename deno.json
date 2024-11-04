@@ -1,0 +1,26 @@
+{
+  "tasks": {
+    "dev": "deno run --allow-net --allow-read --allow-env=NODE_DEBUG,NO_COLOR,FORCE_COLOR,TERM --watch --no-check ./content/main.tsx --dev",
+    "test": "deno test --allow-net --allow-read --allow-env=NODE_DEBUG,NO_COLOR,FORCE_COLOR,TERM --no-check=remote",
+    "serve": "deno run --allow-net --allow-read --allow-env --no-check ./content/main.tsx"
+  },
+  "imports": {
+    "@deno/gfm": "jsr:@deno/gfm@^0.10.0",
+    "@std/testing": "jsr:@std/testing@^1.0.4",
+    "@std/assert": "jsr:@std/assert@^1.0.7",
+    "@std/async": "jsr:@std/async@^1.0.8",
+    "@std/front-matter": "jsr:@std/front-matter@^1.0.5",
+    "@std/fs": "jsr:@std/fs@^1.0.5",
+    "@std/http": "jsr:@std/http@^1.0.9",
+    "@std/path": "jsr:@std/path@^1.0.8",
+    "@denoland/htm": "https://deno.land/x/htm@0.1.3/mod.ts",
+    "@denoland/htm/plugins/color-scheme": "https://deno.land/x/htm@0.1.3/plugins/color-scheme.ts",
+    "@denoland/htm/plugins/unocss": "https://deno.land/x/htm@0.1.3/plugins/unocss.ts",
+    "@denoland/g_a": "https://deno.land/x/g_a@0.1.2/mod.ts",
+    "@githubcontent/kt3k/callsites": "https://raw.githubusercontent.com/kt3k/callsites/v1.0.0/mod.ts",
+    "@esm/feed": "https://esm.sh/feed@4.2.2",
+    "@esm/remove-markdown": "https://esm.sh/remove-markdown@0.5.0",
+    "@esm/prism-c": "https://esm.sh/prismjs@1.29.0/components/prism-c?no-check",
+    "@outdated/std-http": "https://deno.land/std@0.193.0/http/mod.ts"
+  }
+}
