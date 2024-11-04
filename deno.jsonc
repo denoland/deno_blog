@@ -3,5 +3,8 @@
   "tasks": {
     "demo": "deno run  --allow-net --allow-read --allow-env=NODE_DEBUG --watch --no-check testdata/my_blog.ts --dev",
     "test": "deno test --no-check=remote --allow-read"
+  },
+  "imports": {
+    "@deno/gfm": "jsr:@deno/gfm@^0.10.0"
   }
 }
