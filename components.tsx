@@ -127,6 +127,7 @@ function PostCard(
   { post, dateFormat }: {
     post: Post;
     dateFormat?: DateFormat;
+    lang?: string;
   },
 ) {
   return (
@@ -231,7 +232,7 @@ export function PostPage({ post, state }: PostPageProps) {
   );
 }
 
-function Footer() {
+function Footer(_props: { author?: string }) {
   return (
     <footer class="mt-20 pb-16 lt-sm:pb-8 lt-sm:mt-16">
       <p class="flex items-center gap-2.5 text-gray-400/800 dark:text-gray-500/800 text-sm">
