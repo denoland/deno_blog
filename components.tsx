@@ -7,7 +7,7 @@
 /// <reference lib="dom.asynciterable" />
 /// <reference lib="deno.ns" />
 
-import { Fragment, gfm, h } from "./deps.ts";
+import { gfm, h } from "./deps.ts";
 import type { BlogState, DateFormat, Post } from "./types.d.ts";
 
 const socialAppIcons = new Map([
@@ -124,7 +124,7 @@ export function Index({ state, posts }: IndexProps) {
 }
 
 function PostCard(
-  { post, dateFormat, lang }: {
+  { post, dateFormat }: {
     post: Post;
     dateFormat?: DateFormat;
     lang?: string;
@@ -232,7 +232,7 @@ export function PostPage({ post, state }: PostPageProps) {
   );
 }
 
-function Footer(props: { author?: string }) {
+function Footer(_props: { author?: string }) {
   return (
     <footer class="mt-20 pb-16 lt-sm:pb-8 lt-sm:mt-16">
       <p class="flex items-center gap-2.5 text-gray-400/800 dark:text-gray-500/800 text-sm">
