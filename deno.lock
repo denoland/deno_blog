@@ -23,6 +23,7 @@
     "jsr:@std/toml@^1.0.1": "1.0.1",
     "jsr:@std/yaml@^1.0.5": "1.0.5",
     "npm:@types/node@*": "22.5.4",
+    "npm:feed@^4.2.2": "4.2.2",
     "npm:github-slugger@2": "2.0.0",
     "npm:he@^1.2.0": "1.2.0",
     "npm:katex@0.16": "0.16.11",
@@ -31,6 +32,7 @@
     "npm:marked-gfm-heading-id@^3.1.0": "3.2.0_marked@12.0.2",
     "npm:marked@12": "12.0.2",
     "npm:prismjs@^1.29.0": "1.29.0",
+    "npm:remove-markdown@~0.5.5": "0.5.5",
     "npm:sanitize-html@^2.13.0": "2.13.1"
   },
   "jsr": {
@@ -181,6 +183,12 @@
     "escape-string-regexp@4.0.0": {
       "integrity": "sha512-TtpcNJ3XAzx3Gq8sWRzJaVajRs0uVxA2YAkdb1jm2YkPz4G6egUFAyA3n5vtEIZefPk5Wa4UXbKuS5fKkJWdgA=="
     },
+    "feed@4.2.2": {
+      "integrity": "sha512-u5/sxGfiMfZNtJ3OvQpXcvotFpYkL0n9u9mM2vkui2nGo8b4wvDkJ8gAkYqbA8QpGyFCv3RK0Z+Iv+9veCS9bQ==",
+      "dependencies": [
+        "xml-js"
+      ]
+    },
     "github-slugger@2.0.0": {
       "integrity": "sha512-IaOQ9puYtjrkq7Y0Ygl9KDZnrf/aiUJYUpVf89y8kyaxbRG7Y1SrX/jaumrv81vc61+kiMempujsM3Yw7w5qcw=="
     },
@@ -247,6 +255,9 @@
     "prismjs@1.29.0": {
       "integrity": "sha512-Kx/1w86q/epKcmte75LNrEoT+lX8pBpavuAbvJWRXar7Hz8jrtF+e3vY751p0R8H9HdArwaCTNDDzHg/ScJK1Q=="
     },
+    "remove-markdown@0.5.5": {
+      "integrity": "sha512-lMR8tOtDqazFT6W2bZidoXwkptMdF3pCxpri0AEokHg0sZlC2GdoLqnoaxsEj1o7/BtXV1MKtT3YviA1t7rW7g=="
+    },
     "sanitize-html@2.13.1": {
       "integrity": "sha512-ZXtKq89oue4RP7abL9wp/9URJcqQNABB5GGJ2acW1sdO8JTVl92f4ygD7Yc9Ze09VAZhnt2zegeU0tbNsdcLYg==",
       "dependencies": [
@@ -258,11 +269,20 @@
         "postcss"
       ]
     },
+    "sax@1.4.1": {
+      "integrity": "sha512-+aWOz7yVScEGoKNd4PA10LZ8sk0A/z5+nXQG5giUO5rprX9jgYsTdov9qCchZiPIZezbZH+jRut8nPodFAX4Jg=="
+    },
     "source-map-js@1.2.1": {
       "integrity": "sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA=="
     },
     "undici-types@6.19.8": {
       "integrity": "sha512-ve2KP6f/JnbPBFyobGHuerC9g1FYGn/F8n1LWTwNxCEzd6IfqTwUQcNXgEtmmQ6DlRrC1hrSrBnCZPokRrDHjw=="
+    },
+    "xml-js@1.6.11": {
+      "integrity": "sha512-7rVi2KMfwfWFl+GpPg6m80IVMWXLRjO+PxTq7V2CDhoGak0wzYzFgUY2m4XJ47OGdXd8eLE8EmwfAmdjw7lC1g==",
+      "dependencies": [
+        "sax"
+      ]
     }
   },
   "redirects": {
@@ -396,7 +416,10 @@
       "jsr:@std/fs@^1.0.5",
       "jsr:@std/http@^1.0.9",
       "jsr:@std/path@^1.0.8",
-      "jsr:@std/testing@^1.0.4"
+      "jsr:@std/testing@^1.0.4",
+      "npm:feed@^4.2.2",
+      "npm:prismjs@^1.29.0",
+      "npm:remove-markdown@~0.5.5"
     ]
   }
 }

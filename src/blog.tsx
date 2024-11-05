@@ -18,8 +18,8 @@ import { default as html, type HtmlOptions } from "@denoland/htm";
 
 import { createReporter } from "@denoland/g_a";
 import { default as callsites } from "@githubcontent/kt3k/callsites";
-import { Feed, type Item as FeedItem } from "@esm/feed";
-import { default as removeMarkdown } from "@esm/remove-markdown";
+import { Feed, type Item as FeedItem } from "feed";
+import { default as removeMarkdown } from "remove-markdown";
 
 import UnoCSS from "@denoland/htm/plugins/unocss";
 import ColorScheme from "@denoland/htm/plugins/color-scheme";
@@ -36,7 +36,7 @@ import type {
 import { WalkEntry } from "@std/fs";
 
 // Add syntax highlighting support for C by default
-import "@esm/prism-c";
+import "prismjs";
 
 export { Fragment, h };
 
