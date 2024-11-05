@@ -13,8 +13,8 @@ blog();
 
 To initialize your own blog you can run following script:
 
-```shellsession
-$ deno run -r --allow-read --allow-write https://deno.land/x/blog/init.ts ./directory/for/blog/
+```sh
+deno run -r --allow-read --allow-write https://deno.land/x/blog/init.ts ./directory/for/blog/
 ```
 
 _This command will setup a blog with a "Hello world" post so you can start
@@ -22,8 +22,8 @@ writing right away._
 
 Start local server with live reload:
 
-```shellsession
-$ deno task dev
+```sh
+deno task dev
 ```
 
 To ensure the best development experience, make sure to follow
@@ -106,6 +106,6 @@ To deploy the project to the live internet, you can use
 
 You can also self-host the blog, in such case run:
 
-```shellsession
-$ deno task serve
+```sh
+deno task serve
 ```

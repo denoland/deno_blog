@@ -1,4 +1,4 @@
-import blog from "../blog.tsx";
+import blog from "../src/blog.tsx";
 
 blog({
   author: "Dino",
