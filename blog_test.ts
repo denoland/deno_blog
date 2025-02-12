@@ -1,12 +1,8 @@
 // Copyright 2022 the Deno authors. All rights reserved. MIT license.
 
 import { configureBlog, createBlogHandler, redirects } from "./blog.tsx";
-import {
-  assert,
-  assertEquals,
-  assertStringIncludes,
-} from "https://deno.land/std@0.193.0/testing/asserts.ts";
-import { fromFileUrl, join } from "https://deno.land/std@0.193.0/path/mod.ts";
+import { assert, assertEquals, assertStringIncludes } from "@std/assert";
+import { fromFileUrl, join } from "@std/path";
 
 const BLOG_URL = new URL("./testdata/main.js", import.meta.url).href;
 const TESTDATA_PATH = fromFileUrl(new URL("./testdata/", import.meta.url));
@@ -26,17 +22,13 @@ const BLOG_SETTINGS = await configureBlog(BLOG_URL, false, {
   readtime: true,
 });
 const CONN_INFO = {
-  localAddr: {
+  remoteAddr: {
     transport: "tcp" as const,
     hostname: "0.0.0.0",
     port: 8000,
   },
-  remoteAddr: {
-    transport: "tcp" as const,
-    hostname: "0.0.0.0",
-    port: 8001,
-  },
-};
+  completed: Promise.resolve(),
+} satisfies Deno.ServeHandlerInfo;
 
 const blogHandler = createBlogHandler(BLOG_SETTINGS);
 const testHandler = (req: Request): Response | Promise<Response> => {
