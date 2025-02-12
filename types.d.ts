@@ -1,10 +1,11 @@
 // Copyright 2022 the Deno authors. All rights reserved. MIT license.
 
-import type { ConnInfo, UnoConfig, VNode } from "./deps.ts";
+import { type VNode } from "htm/html.tsx";
+import UnoCSS from "htm/plugins/unocss.ts";
 
 export interface BlogContext {
   state: BlogState;
-  connInfo: ConnInfo;
+  connInfo: Deno.ServeHandlerInfo;
   next: () => Promise<Response>;
 }
 
@@ -103,3 +104,8 @@ export interface Post {
   readTime: number;
   renderMath?: boolean;
 }
+
+export type UnoConfig = typeof UnoCSS extends (
+  arg: infer P | undefined,
+) => unknown ? P
+  : never;
