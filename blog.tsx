@@ -1,35 +1,21 @@
 // Copyright 2022 the Deno authors. All rights reserved. MIT license.
 
 /** @jsx h */
-/// <reference no-default-lib="true"/>
-/// <reference lib="dom" />
-/// <reference lib="dom.asynciterable" />
-/// <reference lib="deno.ns" />
 
-import {
-  callsites,
-  ColorScheme,
-  createReporter,
-  dirname,
-  Feed,
-  Fragment,
-  fromFileUrl,
-  frontMatter,
-  gfm,
-  h,
-  html,
-  HtmlOptions,
-  join,
-  relative,
-  removeMarkdown,
-  serve,
-  serveDir,
-  UnoCSS,
-  walk,
-} from "./deps.ts";
-import { pooledMap } from "https://deno.land/std@0.187.0/async/pool.ts";
+import * as gfm from "@deno/gfm";
+import { pooledMap } from "@std/async";
+import { extractYaml as frontMatter } from "@std/front-matter";
+import { walk, WalkEntry } from "@std/fs";
+import { serveDir } from "@std/http";
+import { dirname, fromFileUrl, join, relative } from "@std/path";
+import callsites from "callsites";
+import { Feed, type Item as FeedItem } from "feed";
+import { createReporter } from "ga";
+import html, { Fragment, h, HtmlOptions } from "htm/html.tsx";
+import ColorScheme from "htm/plugins/color-scheme.ts";
+import UnoCSS from "htm/plugins/unocss.ts";
+import removeMarkdown from "remove-markdown";
 import { Index, PostPage } from "./components.tsx";
-import type { ConnInfo, FeedItem } from "./deps.ts";
 import type {
   BlogContext,
   BlogMiddleware,
@@ -37,7 +23,6 @@ import type {
   BlogState,
   Post,
 } from "./types.d.ts";
-import { WalkEntry } from "https://deno.land/std@0.176.0/fs/walk.ts";
 
 export { Fragment, h };
 
@@ -110,17 +95,17 @@ export default async function blog(settings?: BlogSettings) {
   const blogState = await configureBlog(url, IS_DEV, settings);
 
   const blogHandler = createBlogHandler(blogState);
-  serve(blogHandler, {
+  Deno.serve({
     port: blogState.port,
     hostname: blogState.hostname,
     onError: errorHandler,
-  });
+  }, blogHandler);
 }
 
 export function createBlogHandler(state: BlogState) {
   const inner = handler;
   const withMiddlewares = composeMiddlewares(state);
-  return function handler(req: Request, connInfo: ConnInfo) {
+  return function handler(req: Request, connInfo: Deno.ServeHandlerInfo) {
     // Redirect requests that end with a trailing slash
     // to their non-trailing slash counterpart.
     // Ex: /about/ -> /about
@@ -136,7 +121,7 @@ export function createBlogHandler(state: BlogState) {
 function composeMiddlewares(state: BlogState) {
   return (
     req: Request,
-    connInfo: ConnInfo,
+    connInfo: Deno.ServeHandlerInfo,
     inner: (req: Request, ctx: BlogContext) => Promise<Response>,
   ) => {
     const mws = state.middlewares?.slice().reverse();
@@ -232,7 +217,7 @@ async function watchForChanges(postsDirectory: string) {
               socket.send("refresh");
             });
           } catch (err) {
-            console.error(`loadPost ${path} error:`, err.message);
+            console.error(`loadPost ${path} error:`, (err as Error).message);
           }
         }
       }
@@ -436,7 +421,7 @@ export async function handler(
   } catch (e) {
     if (!(e instanceof Deno.errors.NotFound)) {
       console.error(e);
-      return new Response(e.message, { status: 500 });
+      return new Response((e as Error).message, { status: 500 });
     }
   }
 
@@ -553,7 +538,7 @@ export function redirects(redirectMap: Record<string, string>): BlogMiddleware {
       return await ctx.next();
     } catch (e) {
       console.error(e);
-      return new Response(`Internal server error: ${e.message}`, {
+      return new Response(`Internal server error: ${(e as Error).message}`, {
         status: 500,
       });
     }
